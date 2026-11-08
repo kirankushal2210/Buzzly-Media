@@ -3,7 +3,7 @@
  * API routes, generated images). Static files in /public get the equivalent
  * rules from public/_headers.
  */
-const contentSecurityPolicy = [
+export const contentSecurityPolicy = [
   "default-src 'self'",
   // vinext streams RSC data and the theme bootstrap as inline scripts.
   "script-src 'self' 'unsafe-inline'",
@@ -19,7 +19,7 @@ const contentSecurityPolicy = [
   "upgrade-insecure-requests",
 ].join("; ");
 
-const baseHeaders: Record<string, string> = {
+export const baseHeaders: Record<string, string> = {
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "DENY",
   "Referrer-Policy": "strict-origin-when-cross-origin",

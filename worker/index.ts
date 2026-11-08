@@ -2,9 +2,12 @@ import handler from "vinext/server/fetch-handler";
 import { runWithConnectorBinding } from "../lib/connector-context";
 import type { ConnectorBinding } from "../lib/connector-contract.mjs";
 import { withSecurityHeaders } from "../lib/security-headers";
+import { setPlatformEnv } from "../lib/runtime-env";
 
 const worker = {
   async fetch(request: Request, env: Cloudflare.Env, ctx: ExecutionContext<{ CONNECTORS?: ConnectorBinding }>) {
+    // Expose Cloudflare bindings (D1, secrets) to platform-neutral app code.
+    setPlatformEnv(env);
     let binding = ctx.props?.CONNECTORS;
     // Local preview emulates the same request-scoped capability. This branch and
     // the auxiliary service binding are absent from production builds.

@@ -1,5 +1,6 @@
 import { emailConfig } from "@/lib/server-env";
 import { siteUrl } from "@/lib/site";
+import { interestLabels } from "@/lib/notify";
 
 export type Inquiry = { name: string; email: string; company: string; interest: string; message: string };
 
@@ -8,13 +9,6 @@ export type SendResult =
   | { status: "failed"; error: string }
   | { status: "skipped" };
 
-const interestLabels: Record<string, string> = {
-  content: "Content and social media",
-  brand: "Brand strategy",
-  distribution: "Distribution",
-  partnership: "Partnership",
-  other: "Something else",
-};
 
 export function escapeHtml(value: string) {
   return value.replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch] || ch);

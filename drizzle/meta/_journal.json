@@ -15,6 +15,13 @@
       "when": 1794143128521,
       "tag": "0001_rate_limit_auto_reply",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1794143786153,
+      "tag": "0002_lead_channels",
+      "breakpoints": true
     }
   ]
 }

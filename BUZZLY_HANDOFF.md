@@ -10,6 +10,23 @@ Home, Work, Clients, Our Companies, three company pages, About, Services, and Co
 
 Requires Node.js 22.13 or newer. Run `npm ci`, then `npm run dev`. Use `npm run build` to recreate the compiled build. The ZIP excludes `node_modules` and temporary local state.
 
+## Deploying on Vercel
+
+`vercel.json` makes Vercel run a plain `next build` (not the vinext `npm run build`, which targets Cloudflare). App code reads settings through `lib/runtime-env.ts`, so it has no Cloudflare imports; the Cloudflare D1 database is used only when the site runs on Cloudflare.
+
+Set these in Vercel → Project → Settings → Environment Variables (Production and Preview):
+
+| Variable | Purpose |
+|---|---|
+| `NEXT_PUBLIC_SITE_URL` | Production origin, e.g. `https://www.yourdomain.com` |
+| `SLACK_WEBHOOK_URL` | Slack incoming webhook (`https://hooks.slack.com/services/...`) |
+| `DISCORD_WEBHOOK_URL` | Discord channel webhook (`https://discord.com/api/webhooks/...`) |
+| `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL` | Email delivery via Resend |
+| `CONTACT_IP_SALT` | Long random string for hashing IPs |
+| `CONTACT_AUTO_REPLY` | `true` to email customers a confirmation (off by default) |
+
+Leads go to every configured channel at once; a submission succeeds if at least one channel accepts it. On Vercel there is no database, so if every channel fails the visitor is asked to try again (nothing is stored). Rate limiting on Vercel is per server instance; for a hard limit, add a Vercel Firewall rate-limit rule on `POST /api/contact` (for example 5 requests per hour per IP).
+
 ## Inquiry inbox
 
 Every contact form submission is saved to the D1 table `contact_inquiries` (see `db/schema.ts`, migration in `drizzle/`) before any email is sent, so inquiries are kept even when Resend is down or not configured. Each row records whether the email was sent (`emailed`, `email_failed`, `email_skipped`).

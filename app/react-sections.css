@@ -298,3 +298,15 @@
 .footer-legal a:hover{color:var(--cream)}
 .contact-grid p a{color:var(--cream);text-decoration:underline!important;text-underline-offset:3px}
 @media(max-width:900px){.legal{grid-template-columns:1fr;gap:30px}.legal-toc{position:static;border-bottom:1px solid var(--line);padding-bottom:20px}}
+
+/* ---------- Contact form validation states ---------- */
+.contact-form .field-required{color:var(--red)}
+.contact-form .field-optional{color:var(--soft);font-weight:400}
+.contact-form [aria-invalid="true"]{border-color:var(--red)!important;box-shadow:inset 3px 0 0 var(--red)}
+.contact-form .field-error{color:#ff7a73;font-size:13px;line-height:1.4}
+.contact-form .field-error:before{content:"! ";font-weight:700}
+.contact-form input:disabled,.contact-form textarea:disabled,.contact-form select:disabled{opacity:.6}
+.contact-status{font-size:15px;line-height:1.5;padding:0}
+.contact-status:focus{outline:none}
+.contact-status.is-success{color:var(--cream);border-left:3px solid #3ddc84;padding:12px 16px;background:#3ddc8414}
+.contact-status.is-error{color:#ff7a73}

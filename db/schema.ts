@@ -22,6 +22,8 @@ export const contactInquiries = sqliteTable(
     autoReplyStatus: text("auto_reply_status", { enum: ["received", "sent", "failed", "skipped"] }).notNull().default("received"),
     /** Salted SHA-256 of the sender IP, used only for rate limiting. Never the raw IP. */
     ipHash: text("ip_hash"),
+    /** Per-channel delivery outcome, e.g. {"email":"skipped","slack":"sent","discord":"failed"} */
+    channels: text("channels"),
     userAgent: text("user_agent"),
     createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
     emailedAt: text("emailed_at"),

@@ -1,8 +1,6 @@
 import { and, count, eq, gt } from "drizzle-orm";
-import type { getDb } from "@/db";
+import type { Db } from "@/db";
 import { contactInquiries } from "@/db/schema";
-
-type Db = ReturnType<typeof getDb>;
 
 /** Limits for the contact form. Generous for people, tight for scripts. */
 export const CONTACT_LIMITS = {

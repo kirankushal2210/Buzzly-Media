@@ -1,13 +1,12 @@
-import { env } from "cloudflare:workers";
+import { getEnvVar } from "@/lib/runtime-env";
 
-type StringVar = "RESEND_API_KEY" | "CONTACT_TO_EMAIL" | "CONTACT_FROM_EMAIL" | "CONTACT_AUTO_REPLY" | "CONTACT_IP_SALT";
+type StringVar =
+  | "RESEND_API_KEY" | "CONTACT_TO_EMAIL" | "CONTACT_FROM_EMAIL"
+  | "SLACK_WEBHOOK_URL" | "DISCORD_WEBHOOK_URL"
+  | "CONTACT_AUTO_REPLY" | "CONTACT_IP_SALT";
 
-/** Reads a secret/var from the Worker environment, falling back to process.env (local .env files). */
 export function serverVar(name: StringVar): string | undefined {
-  const fromWorker = (env as unknown as Record<string, unknown>)[name];
-  if (typeof fromWorker === "string" && fromWorker.trim()) return fromWorker.trim();
-  const fromProcess = typeof process !== "undefined" ? process.env?.[name] : undefined;
-  return fromProcess?.trim() || undefined;
+  return getEnvVar(name);
 }
 
 export function emailConfig() {
@@ -17,9 +16,41 @@ export function emailConfig() {
   return apiKey && to && from ? { apiKey, to, from } : null;
 }
 
-/** Customer confirmation emails are on unless CONTACT_AUTO_REPLY is "false". */
+/** Only real Slack/Discord webhook hosts are accepted (plus localhost outside production, for testing). */
+function webhookUrl(name: "SLACK_WEBHOOK_URL" | "DISCORD_WEBHOOK_URL", allowedHosts: string[], pathPrefix: string) {
+  const raw = serverVar(name);
+  if (!raw) return null;
+  try {
+    const url = new URL(raw);
+    const local = process.env.NODE_ENV !== "production" && (url.hostname === "localhost" || url.hostname === "127.0.0.1");
+    if (local) return url.toString();
+    if (url.protocol !== "https:" || !allowedHosts.includes(url.hostname) || !url.pathname.startsWith(pathPrefix)) {
+      console.error(`${name} is not a valid webhook URL; ignoring it.`);
+      return null;
+    }
+    return url.toString();
+  } catch {
+    console.error(`${name} is not a valid URL; ignoring it.`);
+    return null;
+  }
+}
+
+export function slackWebhook() {
+  return webhookUrl("SLACK_WEBHOOK_URL", ["hooks.slack.com"], "/services/");
+}
+
+export function discordWebhook() {
+  return webhookUrl("DISCORD_WEBHOOK_URL", ["discord.com", "discordapp.com", "ptb.discord.com", "canary.discord.com"], "/api/webhooks/");
+}
+
+/** True when at least one place can receive a lead. */
+export function anyLeadChannel() {
+  return Boolean(emailConfig() || slackWebhook() || discordWebhook());
+}
+
+/** Customer confirmation emails are off unless CONTACT_AUTO_REPLY is "true". */
 export function autoReplyEnabled() {
-  return serverVar("CONTACT_AUTO_REPLY")?.toLowerCase() !== "false";
+  return serverVar("CONTACT_AUTO_REPLY")?.toLowerCase() === "true";
 }
 
 /** Salt for hashing IPs. Set CONTACT_IP_SALT in production; the fallback only keeps local dev working. */
