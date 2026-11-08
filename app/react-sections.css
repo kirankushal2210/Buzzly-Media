@@ -336,3 +336,25 @@
 .faq-answer{padding:0 0 28px;color:var(--soft);font-size:16px;line-height:1.6;max-width:850px;animation:riseIn .35s both}
 .faq-answer p{margin:0}
 
+/* ---------- Contact Page Extras & Direct Actions ---------- */
+.contact-direct-actions{display:flex;flex-direction:column;gap:12px;margin-top:32px;padding-top:28px;border-top:1px solid var(--line)}
+.contact-direct-actions h3{font:400 24px/1.2 'Instrument Serif',serif;margin:0 0 4px;color:var(--cream)}
+.contact-direct-actions p{font-size:14px;color:var(--soft);line-height:1.5;margin:0 0 12px}
+.contact-direct-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:13px 22px;border-radius:999px;font-size:13px;font-weight:700;letter-spacing:.04em;text-decoration:none;transition:all .2s;cursor:pointer}
+.contact-direct-btn.is-calendar{background:var(--red);color:#111}
+.contact-direct-btn.is-calendar:hover{background:#ff4d46;transform:translateY(-1px)}
+.contact-direct-btn.is-whatsapp{background:#25D366;color:#111;margin-top:4px}
+.contact-direct-btn.is-whatsapp:hover{background:#2ee071;transform:translateY(-1px)}
+.contact-trust-badge{margin-top:20px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--soft);letter-spacing:.02em}
+.contact-trust-dot{width:8px;height:8px;border-radius:50%;background:#3ddc84;box-shadow:0 0 10px #3ddc84}
+
+/* ---------- Services Audit Banner ---------- */
+.services-audit-banner{max-width:1500px;margin:80px auto;padding:0 clamp(20px,8vw,130px)}
+.audit-card{background:linear-gradient(135deg,#1f1b1b,#181515);border:1px solid #403b38;padding:clamp(32px,5vw,56px);border-radius:20px;display:flex;flex-direction:column;align-items:flex-start;position:relative;overflow:hidden}
+.audit-card:before{content:"";position:absolute;top:-50%;right:-20%;width:400px;height:400px;background:radial-gradient(circle,#ef342d18 0%,transparent 70%);pointer-events:none}
+.audit-card h2{font:400 clamp(32px,4vw,52px)/1.1 'Instrument Serif',serif;margin:12px 0 14px;color:var(--cream);letter-spacing:-.02em}
+.audit-card p{color:var(--soft);font-size:16px;line-height:1.6;max-width:680px;margin:0 0 28px}
+.audit-btn{display:inline-flex;align-items:center;padding:14px 28px;background:var(--red);color:#111;font-weight:700;font-size:14px;letter-spacing:.04em;border-radius:999px;text-decoration:none;transition:all .2s}
+.audit-btn:hover{background:#ff4d46;transform:translateY(-2px);box-shadow:0 8px 24px #ef342d33}
+
+

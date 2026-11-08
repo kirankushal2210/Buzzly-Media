@@ -67,9 +67,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   // One preload hint per critical font (React dedupes these; <link> tags were emitted twice).
   for (const font of fonts) preload(`/fonts/${font}.woff2`, { as: "font", type: "font/woff2", crossOrigin: "anonymous" });
   return <html lang="en" suppressHydrationWarning><head>
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="alternate icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     {/* Enables scroll-reveal styles only when JavaScript runs; content stays visible otherwise. */}
     <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />

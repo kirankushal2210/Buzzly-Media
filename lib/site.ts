@@ -35,3 +35,16 @@ export const studioStatus = {
  * "https://www.instagram.com/buzzly", "https://www.linkedin.com/company/buzzly".
  */
 export const socialLinks: string[] = [];
+
+/**
+ * Buzzly's WhatsApp Business number in international format, digits only
+ * (country code first, no "+", spaces or dashes), e.g. "919876543210".
+ * The contact page hides its WhatsApp button while this is null.
+ */
+export const whatsappNumber: string | null = null;
+
+/** wa.me chat link with a prefilled greeting, or null when no number is set. */
+export function whatsappLink(message = "Hi Buzzly Media, I would like to discuss a project for my brand.") {
+  const digits = whatsappNumber?.replace(/\D/g, "");
+  return digits ? `https://wa.me/${digits}?text=${encodeURIComponent(message)}` : null;
+}

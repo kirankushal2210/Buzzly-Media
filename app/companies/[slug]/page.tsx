@@ -5,7 +5,7 @@ import { Interior } from "@/components/Interior";
 import { companies } from "@/lib/content";
 import { InViewVideo } from "@/components/InViewVideo";
 export function generateStaticParams() { return companies.map(({ slug }) => ({ slug })); }
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> { const { slug } = await params; const company = companies.find(c => c.slug === slug); return { title: company ? `${company.name} · Buzzly sub-company` : "Sub-company", alternates: { canonical: `/companies/${slug}` }, description: company ? `${company.intro} Explore the sub-company Buzzly owns and is building through content and distribution.` : undefined }; }
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> { const { slug } = await params; const company = companies.find(c => c.slug === slug); return { title: company ? `${company.name} · Buzzly sub-company` : "Sub-company", alternates: { canonical: `/companies/${slug}` }, description: company?.intro }; }
 export default async function CompanyPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const company = companies.find(c => c.slug === slug);
