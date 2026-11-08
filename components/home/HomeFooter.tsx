@@ -22,7 +22,7 @@ export function HomeFooter({ variant = "home" }: { variant?: "home" | "interior"
     <footer className="sitefooter" id="contact">
       <FooterGrid />
       <div className="footer-intro wrap">
-        <p>Buzzly builds brands through content, bringing together strategy, storytelling, and distribution for our own companies and ambitious partners.</p>
+        <p>Buzzly builds brands through content, bringing together strategy, storytelling, and distribution for our own sub-companies and ambitious outside partners.</p>
         <Link className="cta" href="/contact">Let’s Connect</Link>
       </div>
       <div className="footer-live wrap">
@@ -30,12 +30,12 @@ export function HomeFooter({ variant = "home" }: { variant?: "home" | "interior"
           <span className="footer-status-dot" aria-hidden="true" />
           <div><strong>{studioStatus.label}</strong><small>{studioStatus.detail}</small></div>
         </div>
-        <ul className="footer-building" aria-label="Companies currently in build">
+        <ul className="footer-building" aria-label="Sub-companies currently in build">
           {companies.map(company => (
             <li key={company.slug} style={{ ["--accent" as string]: company.accent }}>
               <span className="footer-status-dot is-small" aria-hidden="true" />
               <Link href={`/companies/${company.slug}`}>{company.name}</Link>
-              <small>In build</small>
+              <small>Sub-company in build</small>
             </li>
           ))}
         </ul>
@@ -45,7 +45,7 @@ export function HomeFooter({ variant = "home" }: { variant?: "home" | "interior"
         <a className="footer-wordmark" href="#top" aria-label="Buzzly — back to top">Buzzly<span>.</span></a>
         <span className="footer-symbol" aria-hidden="true">✳</span>
         <p>Building brands through content. Ours and everyone else’s.</p>
-        <nav aria-label="Our companies">
+        <nav aria-label="Our sub-companies">
           {companies.map(company => <Link key={company.slug} href={`/companies/${company.slug}`}>{company.name}</Link>)}
         </nav>
         <nav aria-label="Footer navigation">

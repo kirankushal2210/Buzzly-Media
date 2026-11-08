@@ -8,20 +8,20 @@ import { caseStudies } from "@/lib/work";
 
 export const metadata: Metadata = {
   title: "Client Confessions and Wins",
-  description: "The brands Buzzly builds with, what partners say about the work, and the outcomes behind each story.",
+  description: "The outside brands Buzzly builds with, what partners say about the work, and the outcomes behind each story.",
   alternates: { canonical: "/clients" },
 };
 
 export default function Clients() {
   return (
-    <Interior eyebrow="BUZZLY / PEOPLE WE BUILD WITH" title="Client Confessions and Wins." intro="The brands we build with, what they say about the work, and where each story landed.">
-      <section className="clients-logos" aria-label="Brands we build with">
-        <p>BRANDS WE BUILD WITH</p>
+    <Interior eyebrow="BUZZLY / PEOPLE WE BUILD WITH" title="Client Confessions and Wins." intro="The outside brands and partner businesses we build with, what they say about our collaboration, and where each campaign landed. Buzzly’s own sub-companies are built separately and are never presented here as clients.">
+      <section className="clients-logos" aria-label="Partner industries">
+        <p>PARTNER INDUSTRIES & COLLABORATIONS</p>
         <div className="clients-logo-grid">
           {clientLogos.map(logo => (
-            <Link key={logo.name} href={logo.href ?? "/contact"} className={`clients-logo${logo.name === "Your brand" ? " is-open" : ""}`}>
+            <Link key={logo.name} href={logo.href ?? "/contact"} className={`clients-logo${logo.name === "Your Brand" ? " is-open" : ""}`}>
               <span>{logo.field}</span>
-              <strong>{logo.name}{logo.name === "Your brand" ? " ↗" : ""}</strong>
+              <strong>{logo.name}{logo.name === "Your Brand" ? " ↗" : ""}</strong>
             </Link>
           ))}
         </div>
@@ -32,7 +32,7 @@ export default function Clients() {
       <section className="outcome-section" aria-labelledby="outcomes-title">
         <header>
           <div><p className="interior-eyebrow">BUZZLY / OUTCOMES</p><h2 id="outcomes-title">You win.<br /><em>We grin.</em></h2></div>
-          <p>Every story starts with a brief and ends with something you can point to. Open a card for the full problem, solution, and results.</p>
+          <p>Every story starts with a brief and ends with something you can point to. Partner work sits alongside the sub-companies Buzzly owns and builds itself, which are clearly marked. Open a card for the full problem, solution, and results.</p>
         </header>
         <div className="outcome-grid">
           {caseStudies.map(study => {
@@ -41,10 +41,10 @@ export default function Clients() {
               <Link key={study.slug} className="outcome-card" href={`/work/${study.slug}`} style={{ ["--accent" as string]: study.accent }}>
                 <Image src={study.poster} alt="" width={960} height={540} sizes="(max-width: 750px) 100vw, (max-width: 1000px) 50vw, 25vw" />
                 <div>
-                  <span>{study.categoryLabel}</span>
+                  <span>{study.isSubCompany ? "Buzzly sub-company · Owned venture" : study.categoryLabel}</span>
                   <strong>{headline.value}</strong>
-                  <p>{headline.label} — {study.client}</p>
-                  <small>{study.illustrative ? "Illustrative scenario · not a client result" : "Read the case study ↗"}</small>
+                  <p>{headline.label} — {study.client}{study.isSubCompany ? ", owned by Buzzly" : ""}</p>
+                  <small>{study.illustrative ? "Illustrative scenario · not a client result" : study.isSubCompany ? "Not a client · Read the story ↗" : "Read the case study ↗"}</small>
                 </div>
               </Link>
             );
@@ -60,7 +60,7 @@ export default function Clients() {
       <section className="clients-page-wins">
         <p className="interior-eyebrow">BUZZLY / YOUR STORY NEXT</p>
         <h2>Your brand.<br /><em>Our next win.</em></h2>
-        <p>We build content and distribution for ambitious businesses and the companies we are building. Tell us what you want people to know.</p>
+        <p>We build content and distribution for ambitious outside businesses, with the same engine that powers our own sub-companies. Tell us what you want people to know.</p>
         <Link href="/contact">Start a Project ↗</Link>
       </section>
     </Interior>

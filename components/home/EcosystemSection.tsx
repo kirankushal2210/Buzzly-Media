@@ -24,7 +24,7 @@ const nodes: Node[] = [
   ...companies.map(company => ({
     id: company.slug,
     label: company.name,
-    kicker: `Buzzly company / ${company.field}`,
+    kicker: `Buzzly sub-company / ${company.field}`,
     title: company.word,
     copy: company.intro,
     gives: ["Real-world proof of what content can build", "A testing ground for formats and channels"],
@@ -36,12 +36,12 @@ const nodes: Node[] = [
   })),
   {
     id: "partners",
-    label: "Partner brands",
+    label: "Outside partners",
     kicker: "Partner distribution model",
     title: "Your brand, same engine.",
-    copy: "Everything we learn building our own companies goes into the work we do for ambitious partners: the same strategy, production, and distribution, pointed at your goals.",
+    copy: "Everything we learn building our own sub-companies goes into the work we do for ambitious outside partners: the same strategy, production, and distribution, pointed at your goals.",
     gives: ["A brief and a business goal", "Access to the product, place, and people"],
-    gets: ["The playbook proven on Buzzly’s own companies", "A content team that plans, films, edits, and publishes", "Distribution that keeps building reach"],
+    gets: ["The playbook proven on Buzzly’s own sub-companies", "A content team that plans, films, edits, and publishes", "Distribution that keeps building reach"],
     image: "/media/buzzly-cafe-story-poster.jpg",
     href: "/services",
     cta: "See how we work with partners",
@@ -49,14 +49,14 @@ const nodes: Node[] = [
   },
 ];
 
-/** Interactive map of the Buzzly ecosystem: three owned companies plus the partner model, sharing one content engine. */
+/** Interactive map of the Buzzly ecosystem: three owned sub-companies plus the outside-partner model, sharing one content engine. */
 export function EcosystemSection() {
   return (
     <Reveal className="ecosystem wrap" id="ecosystem" aria-labelledby="ecosystem-title">
       <div className="ecosystem-title">
         <p className="eyebrow">THE BUZZLY ECOSYSTEM</p>
         <h2 id="ecosystem-title">Inside<br />Buzzly.</h2>
-        <p className="ecosystem-lede">One content engine—strategy, production, distribution—powering our own companies and the partners we build with.</p>
+        <p className="ecosystem-lede">One content engine powering our own sub-companies and the outside partners we build with.</p>
       </div>
       <Tabs.Root className="eco-tabs" defaultValue={nodes[0].id}>
         <Tabs.List className="eco-tablist" aria-label="Parts of the Buzzly ecosystem">

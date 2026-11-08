@@ -29,7 +29,7 @@ export function ClientPreviewSection() {
               <Link href={`/work/${study.slug}`}>
                 <strong>{study.stats[0].value}</strong>
                 <span>{study.stats[0].label}</span>
-                <small>{study.client} ↗</small>
+                <small>{study.client}{study.isSubCompany ? " · Buzzly sub-company" : ""} ↗</small>
               </Link>
             </li>
           ))}

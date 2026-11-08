@@ -48,7 +48,7 @@ export function WorkShowcaseSection() {
         <div><p className="eyebrow">BUZZLY / RECENT WORK</p><h2 className="workheading" id="showcase-title">Work in<br /><em>motion.</em></h2></div>
         <div className="work-intro">
           <span className="work-count">0{caseStudies.length}<span>↗</span></span>
-          <p>Films, brands, and campaigns from the companies we’re building and the partners we build with.</p>
+          <p>Films, brands, and campaigns from the sub-companies we own and build, and the outside partners we build with.</p>
         </div>
       </Reveal>
       <div className="showcase-grid">

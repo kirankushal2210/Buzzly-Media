@@ -12,7 +12,7 @@ import "./design-match.css";
 import "./react-sections.css";
 import { siteDescription, siteName, siteTitle, siteUrl, socialLinks } from "@/lib/site";
 
-const shareDescription = "We build brands through content—our own companies and ambitious partners’ businesses.";
+const shareDescription = "We build brands through content—our own sub-companies and ambitious outside partners’ businesses.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

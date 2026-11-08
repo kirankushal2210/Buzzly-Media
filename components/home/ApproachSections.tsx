@@ -31,7 +31,7 @@ export function Manifesto() {
     <Reveal className="manifesto wrap" id="approach">
       <h2>Build the brand.<br /><em>Build the reach.</em></h2>
       <aside>
-        <p>Buzzly is a technology-led company. Content and social media help us build distribution, trust, and customer reach—both for the companies we’re building and for ambitious businesses.</p>
+        <p>Buzzly is a technology-led company. Content and social media help us build distribution, trust, and customer reach—both for the sub-companies we own and build, and for ambitious outside businesses.</p>
         <a className="plain" href="#content">See how content moves ↗</a>
       </aside>
     </Reveal>
@@ -80,7 +80,7 @@ export function ContentLine() {
     <Reveal className="contentline wrap" id="content">
       <div className="eyebrow">Content as distribution</div>
       <h2>Made to be seen.<br /><em>Built to connect.</em></h2>
-      <p>Ideas become films, reels, images and stories that help people discover and understand a brand. These frames come from the films of the companies Buzzly is building.</p>
+      <p>Ideas become films, reels, images and stories that help people discover and understand a brand. These frames come from the films of Buzzly’s own sub-companies.</p>
       <div className="reels">
         {reels.map(reel => (
           <Link className="reel" key={reel.label} href={reel.href}>

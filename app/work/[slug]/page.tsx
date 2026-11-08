@@ -31,9 +31,9 @@ export default async function CaseStudyPage({ params }: { params: Promise<{ slug
   return (
     <Interior eyebrow={`BUZZLY / CASE STUDY / ${study.categoryLabel.toUpperCase()}`} title={study.title} intro={study.summary}>
       <section className="case-meta" aria-label="Project details">
-        <div><span>CLIENT</span><p>{study.client}</p></div>
+        <div><span>{study.isSubCompany ? "BUZZLY SUB-COMPANY" : "CLIENT"}</span><p>{study.client}</p></div>
         <div><span>WHAT WE DID</span><p>{study.services.join(" · ")}</p></div>
-        <div><span>YEAR</span><p>{study.year}</p></div>
+        <div><span>YEAR / STAGE</span><p>{study.isSubCompany ? "In build · Owned Venture" : study.year}</p></div>
       </section>
 
       <section className="case-film">

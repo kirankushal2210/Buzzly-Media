@@ -7,7 +7,7 @@ export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://buzzly.medi
 export const siteName = "Buzzly";
 export const siteTitle = "Buzzly — Building Brands Through Content";
 export const siteDescription =
-  "Buzzly is a technology-led company builder. We build brands through content—our own companies and ambitious partners’ businesses.";
+  "Buzzly is a technology-led company builder. We build brands through content—our own sub-companies and ambitious outside partners’ businesses.";
 
 export type NavLink = { href: string; label: string; caret?: boolean };
 
@@ -15,7 +15,7 @@ export const primaryNav: NavLink[] = [
   { href: "/work", label: "Work" },
   { href: "/about", label: "About" },
   { href: "/services", label: "Services", caret: true },
-  { href: "/companies", label: "Our companies" },
+  { href: "/companies", label: "Our sub-companies" },
   { href: "/clients", label: "Clients" },
 ];
 

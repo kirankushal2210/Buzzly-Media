@@ -17,27 +17,24 @@ export type Testimonial = {
 
 export const testimonials: Testimonial[] = [
   {
-    quote: "Buzzly gave our kitchen a voice. The film made people feel the place before they ever walked in.",
-    name: "Partner name",
-    role: "Founder",
-    company: "Food & restaurant partner",
-    caseStudy: "de-food-kampney",
+    quote: "Buzzly transformed our brand storytelling. Their content gave our brand an authentic voice that connected immediately with our target audience.",
+    name: "Partner Name",
+    role: "Founder & CEO",
+    company: "Partner Brand",
     approved: false,
   },
   {
-    quote: "They understood that in health, trust comes first. Every piece of content felt calm and honest.",
-    name: "Partner name",
-    role: "Director",
-    company: "Health partner",
-    caseStudy: "buzzly-health",
+    quote: "They understood our positioning and built a social-first content engine that drove real engagement and lasting organic reach.",
+    name: "Partner Name",
+    role: "Marketing Director",
+    company: "Partner Brand",
     approved: false,
   },
   {
-    quote: "Our listings finally look like places people want to be, not just rooms with furniture.",
-    name: "Partner name",
-    role: "Head of Sales",
-    company: "Property partner",
-    caseStudy: "buzzly-properties",
+    quote: "From initial creative strategy to campaign rollout, Buzzly delivered video and social distribution that made our brand stand out.",
+    name: "Partner Name",
+    role: "Brand Lead",
+    company: "Partner Brand",
     approved: false,
   },
 ];
@@ -45,8 +42,8 @@ export const testimonials: Testimonial[] = [
 export type ClientLogo = { name: string; field: string; href?: string };
 
 export const clientLogos: ClientLogo[] = [
-  { name: "De Food Kampney", field: "Food", href: "/companies/de-food-kampney" },
-  { name: "Buzzly Health", field: "Health", href: "/companies/buzzly-health" },
-  { name: "Buzzly Properties", field: "Property", href: "/companies/buzzly-properties" },
-  { name: "Your brand", field: "Next partner", href: "/contact" },
+  { name: "Hospitality & Dining", field: "Partner Category", href: "/contact" },
+  { name: "Health & Wellness", field: "Partner Category", href: "/contact" },
+  { name: "Real Estate & Living", field: "Partner Category", href: "/contact" },
+  { name: "Your Brand", field: "Next Partner", href: "/contact" },
 ];

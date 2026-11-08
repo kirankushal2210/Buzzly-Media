@@ -19,7 +19,7 @@ const sections: LegalSection[] = [
     id: "content",
     title: "Our content",
     body: <>
-      <p>The films, images, text, logos, and design on this site belong to Buzzly, our companies, or the partners who allowed us to show their work. You may view and share links to the site, but you may not copy, reuse, or redistribute its content without our written permission.</p>
+      <p>The films, images, text, logos, and design on this site belong to Buzzly, its sub-companies, or the partners who allowed us to show their work. You may view and share links to the site, but you may not copy, reuse, or redistribute its content without our written permission.</p>
       <p>The Buzzly name and logo are our trademarks. Please see our <Link href="/logo">logo page</Link> for approved usage.</p>
     </>,
   },

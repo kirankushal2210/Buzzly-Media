@@ -49,7 +49,7 @@ export function MobileNav({ contactHref }: { contactHref: string }) {
             })}
           </nav>
           <div className="mobile-drawer-companies">
-            <span>OUR COMPANIES</span>
+            <span>OUR SUB-COMPANIES</span>
             {companies.map(company => (
               <Link key={company.slug} href={`/companies/${company.slug}`} onClick={() => setOpen(false)}>{company.name} ↗</Link>
             ))}

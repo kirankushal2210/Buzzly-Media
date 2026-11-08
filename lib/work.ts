@@ -33,6 +33,7 @@ export type CaseStudy = {
   poster: string;
   accent: string;
   illustrative?: boolean;
+  isSubCompany?: boolean;
 };
 
 export const caseStudies: CaseStudy[] = [
@@ -40,10 +41,11 @@ export const caseStudies: CaseStudy[] = [
     slug: "de-food-kampney",
     title: "Giving a food platform its appetite.",
     client: "De Food Kampney",
+    isSubCompany: true,
     category: "food",
-    categoryLabel: "Food",
+    categoryLabel: "Food Sub-Company",
     year: "2026",
-    summary: "Building the brand world for a platform and ecosystem made for the food and restaurant industry.",
+    summary: "Building the brand world for De Food Kampney, an internal sub-company of Buzzly Media for the food and restaurant industry.",
     services: ["Brand strategy", "Company film", "Social content", "Distribution"],
     problem:
       "Restaurants and food businesses are crowded with platforms that all sound the same. De Food Kampney needed a voice that felt like the industry itself—warm, busy, and full of craft—before it could ask anyone to join.",
@@ -56,7 +58,7 @@ export const caseStudies: CaseStudy[] = [
       "De Food Kampney now has a recognisable visual identity and a library of launch content. Audience and growth figures will be published here once they are measured and approved.",
     stats: [
       { value: "01", label: "Company film produced" },
-      { value: "Food", label: "Restaurants & food businesses" },
+      { value: "Sub-Company", label: "Buzzly Venture" },
       { value: "In build", label: "Stage" },
     ],
     video: "/media/de-food-kampney.mp4",
@@ -67,10 +69,11 @@ export const caseStudies: CaseStudy[] = [
     slug: "buzzly-health",
     title: "Making care feel close.",
     client: "Buzzly Health",
+    isSubCompany: true,
     category: "health",
-    categoryLabel: "Health",
+    categoryLabel: "Health Sub-Company",
     year: "2026",
-    summary: "A calm, human brand language for a company Buzzly is building in the health space.",
+    summary: "A calm, human brand language for Buzzly Health, a dedicated sub-company founded and built by Buzzly Media.",
     services: ["Positioning", "Company film", "Content direction"],
     problem:
       "Health brands often lean clinical or loud. Buzzly Health needed to earn trust first: content that feels steady, clear, and centred on people rather than procedures.",
@@ -83,7 +86,7 @@ export const caseStudies: CaseStudy[] = [
       "The brand has a clear tone and a film that carries it. Measured outcomes will be added once the company launches publicly.",
     stats: [
       { value: "01", label: "Company film produced" },
-      { value: "Health", label: "Sector" },
+      { value: "Sub-Company", label: "Buzzly Venture" },
       { value: "In build", label: "Stage" },
     ],
     video: "/media/buzzly-health.mp4",
@@ -94,10 +97,11 @@ export const caseStudies: CaseStudy[] = [
     slug: "buzzly-properties",
     title: "Space to grow, on screen.",
     client: "Buzzly Properties",
+    isSubCompany: true,
     category: "real-estate",
-    categoryLabel: "Real Estate",
+    categoryLabel: "Property Sub-Company",
     year: "2026",
-    summary: "Turning places into stories for a company Buzzly is building in the property space.",
+    summary: "Developing the brand world and film walkthroughs for Buzzly Properties, an internal real estate sub-company of Buzzly Media.",
     services: ["Brand world", "Company film", "Listing content"],
     problem:
       "Property marketing is usually a grid of identical photos. Buzzly Properties needed content that helps people imagine living or working in a space before they visit it.",
@@ -110,7 +114,7 @@ export const caseStudies: CaseStudy[] = [
       "Buzzly Properties launches with a distinctive film language. Enquiry and reach figures will appear here once verified.",
     stats: [
       { value: "01", label: "Company film produced" },
-      { value: "Property", label: "Sector" },
+      { value: "Sub-Company", label: "Buzzly Venture" },
       { value: "In build", label: "Stage" },
     ],
     video: "/media/buzzly-properties.mp4",

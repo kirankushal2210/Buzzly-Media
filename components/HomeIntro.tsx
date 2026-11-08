@@ -66,7 +66,6 @@ export function Hero() {
           <small>We build our own businesses and help ambitious partners grow through strategy, storytelling, and distribution.</small>
           <Link className="outlinecta" href="/work">Our Work</Link>
         </div>
-        <div className="film-tease"><span>01 / THE CAFE STORY</span><strong>From cafe brief to customers ↓</strong><small>48 seconds · An illustrative cafe campaign</small></div>
       </div>
     </section>
   );

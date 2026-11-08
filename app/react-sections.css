@@ -323,3 +323,16 @@
 @media (prefers-reduced-motion: no-preference) and (max-width:750px){
   .film-frame.is-clip{--ix:4%;--iy:22%;--iy-px:22vh;--r:9px;--vs:.92;--cw:92vw}
 }
+
+/* ---------- FAQ Section ---------- */
+.faq-section{max-width:1500px;margin:100px auto 140px;padding:0 clamp(20px,8vw,130px)}
+.faq-header{margin-bottom:40px}
+.faq-header h2{font:400 clamp(36px,5vw,60px)/1.08 'Instrument Serif',serif;margin:12px 0 0;letter-spacing:-.02em}
+.faq-list{border-top:1px solid var(--line)}
+.faq-item{border-bottom:1px solid var(--line);transition:background .2s}
+.faq-question{width:100%;display:flex;justify-content:space-between;align-items:center;padding:26px 0;background:none;border:none;color:var(--cream);text-align:left;font:400 clamp(20px,2.4vw,28px)/1.2 'Instrument Serif',serif;cursor:pointer;gap:20px;letter-spacing:-.01em;transition:color .2s}
+.faq-question:hover,.faq-question:focus-visible{color:var(--red)}
+.faq-icon{font-family:'DM Sans',sans-serif;font-size:24px;color:var(--red);flex-shrink:0;font-weight:300}
+.faq-answer{padding:0 0 28px;color:var(--soft);font-size:16px;line-height:1.6;max-width:850px;animation:riseIn .35s both}
+.faq-answer p{margin:0}
+
