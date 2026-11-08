@@ -1,31 +1,72 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { hasAnchorTarget, scrollToTopNow } from "@/lib/scroll";
 
 /**
- * Every full page load (refresh, typed URL, back from another site) starts at
- * the top instead of wherever the browser last left the page.
- *
- * Client-side navigation is left to the router, which already scrolls new
- * pages to the top. Links to an in-page anchor (/#contact) still land on it.
+ * Ensures that whenever the page is refreshed from anywhere or scrolled down,
+ * the user is always returned to the Homepage (Hero Section at /) pinned at the top.
  */
 export function ScrollReset() {
+  const pathname = usePathname();
+
   useEffect(() => {
-    try { if ("scrollRestoration" in history) history.scrollRestoration = "manual"; } catch { /* unsupported */ }
-    if (!hasAnchorTarget()) scrollToTopNow();
+    try {
+      if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    } catch { /* unsupported */ }
 
-    // Pin the snapshot browsers keep for reload / back-forward at the top.
-    // `pagehide` is used instead of `beforeunload`, which would disable the back-forward cache.
-    const onPageHide = () => scrollToTopNow();
-    // A page restored from the back-forward cache skips React mounting, so reset it here too.
-    const onPageShow = (event: PageTransitionEvent) => { if (event.persisted && !hasAnchorTarget()) scrollToTopNow(); };
+    // Detect if this visit was triggered by a reload / refresh
+    let isReload = false;
+    try {
+      const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+      if (nav && nav.type) {
+        isReload = nav.type === "reload";
+      } else if (window.performance && window.performance.navigation) {
+        isReload = window.performance.navigation.type === 1;
+      }
+    } catch { /* navigation API unsupported */ }
 
-    window.addEventListener("pagehide", onPageHide);
+    // If reloading while on any subpage, redirect straight to the Homepage
+    if (isReload && pathname !== "/") {
+      window.location.replace("/");
+      return;
+    }
+
+    if (!hasAnchorTarget()) {
+      scrollToTopNow();
+      requestAnimationFrame(() => scrollToTopNow());
+      const t1 = setTimeout(scrollToTopNow, 20);
+      const t2 = setTimeout(scrollToTopNow, 120);
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
+    }
+  }, [pathname]);
+
+  useEffect(() => {
+    const onReset = () => {
+      try {
+        if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+      } catch { /* unsupported */ }
+      window.scrollTo(0, 0);
+    };
+
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted && !hasAnchorTarget()) {
+        scrollToTopNow();
+      }
+    };
+
+    window.addEventListener("pagehide", onReset);
     window.addEventListener("pageshow", onPageShow);
+    window.addEventListener("beforeunload", onReset);
+
     return () => {
-      window.removeEventListener("pagehide", onPageHide);
+      window.removeEventListener("pagehide", onReset);
       window.removeEventListener("pageshow", onPageShow);
+      window.removeEventListener("beforeunload", onReset);
     };
   }, []);
 

@@ -20,6 +20,7 @@ export function Splash() {
     const skip = seen || reduced;
     // Start at the hero before the splash lifts (instant, not smooth), unless the URL targets an anchor.
     if (!hasAnchorTarget()) scrollToTopNow();
+    window.scrollTo(0, 0);
     if (!skip) document.body.classList.add("is-loading");
     const timer = window.setTimeout(() => setDone(true), skip ? 0 : 1250);
     return () => window.clearTimeout(timer);

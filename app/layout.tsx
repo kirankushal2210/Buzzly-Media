@@ -68,8 +68,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   // One preload hint per critical font (React dedupes these; <link> tags were emitted twice).
   for (const font of fonts) preload(`/fonts/${font}.woff2`, { as: "font", type: "font/woff2", crossOrigin: "anonymous" });
   return <html lang="en" suppressHydrationWarning><head>
-    {/* Always start at the top on page reload; disable browser scroll restoration. */}
-    <script dangerouslySetInnerHTML={{ __html: "if('scrollRestoration' in history){history.scrollRestoration='manual';}window.scrollTo(0,0);" }} />
+    {/* On refresh/reload: redirect directly to the homepage and reset scroll to the hero section. */}
+    <script dangerouslySetInnerHTML={{ __html: "(function(){try{if('scrollRestoration' in history){history.scrollRestoration='manual';}var nav=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{};var isReload=nav.type==='reload'||(window.performance&&window.performance.navigation&&window.performance.navigation.type===1);if(isReload&&window.location.pathname!=='/'){window.location.replace('/');return;}if(!window.location.hash){window.scrollTo(0,0);window.addEventListener('load',function(){window.scrollTo(0,0);});}}catch(e){}})();" }} />
     {/* Enables scroll-reveal styles only when JavaScript runs; content stays visible otherwise. */}
     <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
