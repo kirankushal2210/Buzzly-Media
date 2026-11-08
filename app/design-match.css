@@ -1,0 +1,26 @@
+/* Interior pages use the exact navigation and footer visual language of the approved homepage. */
+.interior-site-header{position:relative;z-index:5}
+.interior-site-header .leftnav{min-width:0}
+.interior-site-header .logo{justify-self:center;position:relative;font-family:'DM Sans',sans-serif}
+.interior-site-header .rightnav{justify-self:end}
+.interior-site-header .topcontact{white-space:nowrap}
+.interior .interior-hero{max-width:1480px;margin:auto;padding:125px clamp(20px,4vw,64px) 95px;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(250px,.6fr);column-gap:50px;align-items:end;border-bottom:1px solid var(--line)}
+.interior .interior-eyebrow{grid-column:1/-1;font:700 12px/1.4 'DM Sans',sans-serif!important;letter-spacing:.19em;color:var(--red);margin:0 0 18px}
+.interior .interior-hero h1{grid-column:1;font:400 clamp(70px,9vw,145px)/.88 'Instrument Serif',serif;letter-spacing:-.05em;max-width:none;margin:0;overflow-wrap:normal}
+.interior .interior-intro{grid-column:2;align-self:end;font:400 15px/1.5 'DM Sans',sans-serif;max-width:330px;color:var(--soft);margin:0 0 5px}
+.work-design-match .samplework{border-top:0}
+.work-design-match .samplehead h1{font:400 clamp(70px,9vw,145px)/.88 'Instrument Serif',serif;letter-spacing:-.05em;margin:18px 0 0}
+.work-design-match .samplehead h1 em{color:var(--red);font-weight:400}
+@media(max-width:1000px){.interior-site-header .leftnav{gap:14px}.interior-site-header .navlink{font-size:10px}.interior .interior-hero{grid-template-columns:1fr 250px}}
+@media(max-width:750px){.interior-site-header{grid-template-columns:1fr auto;min-height:85px}.interior-site-header .logo{justify-self:start}.interior-site-header .leftnav{display:none}.interior-site-header .leftnav.is-open{display:flex;flex-direction:column;align-items:flex-start;position:absolute;z-index:20;top:85px;left:0;right:0;background:var(--bg);padding:28px;gap:20px;border-bottom:1px solid var(--line)}.interior-site-header .leftnav.is-open .navlink{font-size:16px}.interior .interior-hero{display:block;padding-top:80px;padding-bottom:75px}.interior .interior-hero h1{font-size:clamp(65px,12vw,100px)}.interior .interior-intro{margin-top:30px}.work-design-match .samplehead h1{font-size:clamp(65px,12vw,100px)}}
+@media(max-width:750px){.home-site-header{position:relative;z-index:5}.home-site-header .leftnav.is-open{display:flex;flex-direction:column;align-items:flex-start;position:absolute;z-index:20;top:85px;left:0;right:0;background:var(--bg);padding:28px;gap:20px;border-bottom:1px solid var(--line)}.home-site-header .leftnav.is-open .navlink{font-size:16px}}
+
+.work-design-match .samplecard h2{font-size:17px;font-weight:500;margin:15px 0 4px}
+.contact-preview-note{margin:0 0 6px;padding-left:12px;border-left:2px solid #ef342d;color:#bbb5a9;font-size:12px;line-height:1.5}
+.clientstrip{overflow:hidden;scroll-snap-type:none}
+.clientstrip-track.is-animated{min-width:0;animation:clientMarquee 55s linear infinite;animation-play-state:paused}
+.clientstrip-track.is-animated.is-visible{animation-play-state:running}
+.clientstrip:focus-visible .clientstrip-track.is-animated{animation-play-state:paused}
+@media (hover:hover){.clientstrip:hover .clientstrip-track.is-animated{animation-play-state:paused}}
+@keyframes clientMarquee{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.clientstrip{overflow-x:auto;scroll-snap-type:x mandatory}.clientstrip-track.is-animated{animation:none}.client-logo-card{scroll-snap-align:start}}

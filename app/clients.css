@@ -1,0 +1,18 @@
+.clients-page-process{border-top:1px solid #403b38;max-width:1500px;margin:auto;padding:100px clamp(20px,8vw,130px) 120px;display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(45px,7vw,120px)}
+.clients-page-process h2,.clients-page-film h2,.clients-page-wins h2{font:clamp(70px,8vw,132px)/.9 'Instrument Serif',serif;letter-spacing:-.045em;margin:35px 0}
+.clients-page-process h2 em,.clients-page-film h2 em,.clients-page-wins h2 em{color:#ef342d;font-weight:400}
+.clients-page-process-heading>p:last-child{font-size:18px;line-height:1.55;color:#bbb5a9;max-width:520px}
+.clients-page-process-steps{align-self:end;border-top:1px solid #403b38}
+.clients-page-process-steps>div{display:grid;grid-template-columns:130px 1fr;gap:25px;border-bottom:1px solid #403b38;padding:27px 0}
+.clients-page-process-steps span{font-size:11px;letter-spacing:.12em;font-weight:700;color:#ef342d}
+.clients-page-process-steps p{font:clamp(20px,2vw,30px)/1.15 'Instrument Serif',serif;margin:0}
+.clients-page-film{max-width:1500px;margin:auto;padding:80px clamp(20px,8vw,130px) 120px;display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(35px,6vw,100px);align-items:center;border-top:1px solid #403b38}
+.clients-page-film h2{font-size:clamp(66px,7vw,112px)}
+.clients-page-film p:not(.interior-eyebrow){font-size:16px;line-height:1.6;color:#bbb5a9;max-width:430px}
+.clients-page-film a,.clients-page-wins a{display:inline-block;margin-top:25px;padding:15px 20px;background:#ef342d;color:#151313;text-decoration:none;font-weight:700;font-size:13px}
+.clients-page-film video{width:100%;aspect-ratio:16/10;object-fit:cover;background:#2b1017}
+.clients-page-wins{max-width:1500px;margin:auto;min-height:600px;padding:100px clamp(20px,8vw,130px) 150px;border-top:1px solid #403b38}
+.clients-page-wins h2{font-size:clamp(80px,10vw,155px)}
+.clients-page-wins>p:not(.interior-eyebrow){max-width:620px;color:#bbb5a9;line-height:1.55;font-size:18px}
+@media(max-width:850px){.clients-page-process,.clients-page-film{grid-template-columns:1fr;gap:35px}.clients-page-process{padding-top:80px}.clients-page-process-steps{align-self:auto}.clients-page-film{padding-top:70px}.clients-page-wins{min-height:0;padding-top:80px;padding-bottom:110px}}
+@media(max-width:550px){.clients-page-process h2,.clients-page-film h2{font-size:clamp(60px,13vw,85px)}.clients-page-process-steps>div{grid-template-columns:1fr;gap:8px}.clients-page-wins h2{font-size:clamp(72px,15vw,110px)}}

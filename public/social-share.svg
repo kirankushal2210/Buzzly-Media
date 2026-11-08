@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#151313"/>
+  <path d="M40 109h1120M40 527h1120" stroke="#514842" stroke-width="1"/>
+  <circle cx="1114" cy="66" r="22" fill="#ef342d"/>
+  <text x="42" y="82" fill="#f5efdf" font-family="Arial, sans-serif" font-size="39" font-weight="700" letter-spacing="-2">Buzzly<tspan fill="#ef342d">.</tspan></text>
+  <text x="46" y="192" fill="#ef342d" font-family="Arial, sans-serif" font-size="18" font-weight="700" letter-spacing="3">A TECHNOLOGY-LED COMPANY BUILDER</text>
+  <text x="38" y="322" fill="#f5efdf" font-family="Georgia, serif" font-size="101" letter-spacing="-5">Building brands</text>
+  <text x="38" y="427" fill="#f5efdf" font-family="Georgia, serif" font-size="101" letter-spacing="-5">through <tspan fill="#ef342d" font-style="italic">content.</tspan></text>
+  <text x="44" y="574" fill="#f5efdf" font-family="Arial, sans-serif" font-size="22">Our own companies and ambitious partners’ businesses.</text>
+</svg>
