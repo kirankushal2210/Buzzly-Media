@@ -38,6 +38,7 @@ export function ExpandingScrollFilm() {
   const hintRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const userPaused = useRef(false);
+  const inView = useRef(false);
   const [loaded, setLoaded] = useState(false);
   const [paused, setPaused] = useState(true);
   const [muted, setMuted] = useState(true);
@@ -57,8 +58,11 @@ export function ExpandingScrollFilm() {
       if (entries[0]?.isIntersecting) { ensureLoaded(); loadObserver.disconnect(); }
     }, { rootMargin: "250px 0px", threshold: 0 });
     const playObserver = new IntersectionObserver(entries => {
-      const visible = entries[0]?.isIntersecting;
-      if (visible && !userPaused.current && !reducedMotion && !saveData && !video.ended && !document.hidden) {
+      const visible = Boolean(entries[0]?.isIntersecting);
+      inView.current = visible;
+      // Only play once a source is attached; calling play() on an empty <video>
+      // leaves it flagged as playing but idle in Chromium.
+      if (visible && video.getAttribute("src") && !userPaused.current && !reducedMotion && !saveData && !video.ended && !document.hidden) {
         void video.play().catch(() => {});
       } else if (!visible) {
         video.pause();
@@ -75,25 +79,30 @@ export function ExpandingScrollFilm() {
     };
   }, [ensureLoaded, reducedMotion, saveData]);
 
-  // Scroll-linked expansion, throttled to one update per animation frame.
+  // Scroll-linked expansion. The frame always fills the sticky area; only
+  // clip-path and transforms change, so expanding never causes layout shift.
   useEffect(() => {
     const filmFrame = frameRef.current;
-    if (reducedMotion) {
-      if (filmFrame) { filmFrame.style.width = ""; filmFrame.style.height = ""; filmFrame.style.borderRadius = ""; }
-      return;
-    }
+    if (reducedMotion || !filmFrame) return;
     let frame = 0;
     const update = () => {
       frame = 0;
       const section = sectionRef.current;
-      if (!section || !filmFrame) return;
+      if (!section) return;
       const rect = section.getBoundingClientRect();
       const range = Math.max(1, rect.height - window.innerHeight);
       const progress = Math.max(0, Math.min(1, -rect.top / (range * 0.65)));
       const mobile = window.matchMedia("(max-width:750px)").matches;
-      filmFrame.style.width = `${mobile ? 92 + 8 * progress : 70 + 30 * progress}vw`;
-      filmFrame.style.height = `${mobile ? 56 + 44 * progress : 58 + 42 * progress}vh`;
-      filmFrame.style.borderRadius = `${16 * (1 - progress)}px`;
+      // Visible fraction of the frame: desktop 70%→100% wide, 58%→100% tall.
+      const w = mobile ? 0.92 + 0.08 * progress : 0.7 + 0.3 * progress;
+      const h = mobile ? 0.56 + 0.44 * progress : 0.58 + 0.42 * progress;
+      const insetY = (1 - h) / 2;
+      const style = filmFrame.style;
+      style.setProperty("--ix", `${((1 - w) / 2) * 100}%`);
+      style.setProperty("--iy", `${insetY * 100}%`);
+      style.setProperty("--iy-px", `${insetY * filmFrame.offsetHeight}px`);
+      style.setProperty("--r", `${(mobile ? 9 : 16) * (1 - progress)}px`);
+      style.setProperty("--vs", Math.max(w, h).toFixed(4));
       if (hintRef.current) hintRef.current.style.opacity = Math.max(0, 1 - progress * 2).toFixed(2);
     };
     const onScroll = () => { if (!frame) frame = requestAnimationFrame(update); };
@@ -106,6 +115,16 @@ export function ExpandingScrollFilm() {
       window.removeEventListener("resize", update);
     };
   }, [reducedMotion]);
+
+  // The source is attached after the first intersection, so the observer's
+  // play() can run before there is anything to play (and preload="none" means
+  // nothing loads by itself). Retry as soon as the source is attached.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!loaded || !video || !inView.current || userPaused.current || reducedMotion || saveData || document.hidden || video.ended) return;
+    video.load();
+    void video.play().catch(() => {});
+  }, [loaded, reducedMotion, saveData]);
 
   const play = () => {
     const video = videoRef.current;
@@ -157,7 +176,7 @@ export function ExpandingScrollFilm() {
     <>
       <section className="film-scroll" id="film" ref={sectionRef} aria-label="Buzzly cafe campaign story film">
         <div className="film-sticky">
-          <div className="film-frame" id="filmFrame" ref={frameRef}>
+          <div className="film-frame is-clip" id="filmFrame" ref={frameRef}>
             <video
               ref={videoRef}
               muted

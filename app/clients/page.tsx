@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element -- static poster frames from /public/media */
+import Image from "next/image";
 import type { Metadata } from "next";
 import Link from "@/components/Link";
 import { Interior } from "@/components/Interior";
@@ -39,7 +39,7 @@ export default function Clients() {
             const headline = study.stats[study.illustrative ? 1 : 0];
             return (
               <Link key={study.slug} className="outcome-card" href={`/work/${study.slug}`} style={{ ["--accent" as string]: study.accent }}>
-                <img src={study.poster} alt="" loading="lazy" />
+                <Image src={study.poster} alt="" width={960} height={540} sizes="(max-width: 750px) 100vw, (max-width: 1000px) 50vw, 25vw" />
                 <div>
                   <span>{study.categoryLabel}</span>
                   <strong>{headline.value}</strong>

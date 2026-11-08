@@ -1,5 +1,3 @@
-import React from "react";
-
 interface BuzzlyLogoProps {
   variant?: "horizontal" | "vertical" | "mark";
   theme?: "dark" | "light";

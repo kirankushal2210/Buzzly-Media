@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element -- static poster frames from /public/media */
+import Image from "next/image";
 import Link from "@/components/Link";
 import { Reveal } from "@/components/Reveal";
 
@@ -49,8 +49,8 @@ export function StoryFlow() {
     <Reveal className="storyflow wrap" id="how" aria-label="How Buzzly builds reach">
       <div className="story-visual">
         <div className="story-ring" aria-hidden="true" />
-        <div className="story-photo photo-main"><img src="/media/buzzly-cafe-story-poster.jpg" alt="Frame from the Buzzly cafe story film" loading="lazy" /></div>
-        <div className="story-photo photo-small"><img src="/media/de-food-kampney-poster.webp" alt="Frame from the De Food Kampney film" loading="lazy" /></div>
+        <div className="story-photo photo-main"><Image src="/media/buzzly-cafe-story-poster.jpg" alt="Frame from the Buzzly cafe story film" fill sizes="(max-width: 750px) 80vw, 40vw" /></div>
+        <div className="story-photo photo-small"><Image src="/media/de-food-kampney-poster.webp" alt="Frame from the De Food Kampney film" fill sizes="(max-width: 750px) 45vw, 22vw" /></div>
         <span className="story-stamp" aria-hidden="true">BUZZLY<br />IN MOTION ↗</span>
       </div>
       <div className="story-copy">
@@ -84,7 +84,7 @@ export function ContentLine() {
       <div className="reels">
         {reels.map(reel => (
           <Link className="reel" key={reel.label} href={reel.href}>
-            <img src={reel.src} alt={reel.alt} loading="lazy" /><span>{reel.label}</span>
+            <Image src={reel.src} alt={reel.alt} fill sizes="(max-width: 750px) 50vw, 25vw" /><span>{reel.label}</span>
           </Link>
         ))}
       </div>

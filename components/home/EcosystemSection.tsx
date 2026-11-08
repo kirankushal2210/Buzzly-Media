@@ -1,6 +1,6 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element -- static poster frames from /public/media */
+import Image from "next/image";
 import { Tabs } from "radix-ui";
 import Link from "@/components/Link";
 import { Reveal } from "@/components/Reveal";
@@ -68,7 +68,7 @@ export function EcosystemSection() {
         </Tabs.List>
         {nodes.map(node => (
           <Tabs.Content key={node.id} value={node.id} className="eco-panel" style={{ ["--accent" as string]: node.accent }}>
-            <div className="eco-panel-media"><img src={node.image} alt="" loading="lazy" /><span>{node.kicker}</span></div>
+            <div className="eco-panel-media"><Image src={node.image} alt="" fill sizes="(max-width: 1000px) 90vw, 30vw" /><span>{node.kicker}</span></div>
             <div className="eco-panel-copy">
               <h3>{node.title}</h3>
               <p>{node.copy}</p>

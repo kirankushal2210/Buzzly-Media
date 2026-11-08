@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { Interior } from "@/components/Interior";
 import { BuzzlyLogo, BuzzlyMark } from "@/components/BuzzlyLogo";
 import "./logo.css";
@@ -7,6 +8,9 @@ export const metadata: Metadata = {
   title: "Brand Identity & Logo",
   description:
     "The official logo, mark, color palette, and visual assets of Buzzly Media.",
+  alternates: { canonical: "/logo" },
+  // Internal brand reference: reachable by link, kept out of search results (also disallowed in robots.txt).
+  robots: { index: false, follow: true },
 };
 
 const brandColors = [
@@ -255,9 +259,11 @@ export default function LogoPage() {
             {/* Original Card Render */}
             <div className="logo-variant-card light-card">
               <span className="logo-variant-tag">Original Artwork Card</span>
-              <img
+              <Image
                 src="/logo/buzzly-logo-card.png"
                 alt="Buzzly Media Master Artwork"
+                width={270}
+                height={265}
                 style={{
                   maxWidth: "180px",
                   height: "auto",
@@ -322,9 +328,11 @@ export default function LogoPage() {
                 <div
                   className={`assets-thumb ${asset.lightBg ? "light-bg" : ""}`}
                 >
-                  <img
+                  <Image
                     src={asset.thumb}
                     alt={asset.title}
+                    width={40}
+                    height={40}
                     style={{
                       maxHeight: "40px",
                       maxWidth: "40px",

@@ -124,7 +124,6 @@ export function ContactForm() {
 
   return (
     <form ref={formRef} className="contact-form" onSubmit={submit} onBlur={onBlur} onChange={onChange} noValidate aria-busy={sending}>
-      {deliveryReady === false && <p className="contact-preview-note">Our inbox is being set up. You can still fill in the form; sending will open shortly.</p>}
       <label><span className="field-label">Your name <span className="field-required" aria-hidden="true">*</span></span>
         <input {...fieldProps("name")} autoComplete="name" required maxLength={100} />
         {fieldError("name")}
@@ -155,6 +154,7 @@ export function ContactForm() {
       {/* Honeypot: hidden from people and assistive tech; bots fill it in. */}
       <label className="honeypot" aria-hidden="true">Leave this blank<input name="website" autoComplete="off" tabIndex={-1} /></label>
       <button type="submit" disabled={sending} aria-disabled={sending}>{sending ? "Sending…" : "Send inquiry ↗"}</button>
+      {deliveryReady === false && <p className="contact-preview-note">Our inbox is being set up. You can still fill in the form; sending will open shortly.</p>}
       <p ref={statusRef} tabIndex={-1} className={`contact-status${status === "sent" ? " is-success" : status === "error" ? " is-error" : ""}`} role="status" aria-live="polite">{notice}</p>
     </form>
   );

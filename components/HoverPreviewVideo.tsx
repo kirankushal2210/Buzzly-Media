@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 
 export type HoverPreviewHandle = { start: () => void; stop: () => void };
@@ -32,8 +33,7 @@ export const HoverPreviewVideo = forwardRef<HoverPreviewHandle, { src: string; p
 
     return (
       <span className={`hover-preview${playing ? " is-playing" : ""}`}>
-        {/* eslint-disable-next-line @next/next/no-img-element -- static poster frame */}
-        <img src={poster} alt={alt} loading="lazy" decoding="async" />
+        <Image src={poster} alt={alt} fill sizes="(max-width: 750px) 100vw, 45vw" />
         {armed && (
           <video
             ref={videoRef}

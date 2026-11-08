@@ -52,6 +52,12 @@ Films were re-encoded (H.264, `+faststart`) from about 28 MB to 9.8 MB in total 
 
 `NEXT_PUBLIC_SITE_URL` sets the production origin used by canonical URLs, `app/sitemap.ts`, `app/robots.ts` and the generated share images (`app/opengraph-image.tsx`, `app/work/[slug]/opengraph-image.tsx`). Pages are now indexable.
 
+## Structured data and performance
+
+- `app/layout.tsx` publishes linked `Organization` and `WebSite` JSON-LD. Add your social profile URLs to `socialLinks` in `lib/site.ts` and they appear as `sameAs` automatically.
+- Posters and cards use `next/image` (AVIF/WebP, responsive sizes). Vercel optimises them; on Cloudflare without an Images binding they fall back to the original files.
+- The homepage film expands with `clip-path` and transforms only, so scrolling causes no layout shift. Measured on a production build: CLS 0 on every page (desktop and phone), first contentful paint ~210 ms locally.
+
 ## Content still to approve
 
 - `lib/work.ts`: case study copy and stats. The cafe story is marked illustrative on every page it appears.

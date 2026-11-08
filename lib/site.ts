@@ -17,7 +17,6 @@ export const primaryNav: NavLink[] = [
   { href: "/services", label: "Services", caret: true },
   { href: "/companies", label: "Our companies" },
   { href: "/clients", label: "Clients" },
-  { href: "/logo", label: "Logo" },
 ];
 
 /**
@@ -29,3 +28,10 @@ export const studioStatus = {
   label: "Taking on new projects",
   detail: "Replies to new inquiries within two working days",
 };
+
+/**
+ * Official social profiles, used in the Organization schema (`sameAs`) so
+ * Google can connect them to the site. Add full URLs, e.g.
+ * "https://www.instagram.com/buzzly", "https://www.linkedin.com/company/buzzly".
+ */
+export const socialLinks: string[] = [];
