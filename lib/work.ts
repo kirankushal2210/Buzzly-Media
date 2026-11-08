@@ -4,14 +4,13 @@
  * Every stat here must be true and approved before launch. Entries marked
  * `illustrative` render a visible notice that their numbers are not client results.
  */
-export type WorkCategory = "food" | "health" | "real-estate" | "partner";
+export type WorkCategory = "food" | "health" | "real-estate";
 
 export const workCategories: { id: WorkCategory | "all"; label: string }[] = [
   { id: "all", label: "All" },
   { id: "food", label: "Food" },
   { id: "health", label: "Health" },
   { id: "real-estate", label: "Real Estate" },
-  { id: "partner", label: "Partner Content" },
 ];
 
 export type CaseStudyStat = { value: string; label: string };
@@ -120,34 +119,6 @@ export const caseStudies: CaseStudy[] = [
     video: "/media/buzzly-properties.mp4",
     poster: "/media/buzzly-properties-poster.webp",
     accent: "#b7c8c8",
-  },
-  {
-    slug: "the-cafe-story",
-    title: "From cafe brief to customers.",
-    client: "The Cafe Story",
-    category: "partner",
-    categoryLabel: "Partner Content",
-    year: "2026",
-    summary: "A 48-second walkthrough of how a partner brief becomes a reel, finds an audience, and brings people through the door.",
-    services: ["Reel scripting", "Filming & editing", "Instagram setup", "Optional Meta ads"],
-    problem:
-      "A cafe owner wants more people to discover the cafe, but has no time to plan, film, or post content—and no clear idea of what would work.",
-    solution: [
-      "A social media writer turns the brief into a reel script and sets up the cafe’s Instagram page.",
-      "A videographer films the food, the space, and the people; an editor cuts, colours, captions, and scores the reel.",
-      "Captions and page details are optimised for discovery, with optional Meta ads planned around the launch.",
-    ],
-    results:
-      "The reel goes live and starts reaching people nearby. In this scenario, views climb toward 100K and 10–20 new customers visit the cafe.",
-    stats: [
-      { value: "48s", label: "Story film" },
-      { value: "100K", label: "Possible views" },
-      { value: "10–20", label: "Possible new customers" },
-    ],
-    video: "/media/buzzly-cafe-story.mp4",
-    poster: "/media/buzzly-cafe-story-poster.jpg",
-    accent: "#ef342d",
-    illustrative: true,
   },
 ];
 

@@ -42,7 +42,7 @@ const nodes: Node[] = [
     copy: "Everything we learn building our own sub-companies goes into the work we do for ambitious outside partners: the same strategy, production, and distribution, pointed at your goals.",
     gives: ["A brief and a business goal", "Access to the product, place, and people"],
     gets: ["The playbook proven on Buzzly’s own sub-companies", "A content team that plans, films, edits, and publishes", "Distribution that keeps building reach"],
-    image: "/media/buzzly-cafe-story-poster.jpg",
+    image: "/media/de-food-kampney-poster.webp",
     href: "/services",
     cta: "See how we work with partners",
     accent: "#ef342d",

@@ -55,7 +55,7 @@ export function WorkShowcaseSection() {
         {caseStudies.map((study, index) => <ShowcaseCard key={study.slug} study={study} index={index} />)}
       </div>
       <div className="showcase-footer">
-        <span>FOOD / HEALTH / REAL ESTATE / PARTNER CONTENT</span>
+        <span>FOOD / HEALTH / REAL ESTATE</span>
         <Link className="outlinecta" href="/work">See all work ↗</Link>
       </div>
     </section>

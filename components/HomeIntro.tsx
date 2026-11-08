@@ -4,6 +4,7 @@ import Link from "@/components/Link";
 import { useEffect, useState } from "react";
 import { BuzzlyLogo } from "@/components/BuzzlyLogo";
 import { SiteHeader } from "@/components/SiteHeader";
+import { hasAnchorTarget, scrollToTopNow } from "@/lib/scroll";
 
 const INTRO_KEY = "buzzlyIntroSeen";
 
@@ -17,6 +18,8 @@ export function Splash() {
     try { seen = sessionStorage.getItem(INTRO_KEY) === "1"; } catch { /* storage unavailable */ }
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const skip = seen || reduced;
+    // Start at the hero before the splash lifts (instant, not smooth), unless the URL targets an anchor.
+    if (!hasAnchorTarget()) scrollToTopNow();
     if (!skip) document.body.classList.add("is-loading");
     const timer = window.setTimeout(() => setDone(true), skip ? 0 : 1250);
     return () => window.clearTimeout(timer);

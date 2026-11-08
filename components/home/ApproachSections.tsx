@@ -49,7 +49,7 @@ export function StoryFlow() {
     <Reveal className="storyflow wrap" id="how" aria-label="How Buzzly builds reach">
       <div className="story-visual">
         <div className="story-ring" aria-hidden="true" />
-        <div className="story-photo photo-main"><Image src="/media/buzzly-cafe-story-poster.jpg" alt="Frame from the Buzzly cafe story film" fill sizes="(max-width: 750px) 80vw, 40vw" /></div>
+        <div className="story-photo photo-main"><Image src="/media/buzzly-properties-poster.webp" alt="Frame from the Buzzly Properties film" fill sizes="(max-width: 750px) 80vw, 40vw" /></div>
         <div className="story-photo photo-small"><Image src="/media/de-food-kampney-poster.webp" alt="Frame from the De Food Kampney film" fill sizes="(max-width: 750px) 45vw, 22vw" /></div>
         <span className="story-stamp" aria-hidden="true">BUZZLY<br />IN MOTION ↗</span>
       </div>
@@ -69,10 +69,9 @@ export function StoryFlow() {
 }
 
 const reels = [
-  { src: "/media/buzzly-cafe-story-poster.jpg", alt: "Frame from the Buzzly cafe story film", label: "01 / Create", href: "/work/the-cafe-story" },
-  { src: "/media/de-food-kampney-poster.webp", alt: "Frame from the De Food Kampney film", label: "02 / Food", href: "/work/de-food-kampney" },
-  { src: "/media/buzzly-health-poster.webp", alt: "Frame from the Buzzly Health film", label: "03 / Wellbeing", href: "/work/buzzly-health" },
-  { src: "/media/buzzly-properties-poster.webp", alt: "Frame from the Buzzly Properties film", label: "04 / Spaces", href: "/work/buzzly-properties" },
+  { src: "/media/de-food-kampney-poster.webp", alt: "Frame from the De Food Kampney film", label: "01 / Food Platform", href: "/companies/de-food-kampney" },
+  { src: "/media/buzzly-health-poster.webp", alt: "Frame from the Buzzly Health film", label: "02 / Healthcare", href: "/companies/buzzly-health" },
+  { src: "/media/buzzly-properties-poster.webp", alt: "Frame from the Buzzly Properties film", label: "03 / Real Estate", href: "/companies/buzzly-properties" },
 ];
 
 export function ContentLine() {

@@ -21,7 +21,7 @@ export default function Services() {
         <div className="services-story-lead"><span className="interior-eyebrow">HOW IT MOVES / 01 — 05</span><h2>From the first conversation to the next chapter.</h2><p>Every brand starts with a different challenge. This is how Buzzly turns an idea into content and helps it find an audience.</p><Link href="/contact">Start a Project ↗</Link></div>
         <div className="services-steps">{steps.map(step => <article key={step.number}><span>{step.number}</span><h3>{step.title}</h3><p>{step.copy}</p></article>)}</div>
       </section>
-      <section className="services-film"><div><InViewVideo src="/media/buzzly-cafe-story.mp4" poster="/media/buzzly-cafe-story-poster.jpg" /><span>ILLUSTRATIVE CAMPAIGN / NOT A CLIENT RESULT</span></div><p>Ideas become stories.<br /><em>Stories find people.</em></p></section>
+      <section className="services-film"><div><InViewVideo src="/media/de-food-kampney.mp4" poster="/media/de-food-kampney-poster.webp" /><span>BUZZLY SUB-COMPANY / WORK IN MOTION</span></div><p>Ideas become stories.<br /><em>Stories find people.</em></p></section>
     </Interior>
   );
 }

@@ -3,22 +3,19 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { useMotionPreferences } from "@/hooks/use-in-view";
 
-const FILM_SRC = "/media/buzzly-cafe-story.mp4";
-const FILM_POSTER = "/media/buzzly-cafe-story-poster.jpg";
-const FALLBACK_LENGTH = 48;
-/** The current cafe film has no audio track. Set to true when an approved reel with sound replaces it. */
+const FILM_SRC = "/media/de-food-kampney.mp4";
+const FILM_POSTER = "/media/de-food-kampney-poster.webp";
+const FALLBACK_LENGTH = 30;
+/** The current reel has no audio track. Set to true when an approved reel with sound replaces it. */
 const FILM_HAS_AUDIO = false;
 
 const transcript = [
-  "A cafe owner approaches Buzzly to help more people discover the cafe.",
-  "Our social media writer turns the brief into a reel script and sets up the cafe’s Instagram page.",
-  "We write the content calendar, captions, and stories for the cafe.",
-  "A Buzzly videographer films the cafe, its food, its space, and its people.",
-  "The videographer hands an SD card to an editor. The editor cuts, colours, captions, and scores a short reel.",
-  "We optimize captions and page details for discoverability and plan optional Meta ads.",
-  "The reel goes live on Instagram. An illustrative counter moves from zero to 10K, then toward 100K views.",
-  "In this fictional scenario, 10–20 new customers visit the cafe.",
-  "The cafe’s goal is a stronger reputation, more customers, and increased revenue.",
+  "We discover the core idea, audience, and unfair advantage that gives a brand its direction.",
+  "Our creative team scripts cinematic campaign films and high-impact short-form reels.",
+  "We film on location with high-craft cinematography, lighting, and sound direction.",
+  "Editors cut, colour-grade, score, and caption every asset for maximum viewer retention.",
+  "We deploy organic distribution strategies and platform-specific publishing cadences.",
+  "The content earns sustained attention, building organic reach, community, and brand equity over time.",
 ];
 
 function formatTime(seconds: number) {
@@ -174,7 +171,7 @@ export function ExpandingScrollFilm() {
 
   return (
     <>
-      <section className="film-scroll" id="film" ref={sectionRef} aria-label="Buzzly cafe campaign story film">
+      <section className="film-scroll" id="film" ref={sectionRef} aria-label="Buzzly campaign film">
         <div className="film-sticky">
           <div className="film-frame is-clip" id="filmFrame" ref={frameRef}>
             <video
@@ -191,12 +188,12 @@ export function ExpandingScrollFilm() {
               onLoadedMetadata={event => { if (Number.isFinite(event.currentTarget.duration)) setDuration(event.currentTarget.duration); }}
               onTimeUpdate={event => setTime(event.currentTarget.currentTime)}
               aria-describedby={transcriptId}
-              aria-label="A 48-second illustrative cafe campaign showing Buzzly from client brief and content creation through filming, editing, Instagram, possible views, customers, and business growth"
+              aria-label="Buzzly Media production and distribution film in motion"
             >
               Your browser does not support this video.
             </video>
             <div className="film-controls">
-              <span>BUZZLY / THE CAFE STORY</span>
+              <span>BUZZLY / WORK IN MOTION</span>
               <div className="film-actions">
                 <button type="button" onClick={toggle} aria-label={paused ? "Play video" : "Pause video"}>{paused ? "Play" : "Pause"}</button>
                 <button type="button" className="film-secondary" onClick={replay} aria-label="Replay video">Replay ↺</button>
@@ -223,14 +220,14 @@ export function ExpandingScrollFilm() {
           <div className="film-scroll-hint" ref={hintRef} aria-hidden="true"><span>SCROLL TO EXPAND</span><span>↓</span></div>
         </div>
       </section>
-      <section className="film-transcript wrap" id={transcriptId} hidden={!transcriptOpen} aria-label="Cafe story transcript">
-        <h2>The cafe story, step by step</h2>
+      <section className="film-transcript wrap" id={transcriptId} hidden={!transcriptOpen} aria-label="Methodology transcript">
+        <h2>The Buzzly Content Engine, step by step</h2>
         <ol>{transcript.map(line => <li key={line}>{line}</li>)}</ol>
-        <p>This is a fictional cafe campaign showing the process and a possible outcome. The view counts, customer counts, and revenue direction are illustrative—not actual Buzzly results or a guarantee.</p>
+        <p>This is Buzzly’s core methodology for building brand worlds and generating sustained organic reach.</p>
       </section>
       {!transcriptOpen && (
         <div className="film-transcript-cta wrap">
-          <button type="button" onClick={() => setTranscriptOpen(true)} aria-controls={transcriptId} aria-expanded={false}>Read the full cafe story ↓</button>
+          <button type="button" onClick={() => setTranscriptOpen(true)} aria-controls={transcriptId} aria-expanded={false}>Read our process ↓</button>
         </div>
       )}
     </>

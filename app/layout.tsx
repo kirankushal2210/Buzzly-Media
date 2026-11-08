@@ -11,6 +11,7 @@ import "./company-detail.css";
 import "./design-match.css";
 import "./react-sections.css";
 import { siteDescription, siteName, siteTitle, siteUrl, socialLinks } from "@/lib/site";
+import { ScrollReset } from "@/components/ScrollReset";
 
 const shareDescription = "We build brands through content—our own sub-companies and ambitious outside partners’ businesses.";
 
@@ -67,8 +68,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   // One preload hint per critical font (React dedupes these; <link> tags were emitted twice).
   for (const font of fonts) preload(`/fonts/${font}.woff2`, { as: "font", type: "font/woff2", crossOrigin: "anonymous" });
   return <html lang="en" suppressHydrationWarning><head>
+    {/* Always start at the top on page reload; disable browser scroll restoration. */}
+    <script dangerouslySetInnerHTML={{ __html: "if('scrollRestoration' in history){history.scrollRestoration='manual';}window.scrollTo(0,0);" }} />
     {/* Enables scroll-reveal styles only when JavaScript runs; content stays visible otherwise. */}
     <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
-  </head><body>{children}</body></html>;
+  </head><body><ScrollReset />{children}</body></html>;
 }
