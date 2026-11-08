@@ -2,7 +2,12 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { hasAnchorTarget, scrollToTopNow } from "@/lib/scroll";
+import { hasAnchorTarget, isReloadNavigation, scrollToTopNow } from "@/lib/scroll";
+
+// The reload check must run once per page load: the navigation entry keeps saying
+// "reload" for the whole life of the document, so re-checking after a client-side
+// navigation would bounce every visitor who refreshed once back to the homepage.
+let reloadChecked = false;
 
 /**
  * Ensures that whenever the page is refreshed from anywhere or scrolled down,
@@ -16,21 +21,13 @@ export function ScrollReset() {
       if ("scrollRestoration" in history) history.scrollRestoration = "manual";
     } catch { /* unsupported */ }
 
-    // Detect if this visit was triggered by a reload / refresh
-    let isReload = false;
-    try {
-      const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
-      if (nav && nav.type) {
-        isReload = nav.type === "reload";
-      } else if (window.performance && window.performance.navigation) {
-        isReload = window.performance.navigation.type === 1;
+    // Backstop for the <head> script in app/layout.tsx: a refresh on any subpage goes to the homepage.
+    if (!reloadChecked) {
+      reloadChecked = true;
+      if (isReloadNavigation() && pathname !== "/") {
+        window.location.replace("/");
+        return;
       }
-    } catch { /* navigation API unsupported */ }
-
-    // If reloading while on any subpage, redirect straight to the Homepage
-    if (isReload && pathname !== "/") {
-      window.location.replace("/");
-      return;
     }
 
     if (!hasAnchorTarget()) {
