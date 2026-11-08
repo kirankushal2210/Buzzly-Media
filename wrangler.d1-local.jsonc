@@ -1,0 +1,16 @@
+// Used only by `npm run db:migrate:local` to apply drizzle/ migrations to the
+// local D1 database that `npm run dev` uses (.wrangler/state). The deployed
+// database is migrated by the hosting platform from the same drizzle/ folder.
+{
+  "name": "buzzly-d1-local",
+  "main": "./worker/index.ts",
+  "compatibility_date": "2026-05-15",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "site-creator-d1",
+      "database_id": "00000000-0000-4000-8000-000000000000",
+      "migrations_dir": "drizzle"
+    }
+  ]
+}

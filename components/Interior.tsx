@@ -1,10 +1,8 @@
 import { InteriorHeader } from "@/components/InteriorHeader";
-import { prototypeFooter } from "@/lib/prototype-tail";
-
-const interiorFooter = prototypeFooter.replaceAll('href="#clients"', 'href="/clients"').replaceAll('href="#how"', 'href="/services"');
+import { HomeFooter } from "@/components/home/HomeFooter";
 
 export function InteriorFooter() {
-  return <div style={{ display: "contents" }} dangerouslySetInnerHTML={{ __html: interiorFooter }} />;
+  return <HomeFooter variant="interior" />;
 }
 
 export function Interior({ eyebrow, title, intro, children }: { eyebrow: string; title: string; intro?: string; children: React.ReactNode }) {

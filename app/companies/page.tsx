@@ -1,9 +1,10 @@
+import Link from "@/components/Link";
 import type { Metadata } from "next";
 import { Interior } from "@/components/Interior";
 import { companies } from "@/lib/content";
 import { InViewVideo } from "@/components/InViewVideo";
 
-export const metadata: Metadata = { title: "Our companies", description: "Meet the three businesses Buzzly is building: De Food Kampney, Buzzly Health, and Buzzly Properties." };
+export const metadata: Metadata = { alternates: { canonical: "/companies" }, title: "Our companies", description: "Meet the three businesses Buzzly is building: De Food Kampney, Buzzly Health, and Buzzly Properties." };
 
 export default function Companies() {
   return (
@@ -11,7 +12,7 @@ export default function Companies() {
       <section className="company-stage" aria-label="Buzzly companies">
         {companies.map((company, index) => (
           <article className={`company-feature company-feature-${index + 1}`} key={company.slug}>
-            <a href={`/companies/${company.slug}`} aria-label={`Explore ${company.name}`}>
+            <Link href={`/companies/${company.slug}`} aria-label={`Explore ${company.name}`}>
               <div className="company-feature-film">
                 <InViewVideo src={company.video} poster={company.poster} />
                 <span className="company-feature-tag">BUZZLY COMPANY / 0{index + 1}</span>
@@ -19,7 +20,7 @@ export default function Companies() {
                 <strong>{company.name}</strong>
               </div>
               <div className="company-feature-caption"><h2>{company.name}</h2><span>{company.field}</span><span>EXPLORE ↗</span></div>
-            </a>
+            </Link>
           </article>
         ))}
         <div className="company-stage-outro"><span>01 — 03 / OUR COMPANIES</span><p>Own the idea.<br /><em>Build the reach.</em></p></div>

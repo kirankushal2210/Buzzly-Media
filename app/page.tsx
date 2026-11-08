@@ -1,25 +1,14 @@
-"use client";
-
-import { useEffect } from "react";
 import { HomeHeader, Hero, Splash } from "@/components/HomeIntro";
-import { prototypeFooter, prototypeMainTail, prototypeOverlay } from "@/lib/prototype-tail";
+import { ExpandingScrollFilm } from "@/components/home/ExpandingScrollFilm";
+import { WorkShowcaseSection } from "@/components/home/WorkShowcaseSection";
+import { EcosystemSection } from "@/components/home/EcosystemSection";
+import { ClientPreviewSection } from "@/components/home/ClientPreviewSection";
+import { ContentLine, Manifesto, ServiceBillboard, StoryFlow } from "@/components/home/ApproachSections";
+import { HomeFooter } from "@/components/home/HomeFooter";
+
+export const metadata = { alternates: { canonical: "/" } };
 
 export default function Home() {
-  useEffect(() => {
-    document.body.classList.add("is-loading");
-    if (document.getElementById("buzzly-prototype-script")) return;
-    const fallback = window.setTimeout(() => {
-      document.body.classList.remove("is-loading");
-      document.getElementById("splash")?.classList.add("done");
-    }, 3000);
-    const script = document.createElement("script");
-    script.id = "buzzly-prototype-script";
-    script.src = "/prototype.js";
-    script.async = true;
-    document.body.appendChild(script);
-    return () => window.clearTimeout(fallback);
-  }, []);
-
   return (
     <>
       <Splash />
@@ -27,11 +16,17 @@ export default function Home() {
         <HomeHeader />
         <main id="top">
           <Hero />
-          <div style={{ display: "contents" }} dangerouslySetInnerHTML={{ __html: prototypeMainTail }} />
+          <ExpandingScrollFilm />
+          <WorkShowcaseSection />
+          <EcosystemSection />
+          <ClientPreviewSection />
+          <ServiceBillboard />
+          <Manifesto />
+          <StoryFlow />
+          <ContentLine />
         </main>
-        <div style={{ display: "contents" }} dangerouslySetInnerHTML={{ __html: prototypeFooter }} />
+        <HomeFooter />
       </div>
-      <div style={{ display: "contents" }} dangerouslySetInnerHTML={{ __html: prototypeOverlay }} />
     </>
   );
 }

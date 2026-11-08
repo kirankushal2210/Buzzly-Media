@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
 import { Interior } from "@/components/Interior";
-import { InViewVideo } from "@/components/InViewVideo";
-import { companies } from "@/lib/content";
+import { WorkGrid } from "@/components/work/WorkGrid";
+import { isCategory } from "@/lib/work";
 
-export const metadata: Metadata = { title: "Work", description: "Explore the companies Buzzly is building through content and distribution." };
+export const metadata: Metadata = {
+  title: "Work",
+  description: "Case studies from Buzzly: brand, film, and content work across food, health, real estate, and partner campaigns.",
+  alternates: { canonical: "/work" },
+};
 
-export default function Work() {
-  return <Interior eyebrow="BUZZLY / WORK IN MOTION" title="Ideas made visible." intro="Explore the businesses Buzzly is building and the worlds around them.">
-    <section className="interior-grid" aria-label="Buzzly company films">
-      {companies.map(company => <article className="interior-card" key={company.slug}>
-        <a href={`/companies/${company.slug}`} aria-label={`Explore ${company.name}`}>
-          <InViewVideo src={company.video} poster={company.poster} />
-          <h2>{company.name}</h2><p>{company.field}</p>
-        </a>
-      </article>)}
-    </section>
-  </Interior>;
+export default async function Work({ searchParams }: { searchParams: Promise<{ category?: string | string[] }> }) {
+  const { category } = await searchParams;
+  const initial = typeof category === "string" && isCategory(category) ? category : "all";
+  return (
+    <Interior eyebrow="BUZZLY / WORK IN MOTION" title="Ideas made visible." intro="The brands we’re building and the stories behind them—filter by the world you care about.">
+      <WorkGrid initialCategory={initial} />
+    </Interior>
+  );
 }

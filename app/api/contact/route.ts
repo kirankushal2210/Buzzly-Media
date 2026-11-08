@@ -1,11 +1,30 @@
+import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
+import { getDb } from "@/db";
+import { contactInquiries } from "@/db/schema";
+import { sendAutoReply, sendInboxNotification, type Inquiry } from "@/lib/email";
+import { clientIp, hashIp, isRateLimited, isRateLimitedInMemory } from "@/lib/rate-limit";
+import { autoReplyEnabled, emailConfig, ipSalt } from "@/lib/server-env";
 
+const MAX_BODY_BYTES = 8000;
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const allowedInterests = new Set(["content", "brand", "distribution", "partnership", "other"]);
+const noStore = { "Cache-Control": "no-store" };
 
+function json(body: unknown, status = 200, headers: Record<string, string> = {}) {
+  return NextResponse.json(body, { status, headers: { ...noStore, ...headers } });
+}
+
+function tryGetDb() {
+  try { return getDb(); } catch (error) {
+    console.error("Contact inquiries: database unavailable", error instanceof Error ? error.message : error);
+    return null;
+  }
+}
+
+/** The form is usable when inquiries can be stored or emailed. */
 export function GET() {
-  const ready = Boolean(process.env.RESEND_API_KEY && process.env.CONTACT_TO_EMAIL && process.env.CONTACT_FROM_EMAIL);
-  return NextResponse.json({ ready }, { headers: { "Cache-Control": "no-store" } });
+  return json({ ready: Boolean(tryGetDb() || emailConfig()) });
 }
 
 function stringField(value: unknown, max: number): string | null {
@@ -14,25 +33,79 @@ function stringField(value: unknown, max: number): string | null {
   return clean.length <= max ? clean : null;
 }
 
-function escapeHtml(value: string) {
-  return value.replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch] || ch);
+/** Rejects cross-site submissions: browsers always send Origin on POST fetches. */
+function sameOrigin(request: NextRequest) {
+  const origin = request.headers.get("origin");
+  if (!origin) return true; // non-browser clients; still rate limited
+  try { return new URL(origin).host === (request.headers.get("x-forwarded-host") || request.headers.get("host")); } catch { return false; }
 }
 
 export async function POST(request: NextRequest) {
-  if (!request.headers.get("content-type")?.includes("application/json")) return NextResponse.json({ error: "Invalid request." }, { status: 415 });
-  const length = Number(request.headers.get("content-length") || 0);
-  if (length > 8000) return NextResponse.json({ error: "Message is too long." }, { status: 413 });
+  if (!request.headers.get("content-type")?.includes("application/json")) return json({ error: "Invalid request." }, 415);
+  if (!sameOrigin(request)) return json({ error: "Invalid request." }, 403);
+  if (Number(request.headers.get("content-length") || 0) > MAX_BODY_BYTES) return json({ error: "Message is too long." }, 413);
+
   let body: Record<string, unknown>;
-  try { body = await request.json(); } catch { return NextResponse.json({ error: "Invalid request." }, { status: 400 }); }
-  if (body.website) return NextResponse.json({ ok: true });
-  const name = stringField(body.name, 100), email = stringField(body.email, 200), company = stringField(body.company, 120) ?? "", interest = stringField(body.interest, 30), message = stringField(body.message, 5000);
-  if (!name || name.length < 2 || !email || !emailPattern.test(email) || !interest || !allowedInterests.has(interest) || !message || message.length < 20) return NextResponse.json({ error: "Please complete the required fields." }, { status: 400 });
-  const { RESEND_API_KEY, CONTACT_TO_EMAIL, CONTACT_FROM_EMAIL } = process.env;
-  if (!RESEND_API_KEY || !CONTACT_TO_EMAIL || !CONTACT_FROM_EMAIL) return NextResponse.json({ error: "The contact form is being configured. Please try again later." }, { status: 503 });
-  const html = `<h1>New Buzzly inquiry</h1><p><b>Name:</b> ${escapeHtml(name)}</p><p><b>Email:</b> ${escapeHtml(email)}</p><p><b>Company:</b> ${escapeHtml(company)}</p><p><b>Interest:</b> ${escapeHtml(interest)}</p><p><b>Message:</b><br>${escapeHtml(message).replace(/\n/g, "<br>")}</p>`;
   try {
-    const response = await fetch("https://api.resend.com/emails", { method: "POST", headers: { "Authorization": `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" }, body: JSON.stringify({ from: CONTACT_FROM_EMAIL, to: [CONTACT_TO_EMAIL], reply_to: email, subject: `Buzzly inquiry: ${name}`, html }), cache: "no-store" });
-    if (!response.ok) { console.error("Contact delivery failed", response.status); return NextResponse.json({ error: "Your message could not be sent. Please try again." }, { status: 502 }); }
-    return NextResponse.json({ ok: true });
-  } catch { return NextResponse.json({ error: "Your message could not be sent. Please try again." }, { status: 502 }); }
+    const raw = await request.text();
+    if (raw.length > MAX_BODY_BYTES) return json({ error: "Message is too long." }, 413);
+    body = JSON.parse(raw);
+  } catch { return json({ error: "Invalid request." }, 400); }
+  if (!body || typeof body !== "object") return json({ error: "Invalid request." }, 400);
+  if (body.website) return json({ ok: true }); // honeypot: pretend success to bots
+
+  const name = stringField(body.name, 100), email = stringField(body.email, 200)?.toLowerCase(), company = stringField(body.company, 120) ?? "", interest = stringField(body.interest, 30), message = stringField(body.message, 5000);
+  if (!name || name.length < 2 || !email || !emailPattern.test(email) || !interest || !allowedInterests.has(interest) || !message || message.length < 20) {
+    return json({ error: "Please complete the required fields." }, 400);
+  }
+  const inquiry: Inquiry = { name, email, company, interest, message };
+  const ipHash = await hashIp(clientIp(request.headers), ipSalt());
+  const db = tryGetDb();
+
+  // 0. Rate limit: durable via the inquiries table, or per-isolate memory if the DB is down.
+  let limited = false;
+  try {
+    limited = db ? await isRateLimited(db, ipHash, email) : isRateLimitedInMemory(ipHash);
+  } catch (error) {
+    console.error("Contact inquiries: rate-limit check failed", error instanceof Error ? error.message : error);
+    limited = isRateLimitedInMemory(ipHash);
+  }
+  if (limited) return json({ error: "Too many messages in a short time. Please try again in an hour, or email us directly." }, 429, { "Retry-After": "3600" });
+
+  // 1. Persist first, so the lead survives any email failure.
+  let id: number | null = null;
+  if (db) {
+    try {
+      const [row] = await db.insert(contactInquiries)
+        .values({ ...inquiry, ipHash, userAgent: request.headers.get("user-agent")?.slice(0, 300) ?? null })
+        .returning({ id: contactInquiries.id });
+      id = row?.id ?? null;
+    } catch (error) {
+      console.error("Contact inquiries: insert failed", error instanceof Error ? error.message : error);
+    }
+  }
+
+  // 2. Notify the inbox, then confirm to the customer (only once we actually have the inquiry).
+  const notification = await sendInboxNotification(inquiry, id);
+  const received = id !== null || notification.status === "sent";
+  const autoReply = received && autoReplyEnabled() ? await sendAutoReply(inquiry, id) : { status: "skipped" as const };
+
+  // 3. Record delivery outcomes against the stored inquiry.
+  if (db && id !== null) {
+    try {
+      await db.update(contactInquiries).set({
+        status: notification.status === "sent" ? "emailed" : notification.status === "failed" ? "email_failed" : "email_skipped",
+        emailId: notification.status === "sent" ? notification.id : null,
+        emailError: notification.status === "failed" ? notification.error.slice(0, 1000) : null,
+        emailedAt: notification.status === "sent" ? new Date().toISOString() : null,
+        autoReplyStatus: autoReply.status,
+      }).where(eq(contactInquiries.id, id));
+    } catch (error) {
+      console.error("Contact inquiries: status update failed", error instanceof Error ? error.message : error);
+    }
+  }
+
+  if (received) return json({ ok: true, reference: id, confirmationSent: autoReply.status === "sent" });
+  if (notification.status === "skipped") return json({ error: "The contact form is being configured. Please try again later." }, 503);
+  return json({ error: "Your message could not be sent. Please try again." }, 502);
 }
