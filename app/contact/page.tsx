@@ -32,14 +32,9 @@ export default function Contact() {
               <h3>Fast-track your project</h3>
               <p>{whatsappHref ? "Prefer an intro call or direct messaging? Connect with our team directly:" : "Prefer an intro call? Book time with our team directly:"}</p>
 
-              <a
-                className="contact-direct-btn is-calendar"
-                href="https://cal.com/buzzlymedia"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <Link className="contact-direct-btn is-calendar" href="/book">
                 Schedule a 15-Minute Intro Call ↗
-              </a>
+              </Link>
 
               {whatsappHref && (
                 <a

@@ -358,3 +358,39 @@
 .audit-btn:hover{background:#ff4d46;transform:translateY(-2px);box-shadow:0 8px 24px #ef342d33}
 
 
+
+/* ---------- /book: intro-call booking ---------- */
+.book-layout{display:grid;grid-template-columns:minmax(240px,.75fr) minmax(0,1.6fr);gap:clamp(32px,6vw,90px);align-items:start;padding-top:70px}
+.book-details{position:sticky;top:32px}
+.book-details h2{font:400 clamp(34px,3.4vw,50px)/1 'Instrument Serif',serif;margin:0 0 26px;color:var(--cream)}
+.book-details dl{margin:0;border-top:1px solid var(--line)}
+.book-details dl>div{padding:18px 0;border-bottom:1px solid var(--line)}
+.book-details dt{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--red);font-weight:700;margin-bottom:6px}
+.book-details dd{margin:0;color:#d8d0c3;font-size:15px;line-height:1.55}
+.book-alt{margin-top:26px;font-size:14px;color:var(--soft)}
+.book-alt a{color:var(--cream);text-decoration:underline!important;text-underline-offset:3px}
+.book-panel{background:var(--panel);border:1px solid var(--line);padding:clamp(22px,3vw,40px);min-width:0}
+.book-kicker{margin:0 0 10px;font-size:11px;letter-spacing:.18em;font-weight:700;color:var(--red)}
+.book-scheduler-head{display:flex;justify-content:space-between;align-items:baseline;gap:18px;flex-wrap:wrap;margin-bottom:18px}
+.book-zone{margin:0;font-size:13px;color:var(--soft);line-height:1.5}
+.book-zone strong{color:var(--cream);font-weight:600}
+.book-embed{min-height:620px;width:100%;overflow:auto;opacity:0;transition:opacity .45s ease}
+.book-embed.is-ready{opacity:1}
+.book-skeleton{display:grid;grid-template-columns:1.2fr 1fr;gap:14px;margin-bottom:-620px;height:620px;pointer-events:none}
+.book-skeleton span{display:block;background:linear-gradient(100deg,#2a2625 30%,#353030 50%,#2a2625 70%);background-size:300% 100%;animation:book-shimmer 1.6s linear infinite}
+.book-skeleton span:first-child{grid-row:span 2}
+.book-status{min-height:20px;margin:0 0 12px;font-size:13px;color:var(--soft)}
+.book-status a{color:var(--cream);text-decoration:underline!important;text-underline-offset:3px}
+.book-unavailable h2,.book-confirmed h2{font:400 clamp(40px,4.4vw,68px)/1 'Instrument Serif',serif;margin:0 0 18px;color:var(--cream)}
+.book-unavailable p{color:#d8d0c3;line-height:1.6;max-width:520px;margin:0 0 28px}
+.book-confirmed h2:focus{outline:none}
+.book-confirmed h2:focus-visible{outline:2px solid var(--cream);outline-offset:6px}
+.book-when{display:flex;flex-direction:column;gap:6px;margin:0 0 26px;padding:18px 20px;border-left:3px solid var(--red);background:#191616}
+.book-when strong{font:400 clamp(24px,2.4vw,32px)/1.15 'Instrument Serif',serif;color:var(--cream)}
+.book-when span{font-size:13px;color:var(--soft)}
+.book-next{list-style:none;margin:0 0 30px;padding:0;display:grid;gap:14px;counter-reset:book}
+.book-next li{position:relative;padding-left:38px;color:#d8d0c3;line-height:1.6;counter-increment:book}
+.book-next li::before{content:counter(book,decimal-leading-zero);position:absolute;left:0;top:1px;font-size:12px;font-weight:700;color:var(--red);letter-spacing:.06em}
+@keyframes book-shimmer{from{background-position:100% 0}to{background-position:0 0}}
+@media (max-width:900px){.book-layout{grid-template-columns:1fr;padding-top:40px}.book-layout>.book-panel{order:-1}.book-details{position:static}.book-embed{min-height:560px}.book-skeleton{height:560px;margin-bottom:-560px;grid-template-columns:1fr}.book-skeleton span:first-child{grid-row:auto}}
+@media (prefers-reduced-motion:reduce){.book-embed{transition:none}.book-skeleton span{animation:none}}

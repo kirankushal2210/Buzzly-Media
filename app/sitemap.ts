@@ -18,6 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     page("/companies", 0.7),
     ...companies.map(company => page(`/companies/${company.slug}`, 0.6)),
     page("/contact", 0.9),
+    page("/book", 0.6),
     page("/privacy", 0.2, "yearly"),
     page("/terms", 0.2, "yearly"),
   ];

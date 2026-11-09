@@ -3,15 +3,20 @@
  * API routes, generated images). Static files in /public get the equivalent
  * rules from public/_headers.
  */
+// The intro-call calendar on /book is a Cal.com embed (lib/booking.ts): its loader script
+// and booking iframe come from Cal.com, and nothing else third-party is allowed.
+const bookingOrigins = "https://app.cal.com https://cal.com";
+
 export const contentSecurityPolicy = [
   "default-src 'self'",
   // vinext streams RSC data and the theme bootstrap as inline scripts.
-  "script-src 'self' 'unsafe-inline'",
+  `script-src 'self' 'unsafe-inline' ${bookingOrigins}`,
+  `frame-src ${bookingOrigins}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "media-src 'self' blob:",
   "font-src 'self' data:",
-  "connect-src 'self'",
+  `connect-src 'self' ${bookingOrigins}`,
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

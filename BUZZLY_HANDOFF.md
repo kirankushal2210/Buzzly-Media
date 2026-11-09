@@ -67,3 +67,17 @@ Films were re-encoded (H.264, `+faststart`) from about 28 MB to 9.8 MB in total 
 ## Known vinext issue
 
 `next/link` in the vinext 1.0.0-beta.5 production build throws on click (its lazy navigation import resolves to the wrong chunk). `components/Link.tsx` is a drop-in replacement built on `useRouter()`. Switch imports back to `next/link` when vinext fixes it.
+
+## Intro-call booking (`/book`)
+
+The "Schedule a 15-Minute Intro Call" button on `/contact` opens `/book`, which embeds a Cal.com booking calendar (`components/booking/BookingScheduler.tsx`, settings in `lib/booking.ts`). Cal.com shows available dates and times in the visitor's time zone, collects their details, and emails the calendar invitation and meeting link. When a booking completes, the page swaps to its own confirmation screen.
+
+Until `NEXT_PUBLIC_CAL_LINK` is set, `/book` shows "Online booking opens soon" with a link to the contact form; nothing is broken or invented. To go live:
+
+1. Create a free Cal.com account and connect the calendar that should receive bookings (Google or Outlook).
+2. Create an event type: 15 minutes, a video location (Cal Video, Google Meet or Zoom), sensible buffers and minimum notice, and your working hours under Availability.
+3. Under the event's **Advanced → Booking questions**, keep Name and Email, rename "Additional notes" to "What would you like help with?", and add a short-text question with the identifier `company` labelled "Company or brand". `/book?company=…` prefills it.
+4. Set `NEXT_PUBLIC_CAL_LINK` to the event, e.g. `your-username/intro-call`, in `.env.local` and in Vercel, then rebuild. The value is public: it is the same link anyone could open.
+5. Make one test booking yourself and cancel it from the confirmation email.
+
+Cal.com sends the invitation, reminders and reschedule/cancel links, and stores the booking; Buzzly's site stores nothing. The site's Content-Security-Policy (`lib/security-headers.ts`) allows only `app.cal.com` and `cal.com` for this. If the embed can't load (ad blocker, outage), the page links to the same event on cal.com and to the contact form.
