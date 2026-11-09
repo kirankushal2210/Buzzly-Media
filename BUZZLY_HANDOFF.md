@@ -23,7 +23,7 @@ Set these in Vercel → Project → Settings → Environment Variables (Producti
 | `DISCORD_WEBHOOK_URL` | Discord channel webhook (`https://discord.com/api/webhooks/...`) |
 | `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL` | Email delivery via Resend |
 | `CONTACT_IP_SALT` | Long random string for hashing IPs |
-| `CONTACT_AUTO_REPLY` | `true` to email customers a confirmation (off by default) |
+| `CONTACT_AUTO_REPLY` | Visitor confirmation email; on by default, `false` turns it off |
 
 | `SUPABASE_URL`, `SUPABASE_SECRET_KEY` | **Required.** Inquiry database (server-only secret key) |
 
@@ -37,7 +37,7 @@ The older Cloudflare D1 storage (`db/`, `drizzle/`, `db:*` scripts) is no longer
 
 ### Auto-reply, rate limiting, security
 
-- With `CONTACT_AUTO_REPLY=true`, the sender gets one short confirmation email after the team is notified (`lib/email.ts`). It never repeats their name or message, so the form can’t be used to relay spam. It is off by default.
+- Once the inquiry is saved, the visitor gets one short confirmation email (`lib/email.ts`), independent of whether the team notification succeeded. It never repeats their name or message, so the form can’t be used to relay spam, and it promises no response time. Turn it off with `CONTACT_AUTO_REPLY=false`.
 - Each IP may send 5 inquiries and each email address 3 per hour, counted in the database (`submit_inquiry`); extra attempts get HTTP 429. IPs are stored only as a salted hash — set a random `CONTACT_IP_SALT` secret in production.
 - Cross-site form posts are rejected. Security headers (CSP, frame blocking, nosniff, referrer and permissions policies, HSTS on HTTPS) are added in `worker/index.ts`; static files get theirs from `public/_headers`, which also sets long cache lifetimes for media, fonts and build assets.
 

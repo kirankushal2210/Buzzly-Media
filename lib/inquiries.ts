@@ -6,11 +6,15 @@
  *   2. notifyInquiry: claim the notification (only one concurrent request wins),
  *      send to configured channels that have not succeeded yet, record the outcome.
  * A notification failure never removes or invalidates the saved inquiry.
+ *
+ * Channels: "email" (internal notification to CONTACT_TO_EMAIL), "slack", "discord", and
+ * "confirmation" (the visitor's receipt). Each is recorded separately, so a failed
+ * confirmation never hides a delivered notification and vice versa.
  */
 import { sendAutoReply, sendInboxNotification, type Inquiry, type SendResult } from "@/lib/email";
 import { sendDiscord, sendSlack } from "@/lib/notify";
 import { CONTACT_LIMITS } from "@/lib/rate-limit";
-import { autoReplyEnabled } from "@/lib/server-env";
+import { confirmationEnabled } from "@/lib/server-env";
 import { callRpc } from "@/lib/supabase";
 
 export type SaveOutcome = "created" | "duplicate" | "key_conflict" | "rate_limited";
@@ -36,9 +40,12 @@ export async function saveInquiry(inquiry: Inquiry, idempotencyKey: string, ipHa
   return { outcome: row.outcome, id: row.inquiry_id };
 }
 
-/** Team channels decide the overall status; the auto-reply is tracked but never makes it "failed". */
+/**
+ * Team channels decide notification_status. The visitor confirmation is tracked in
+ * notification_channels.confirmation but never turns the status to "failed" on its own.
+ */
 const TEAM_CHANNELS = ["email", "slack", "discord"] as const;
-type Channel = (typeof TEAM_CHANNELS)[number] | "auto_reply";
+type Channel = (typeof TEAM_CHANNELS)[number] | "confirmation";
 type ChannelState = "sent" | "failed" | "skipped";
 export type NotificationOutcome = "sent" | "failed" | "skipped" | "not_claimed";
 
@@ -57,11 +64,14 @@ export async function notifyInquiry(inquiry: Inquiry, id: string): Promise<Notif
   const pending = (channel: Channel) => previous[channel] !== "sent";
   const skip = Promise.resolve<SendResult>({ status: "skipped" });
 
-  // Retries only resend channels that have not already delivered, so nobody gets a duplicate.
-  const [email, slack, discord] = await Promise.all([
-    pending("email") ? sendInboxNotification(inquiry, reference) : null,
+  // Retries only resend channels that have not already succeeded. Emails also carry a stable
+  // Resend idempotency key, so Resend itself drops a repeat of an email it already accepted.
+  // The confirmation is independent of the team channels: the inquiry is saved, so it was received.
+  const [email, slack, discord, confirmation] = await Promise.all([
+    pending("email") ? sendInboxNotification(inquiry, reference, `inquiry-${id}-notification`) : null,
     pending("slack") ? sendSlack(inquiry, reference) : null,
     pending("discord") ? sendDiscord(inquiry, reference) : null,
+    pending("confirmation") && confirmationEnabled() ? sendAutoReply(inquiry, reference, `inquiry-${id}-confirmation`) : null,
   ].map(task => task ?? skip));
 
   const attempt: Partial<Record<Channel, ChannelState>> = {};
@@ -74,16 +84,12 @@ export async function notifyInquiry(inquiry: Inquiry, id: string): Promise<Notif
   record("email", email);
   record("slack", slack);
   record("discord", discord);
+  record("confirmation", confirmation);
 
   const merged = { ...previous, ...attempt };
   const team = TEAM_CHANNELS.map(channel => merged[channel]);
   const status: Exclude<NotificationOutcome, "not_claimed"> =
     team.includes("failed") ? "failed" : team.includes("sent") ? "sent" : "skipped";
-
-  // Optional confirmation to the visitor: at most once, and only when the team was reached.
-  if (autoReplyEnabled() && status === "sent" && pending("auto_reply")) {
-    record("auto_reply", await sendAutoReply(inquiry, reference));
-  }
 
   // Record the outcome (retried once). If it still cannot be written, the claim simply expires
   // after its lease and the row shows "sending" in the dashboard until then.

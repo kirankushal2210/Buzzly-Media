@@ -49,9 +49,9 @@ export function anyLeadChannel() {
   return Boolean(emailConfig() || slackWebhook() || discordWebhook());
 }
 
-/** Customer confirmation emails are off unless CONTACT_AUTO_REPLY is "true". */
-export function autoReplyEnabled() {
-  return serverVar("CONTACT_AUTO_REPLY")?.toLowerCase() === "true";
+/** Visitor confirmation emails are on whenever email is configured, unless CONTACT_AUTO_REPLY is "false". */
+export function confirmationEnabled() {
+  return serverVar("CONTACT_AUTO_REPLY")?.toLowerCase() !== "false";
 }
 
 /** Salt for hashing IPs. Set CONTACT_IP_SALT in production; the fallback only keeps local dev working. */
