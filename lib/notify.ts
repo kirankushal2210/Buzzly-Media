@@ -1,4 +1,4 @@
-import type { Inquiry, SendResult } from "@/lib/email";
+import { fetchErrorCategory, type Inquiry, type SendResult } from "@/lib/email";
 import { discordWebhook, slackWebhook } from "@/lib/server-env";
 import { siteUrl } from "@/lib/site";
 
@@ -37,19 +37,19 @@ async function postJson(url: string, payload: unknown, label: string): Promise<S
       signal: AbortSignal.timeout(8000),
     });
     if (!response.ok) {
-      const detail = (await response.text()).slice(0, 300);
-      console.error(`${label} webhook failed`, response.status, detail);
-      return { status: "failed", error: `HTTP ${response.status}: ${detail}` };
+      await response.body?.cancel().catch(() => {});
+      console.error(`${label} webhook failed`, response.status);
+      return { status: "failed", error: `http_${response.status}` };
     }
     return { status: "sent", id: null };
   } catch (error) {
-    const detail = error instanceof Error ? error.message : String(error);
-    console.error(`${label} webhook failed`, detail);
-    return { status: "failed", error: detail };
+    const category = fetchErrorCategory(error);
+    console.error(`${label} webhook failed`, category);
+    return { status: "failed", error: category };
   }
 }
 
-export function sendSlack(inquiry: Inquiry, reference: number | null): Promise<SendResult> {
+export function sendSlack(inquiry: Inquiry, reference: string | null): Promise<SendResult> {
   const url = slackWebhook();
   if (!url) return Promise.resolve({ status: "skipped" });
   const { name, email, company, interest, message } = inquiry;
@@ -75,7 +75,7 @@ export function sendSlack(inquiry: Inquiry, reference: number | null): Promise<S
   }, "Slack");
 }
 
-export function sendDiscord(inquiry: Inquiry, reference: number | null): Promise<SendResult> {
+export function sendDiscord(inquiry: Inquiry, reference: string | null): Promise<SendResult> {
   const url = discordWebhook();
   if (!url) return Promise.resolve({ status: "skipped" });
   const { name, email, company, interest, message } = inquiry;

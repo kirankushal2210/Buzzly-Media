@@ -6,8 +6,15 @@ export type Inquiry = { name: string; email: string; company: string; interest: 
 
 export type SendResult =
   | { status: "sent"; id: string | null }
+  /** `error` is a short category (e.g. "http_502", "timeout"); never a provider response. */
   | { status: "failed"; error: string }
   | { status: "skipped" };
+
+/** Log- and database-safe failure category for a thrown fetch error. */
+export function fetchErrorCategory(error: unknown) {
+  const name = error instanceof Error ? error.name : "";
+  return name === "TimeoutError" || name === "AbortError" ? "timeout" : "network";
+}
 
 
 export function escapeHtml(value: string) {
@@ -23,23 +30,25 @@ async function sendViaResend(payload: Record<string, unknown>): Promise<SendResu
       headers: { Authorization: `Bearer ${config.apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({ from: config.from, ...payload }),
       cache: "no-store",
+      signal: AbortSignal.timeout(8000),
     });
     if (!response.ok) {
-      const detail = (await response.text()).slice(0, 500);
-      console.error("Resend request failed", response.status, detail);
-      return { status: "failed", error: `HTTP ${response.status}: ${detail}` };
+      // Provider bodies can echo addresses; log the status only.
+      await response.body?.cancel().catch(() => {});
+      console.error("Resend request failed", response.status);
+      return { status: "failed", error: `http_${response.status}` };
     }
     const result = await response.json().catch(() => ({})) as { id?: string };
     return { status: "sent", id: result.id ?? null };
   } catch (error) {
-    const detail = error instanceof Error ? error.message : String(error);
-    console.error("Resend request failed", detail);
-    return { status: "failed", error: detail };
+    const category = fetchErrorCategory(error);
+    console.error("Resend request failed", category);
+    return { status: "failed", error: category };
   }
 }
 
 /** Internal notification to the Buzzly inbox, with reply-to set to the sender. */
-export function sendInboxNotification(inquiry: Inquiry, reference: number | null) {
+export function sendInboxNotification(inquiry: Inquiry, reference: string | null) {
   const config = emailConfig();
   if (!config) return Promise.resolve<SendResult>({ status: "skipped" });
   const { name, email, company, interest, message } = inquiry;
@@ -54,7 +63,7 @@ export function sendInboxNotification(inquiry: Inquiry, reference: number | null
  * message, so the form cannot be used to send arbitrary text to arbitrary
  * addresses. Replies go to the Buzzly inbox.
  */
-export function sendAutoReply(inquiry: Inquiry, reference: number | null) {
+export function sendAutoReply(inquiry: Inquiry, reference: string | null) {
   const config = emailConfig();
   if (!config) return Promise.resolve<SendResult>({ status: "skipped" });
   const topic = interestLabels[inquiry.interest] ?? "your project";

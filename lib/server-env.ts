@@ -4,6 +4,7 @@ type StringVar =
   | "RESEND_API_KEY" | "CONTACT_TO_EMAIL" | "CONTACT_FROM_EMAIL"
   | "SLACK_WEBHOOK_URL" | "DISCORD_WEBHOOK_URL"
   | "CONTACT_AUTO_REPLY" | "CONTACT_IP_SALT";
+// Supabase settings are read in lib/supabase.ts.
 
 export function serverVar(name: StringVar): string | undefined {
   return getEnvVar(name);

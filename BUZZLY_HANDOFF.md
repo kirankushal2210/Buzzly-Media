@@ -25,19 +25,20 @@ Set these in Vercel → Project → Settings → Environment Variables (Producti
 | `CONTACT_IP_SALT` | Long random string for hashing IPs |
 | `CONTACT_AUTO_REPLY` | `true` to email customers a confirmation (off by default) |
 
-Leads go to every configured channel at once; a submission succeeds if at least one channel accepts it. On Vercel there is no database, so if every channel fails the visitor is asked to try again (nothing is stored). Rate limiting on Vercel is per server instance; for a hard limit, add a Vercel Firewall rate-limit rule on `POST /api/contact` (for example 5 requests per hour per IP).
+| `SUPABASE_URL`, `SUPABASE_SECRET_KEY` | **Required.** Inquiry database (server-only secret key) |
+
+Every inquiry is saved to Supabase (`public.inquiries`) before the visitor is told it was received, then sent to every configured channel (email, Slack, Discord). Retries never save or notify twice, a failed notification is recorded on the row instead of losing the inquiry, and rate limits are counted in the database, so they hold across Vercel instances. Without Supabase configured the form shows "inbox being set up" and accepts nothing.
 
 ## Inquiry inbox
 
-Every contact form submission is saved to the D1 table `contact_inquiries` (see `db/schema.ts`, migration in `drizzle/`) before any email is sent, so inquiries are kept even when Resend is down or not configured. Each row records whether the email was sent (`emailed`, `email_failed`, `email_skipped`).
+Full setup, environment variables, how to view inquiries in the Supabase dashboard, privacy, retention and backups: **[docs/INQUIRIES.md](docs/INQUIRIES.md)**. Migration: `supabase/migrations/`. Tests: `npm run test:contact` (needs a disposable Postgres; see the doc).
 
-- Local: copy `.env.example` to `.env.local` and fill in `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL`. Run `npm run db:migrate:local` once, then `npm run db:inquiries:local` to list recent inquiries.
-- Production: set the same three values as Worker secrets. The hosting platform applies `drizzle/` migrations to the real D1 database (`.openai/hosting.json` now sets `"d1": "DB"`).
+The older Cloudflare D1 storage (`db/`, `drizzle/`, `db:*` scripts) is no longer used by the contact route.
 
 ### Auto-reply, rate limiting, security
 
-- After an inquiry is stored, the sender gets a short confirmation email (`lib/email.ts`). It never repeats their name or message, so the form can’t be used to relay spam. Turn it off with `CONTACT_AUTO_REPLY=false`.
-- Each IP may send 5 inquiries and each email address 3 per hour (`lib/rate-limit.ts`); extra attempts get HTTP 429. IPs are stored only as a salted hash — set a random `CONTACT_IP_SALT` secret in production.
+- With `CONTACT_AUTO_REPLY=true`, the sender gets one short confirmation email after the team is notified (`lib/email.ts`). It never repeats their name or message, so the form can’t be used to relay spam. It is off by default.
+- Each IP may send 5 inquiries and each email address 3 per hour, counted in the database (`submit_inquiry`); extra attempts get HTTP 429. IPs are stored only as a salted hash — set a random `CONTACT_IP_SALT` secret in production.
 - Cross-site form posts are rejected. Security headers (CSP, frame blocking, nosniff, referrer and permissions policies, HSTS on HTTPS) are added in `worker/index.ts`; static files get theirs from `public/_headers`, which also sets long cache lifetimes for media, fonts and build assets.
 
 ## Legal pages

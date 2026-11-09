@@ -1,31 +1,22 @@
-import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
-import { getDb } from "@/db";
-import { contactInquiries } from "@/db/schema";
-import { sendAutoReply, sendInboxNotification, type Inquiry, type SendResult } from "@/lib/email";
+import type { Inquiry } from "@/lib/email";
+import { notifyInquiry, saveInquiry } from "@/lib/inquiries";
 import { validateInquiry } from "@/lib/inquiry-validation";
-import { sendDiscord, sendSlack } from "@/lib/notify";
-import { CONTACT_LIMITS, clientIp, hashIp, isRateLimited, isRateLimitedInMemory } from "@/lib/rate-limit";
-import { anyLeadChannel, autoReplyEnabled, ipSalt } from "@/lib/server-env";
+import { clientIp, hashIp } from "@/lib/rate-limit";
+import { ipSalt } from "@/lib/server-env";
+import { SupabaseError, supabaseConfig } from "@/lib/supabase";
 
 const MAX_BODY_BYTES = 8000;
 const noStore = { "Cache-Control": "no-store" };
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function json(body: unknown, status = 200, headers: Record<string, string> = {}) {
   return NextResponse.json(body, { status, headers: { ...noStore, ...headers } });
 }
 
-/** D1 on Cloudflare; null on Vercel, where leads go to email/Slack/Discord only. */
-function tryGetDb() {
-  try { return getDb(); } catch (error) {
-    console.error("Contact inquiries: database unavailable", error instanceof Error ? error.message : error);
-    return null;
-  }
-}
-
-/** The form is usable when leads can be stored or delivered somewhere. */
+/** The form can accept inquiries only when the database is configured. */
 export function GET() {
-  return json({ ready: Boolean(tryGetDb() || anyLeadChannel()) });
+  return json({ ready: Boolean(supabaseConfig()) });
 }
 
 /** Rejects cross-site submissions (CSRF): browsers always send Origin on POST fetches. */
@@ -36,7 +27,7 @@ function sameOrigin(request: NextRequest) {
   try { return new URL(origin).host === host; } catch { return false; }
 }
 
-const statusOf = (result: SendResult) => result.status;
+const errorCode = (error: unknown) => (error instanceof SupabaseError ? error.code : "unexpected");
 
 export async function POST(request: NextRequest) {
   if (!request.headers.get("content-type")?.includes("application/json")) return json({ error: "Invalid request." }, 415);
@@ -58,66 +49,40 @@ export async function POST(request: NextRequest) {
   if (!validation.ok) return json({ error: "Please check the highlighted fields.", fields: validation.errors }, 400);
   const inquiry: Inquiry = validation.value;
 
-  const db = tryGetDb();
+  if (!supabaseConfig()) return json({ error: "Our inbox is being set up. Please try again a little later." }, 503);
+
+  // The browser sends one key per submission attempt and reuses it on retry, so a retry
+  // returns the original result instead of saving or notifying twice. Callers without a
+  // key (non-browser clients) get a fresh one: no retry protection, everything else applies.
+  const idempotencyKey = typeof body.idempotencyKey === "string" && UUID.test(body.idempotencyKey)
+    ? body.idempotencyKey.toLowerCase()
+    : crypto.randomUUID();
   const ipHash = await hashIp(clientIp(request.headers), ipSalt());
 
-  // Rate limit: durable via D1 when available, otherwise per-instance memory (see BUZZLY_HANDOFF.md).
-  // Same limits either way: 5 per IP and 3 per email address per 60 minutes.
-  const inMemoryLimited = () =>
-    isRateLimitedInMemory(`ip:${ipHash}`, CONTACT_LIMITS.perIp) || isRateLimitedInMemory(`email:${inquiry.email}`, CONTACT_LIMITS.perEmail);
-  let limited: boolean;
+  // 1. Save first. Nothing is reported as received until the database confirms it.
+  let saved: Awaited<ReturnType<typeof saveInquiry>>;
   try {
-    limited = db ? await isRateLimited(db, ipHash, inquiry.email) : inMemoryLimited();
+    saved = await saveInquiry(inquiry, idempotencyKey, ipHash);
   } catch (error) {
-    // Database busy or unreachable: fall back to the in-memory sliding window.
-    console.error("Contact inquiries: rate-limit check failed", error instanceof Error ? error.message : error);
-    limited = inMemoryLimited();
-  }
-  if (limited) return json({ error: "You’ve sent several messages in a short time. Please try again in an hour." }, 429, { "Retry-After": "3600" });
-
-  // 1. Store first when a database exists, so the lead survives delivery failures.
-  let id: number | null = null;
-  if (db) {
-    try {
-      const [row] = await db.insert(contactInquiries)
-        .values({ ...inquiry, ipHash, userAgent: request.headers.get("user-agent")?.slice(0, 300) ?? null })
-        .returning({ id: contactInquiries.id });
-      id = row?.id ?? null;
-    } catch (error) {
-      console.error("Contact inquiries: insert failed", error instanceof Error ? error.message : error);
-    }
+    console.error("Contact inquiries: save failed", errorCode(error));
+    return json({ error: "We couldn’t save your message just now, so nothing was sent. Please try again in a moment." }, 503);
   }
 
-  // 2. Deliver to every configured channel in parallel.
-  const [email, slack, discord] = await Promise.all([
-    sendInboxNotification(inquiry, id),
-    sendSlack(inquiry, id),
-    sendDiscord(inquiry, id),
-  ]);
-  const delivered = [email, slack, discord].some(result => result.status === "sent");
-  const received = id !== null || delivered;
-  if (!delivered) console.error("Contact inquiries: no channel delivered this lead", { email: email.status, slack: slack.status, discord: discord.status, stored: id !== null });
-
-  // 3. Optional customer confirmation (off by default; see CONTACT_AUTO_REPLY).
-  const autoReply: SendResult = received && autoReplyEnabled() ? await sendAutoReply(inquiry, id) : { status: "skipped" };
-
-  // 4. Record outcomes against the stored inquiry.
-  if (db && id !== null) {
-    try {
-      await db.update(contactInquiries).set({
-        status: email.status === "sent" ? "emailed" : email.status === "failed" ? "email_failed" : "email_skipped",
-        emailId: email.status === "sent" ? email.id : null,
-        emailError: email.status === "failed" ? email.error.slice(0, 1000) : null,
-        emailedAt: email.status === "sent" ? new Date().toISOString() : null,
-        autoReplyStatus: autoReply.status,
-        channels: JSON.stringify({ email: statusOf(email), slack: statusOf(slack), discord: statusOf(discord) }),
-      }).where(eq(contactInquiries.id, id));
-    } catch (error) {
-      console.error("Contact inquiries: status update failed", error instanceof Error ? error.message : error);
-    }
+  if (saved.outcome === "rate_limited") {
+    return json({ error: "You’ve sent several messages in a short time. Please try again in an hour." }, 429, { "Retry-After": "3600" });
+  }
+  if (saved.outcome === "key_conflict" || !saved.id) {
+    return json({ error: "This form was already submitted with different details. Please refresh the page and try again." }, 409);
   }
 
-  if (received) return json({ ok: true });
-  if (!anyLeadChannel()) return json({ error: "Our inbox is being set up. Please try again a little later." }, 503);
-  return json({ error: "We couldn’t send your message just now. Please try again in a moment." }, 502);
+  // 2. Notify. The inquiry is already stored, so a failure here is recorded, not surfaced as an error.
+  try {
+    const outcome = await notifyInquiry(inquiry, saved.id);
+    if (outcome === "failed") console.error("Contact inquiries: notification failed; inquiry is saved", { outcome });
+  } catch (error) {
+    console.error("Contact inquiries: notification step errored; inquiry is saved", errorCode(error));
+  }
+
+  // The message is stored with Buzzly. This deliberately makes no claim about email delivery.
+  return json({ ok: true, received: true });
 }

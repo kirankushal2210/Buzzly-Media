@@ -4,6 +4,17 @@ import { useEffect, useId, useRef, useState, type FocusEvent, type FormEvent } f
 import { validateInquiry, type InquiryErrors, type InquiryField } from "@/lib/inquiry-validation";
 
 const SUCCESS_MESSAGE = "Thanks! Your message has reached Buzzly. Our team will review your project and get back to you shortly.";
+const NETWORK_MESSAGE = "We couldn’t reach Buzzly. Check your connection and press Send again; your message won’t be saved twice.";
+
+/** One key per submission attempt, reused on retry so the server never saves or notifies twice. */
+function newSubmissionKey() {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = [...bytes].map(byte => byte.toString(16).padStart(2, "0")).join("");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
 const FIELD_ORDER: InquiryField[] = ["name", "email", "company", "interest", "message"];
 
 type Status = "idle" | "sending" | "sent" | "error";
@@ -12,6 +23,7 @@ export function ContactForm() {
   const formRef = useRef<HTMLFormElement>(null);
   const statusRef = useRef<HTMLParagraphElement>(null);
   const inFlight = useRef(false);
+  const submissionKey = useRef<string | null>(null);
   const [status, setStatus] = useState<Status>("idle");
   const [notice, setNotice] = useState("");
   const [errors, setErrors] = useState<InquiryErrors>({});
@@ -55,6 +67,7 @@ export function ContactForm() {
 
   const onChange = (event: FormEvent<HTMLFormElement>) => {
     const field = ((event.target as unknown) as HTMLInputElement).name as InquiryField;
+    submissionKey.current = null; // edited content is a new submission
     if (touched[field]) revalidate();
     if (status === "sent" || status === "error") { setStatus("idle"); setNotice(""); }
   };
@@ -84,19 +97,26 @@ export function ContactForm() {
     }
 
     inFlight.current = true;
+    submissionKey.current ??= newSubmissionKey();
     setStatus("sending");
-    setNotice("");
+    setNotice("Sending your message…");
     try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...result.value, website: data.website ?? "" }),
-      });
+      let response: Response;
+      try {
+        response = await fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...result.value, website: data.website ?? "", idempotencyKey: submissionKey.current }),
+        });
+      } catch {
+        throw new Error(NETWORK_MESSAGE);
+      }
       const body = await response.json().catch(() => ({})) as { error?: string; fields?: InquiryErrors };
       if (!response.ok) {
         if (body.fields) { setErrors(body.fields); focusFirstError(body.fields); }
         throw new Error(body.error || "We couldn’t send your message just now. Please try again in a moment.");
       }
+      submissionKey.current = null;
       formRef.current?.reset();
       setErrors({});
       setTouched({});
@@ -106,6 +126,7 @@ export function ContactForm() {
     } catch (error) {
       setStatus("error");
       setNotice(error instanceof Error ? error.message : "Please try again.");
+      requestAnimationFrame(() => statusRef.current?.focus());
     } finally {
       inFlight.current = false;
     }

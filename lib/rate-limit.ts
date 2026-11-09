@@ -1,8 +1,9 @@
-import { and, count, eq, gt } from "drizzle-orm";
-import type { Db } from "@/db";
-import { contactInquiries } from "@/db/schema";
-
-/** Limits for the contact form. Generous for people, tight for scripts. */
+/**
+ * Contact-form rate limits. They are enforced inside the database function
+ * submit_inquiry() (supabase/migrations), which counts recent rows by hashed IP
+ * and by email, so the limit is shared by every server instance on Vercel.
+ * Retries of an already-saved submission are never counted.
+ */
 export const CONTACT_LIMITS = {
   windowMinutes: 60,
   perIp: 5,
@@ -17,36 +18,9 @@ export async function hashIp(ip: string, salt: string) {
 }
 
 export function clientIp(headers: Headers) {
-  return headers.get("cf-connecting-ip")
+  return headers.get("x-vercel-forwarded-for")?.split(",")[0]?.trim()
+    || headers.get("cf-connecting-ip")
     || headers.get("x-real-ip")
     || headers.get("x-forwarded-for")?.split(",")[0]?.trim()
     || "unknown";
-}
-
-function windowStart() {
-  // SQLite CURRENT_TIMESTAMP format: "YYYY-MM-DD HH:MM:SS" (UTC).
-  return new Date(Date.now() - CONTACT_LIMITS.windowMinutes * 60_000).toISOString().replace("T", " ").slice(0, 19);
-}
-
-/** Durable limit backed by the inquiries table, so it holds across Worker isolates. */
-export async function isRateLimited(db: Db, ipHash: string, email: string) {
-  const since = windowStart();
-  const [byIp] = await db.select({ n: count() }).from(contactInquiries)
-    .where(and(eq(contactInquiries.ipHash, ipHash), gt(contactInquiries.createdAt, since)));
-  if ((byIp?.n ?? 0) >= CONTACT_LIMITS.perIp) return true;
-  const [byEmail] = await db.select({ n: count() }).from(contactInquiries)
-    .where(and(eq(contactInquiries.email, email), gt(contactInquiries.createdAt, since)));
-  return (byEmail?.n ?? 0) >= CONTACT_LIMITS.perEmail;
-}
-
-/** Best-effort fallback when the database is unavailable: per-isolate memory. */
-const memory = new Map<string, number[]>();
-export function isRateLimitedInMemory(key: string, limit = CONTACT_LIMITS.perIp) {
-  const now = Date.now(), cutoff = now - CONTACT_LIMITS.windowMinutes * 60_000;
-  const hits = (memory.get(key) ?? []).filter(time => time > cutoff);
-  if (hits.length >= limit) { memory.set(key, hits); return true; }
-  hits.push(now);
-  memory.set(key, hits);
-  if (memory.size > 5000) memory.delete(memory.keys().next().value as string);
-  return false;
 }
