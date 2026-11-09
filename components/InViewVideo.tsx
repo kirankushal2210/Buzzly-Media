@@ -23,8 +23,10 @@ export function InViewVideo({ src, poster, className, label, controls = false }:
     let inView = false;
     let sourceLoaded = false;
 
+    // Only play once a source is attached: an earlier play() is cancelled by the load that follows
+    // ("interrupted by a new load request") and is never retried, leaving the film on its poster.
     const maybePlay = () => {
-      if (!controls && inView && !document.hidden && !motionPreference.matches && !connection?.saveData) {
+      if (!controls && sourceLoaded && inView && !document.hidden && !motionPreference.matches && !connection?.saveData) {
         void video.play().catch(() => {});
       } else if (!controls) {
         video.pause();
@@ -37,6 +39,7 @@ export function InViewVideo({ src, poster, className, label, controls = false }:
       video.src = src;
       video.load();
       sourceLoaded = true;
+      maybePlay();
     };
 
     if (!("IntersectionObserver" in window)) {

@@ -23,12 +23,12 @@ export function SiteHeader({ variant }: { variant: "home" | "interior" }) {
         })}
       </nav>
       {home ? (
-        <a className="logo buzzly-header-logo" href="#top" aria-label="Buzzly Media Home">
-          <BuzzlyLogo variant="horizontal" theme="dark" size="sm" />
+        <a className="logo buzzly-header-logo" href="#top">
+          <span aria-hidden="true" style={{ display: "contents" }}><BuzzlyLogo variant="horizontal" theme="dark" size="sm" /></span><span className="sr-only">Buzzly Media home</span>
         </a>
       ) : (
-        <Link className="logo buzzly-header-logo" href="/" aria-label="Buzzly Media Home">
-          <BuzzlyLogo variant="horizontal" theme="dark" size="sm" />
+        <Link className="logo buzzly-header-logo" href="/">
+          <span aria-hidden="true" style={{ display: "contents" }}><BuzzlyLogo variant="horizontal" theme="dark" size="sm" /></span><span className="sr-only">Buzzly Media home</span>
         </Link>
       )}
       <div className="rightnav">

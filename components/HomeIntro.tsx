@@ -39,14 +39,14 @@ export function Splash() {
 
   if (removed) return null;
   return (
-    <div className={`splash${done ? " done" : ""}`} id="splash" role="status" aria-label="Buzzly Media introduction" aria-hidden={done}>
+    <div className={`splash${done ? " done" : ""}`} id="splash" role="status" aria-label="Buzzly Media introduction" aria-hidden={done} inert={done}>
       <div className="splash-inner">
         <div className="splash-brand" style={{ marginBottom: "20px" }}>
           <BuzzlyLogo variant="vertical" theme="dark" size="lg" />
         </div>
         <h2>We build brands through content.<br /><em>Ours and everyone else’s.</em></h2>
       </div>
-      <button className="splash-skip" type="button" onClick={() => setDone(true)} aria-label="Skip introduction">Skip intro ↗</button>
+      <button className="splash-skip" type="button" onClick={() => setDone(true)} >Skip intro ↗</button>
     </div>
   );
 }

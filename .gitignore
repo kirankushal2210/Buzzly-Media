@@ -44,3 +44,7 @@ yarn-error.log*
 
 # OS metadata
 .DS_Store
+
+/playwright-report/
+/test-results/
+/qa-reports/

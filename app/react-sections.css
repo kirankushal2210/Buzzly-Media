@@ -410,3 +410,12 @@
 @keyframes book-shimmer{from{background-position:100% 0}to{background-position:0 0}}
 @media (max-width:900px){.book-layout{grid-template-columns:1fr;padding-top:40px}.book-layout>.book-panel{order:-1}.book-details{position:static}.book-embed{min-height:560px}.book-skeleton{height:560px;margin-bottom:-560px;grid-template-columns:1fr}.book-skeleton span:first-child{grid-row:auto}}
 @media (prefers-reduced-motion:reduce){.book-embed{transition:none}.book-skeleton span{animation:none}}
+
+/* ---------- Accessibility: WCAG AA text contrast ---------- */
+/* Text on Buzzly red uses near-black (4.7:1), as the form and booking buttons already do;
+   cream on red is only 3.5:1. Small red text on the dark footer is lifted slightly (4.9:1). */
+.topcontact,.cta,.rightnav .cta,.herooffer .cta,.footer-intro .cta,.serviceactions .cta,.interior .case-next-actions .cta{color:#101010}
+.footer-main p,.footer-main nav a,.footer-bottom,.footer-bottom span{color:#f2453e}
+/* WCAG 2.2 target size: footer text links get a 24px-tall tap area (they were ~15px). */
+.footer-main nav{gap:0}
+.footer-main nav a{display:inline-block;padding:5px 0}

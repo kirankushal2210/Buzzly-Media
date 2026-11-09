@@ -14,7 +14,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 migrations apply DB --local --config wrangler.d1-local.jsonc --persist-to .wrangler/state",
     "db:inquiries:local": "node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config wrangler.d1-local.jsonc --persist-to .wrangler/state --command \"SELECT id, created_at, name, email, interest, status FROM contact_inquiries ORDER BY id DESC LIMIT 20\"",
-    "test:contact": "tsx --test tests/contact-api.test.ts"
+    "test:contact": "tsx --test tests/contact-api.test.ts",
+    "test:browser": "playwright test"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
@@ -28,7 +29,7 @@
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^1.31.0",
-    "next": "16.3.4",
+    "next": "16.4.5",
     "next-themes": "^0.4.6",
     "radix-ui": "^1.6.7",
     "react": "19.2.6",
@@ -43,8 +44,10 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@cloudflare/vite-plugin": "1.37.1",
     "@cloudflare/workers-types": "4.20260515.1",
+    "@playwright/test": "^1.65.0",
     "@tailwindcss/postcss": "4.2.1",
     "@types/node": "22.19.19",
     "@types/pg": "8.23.1",
@@ -54,8 +57,9 @@
     "@vitejs/plugin-rsc": "0.5.26",
     "drizzle-kit": "0.31.10",
     "eslint": "9.39.4",
-    "eslint-config-next": "16.3.4",
+    "eslint-config-next": "16.4.5",
     "json-rpc-2.0": "1.7.1",
+    "lighthouse": "^13.6.0",
     "pg": "8.23.1",
     "raw-body": "3.0.2",
     "react-server-dom-webpack": "19.2.6",

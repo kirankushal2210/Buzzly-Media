@@ -2,7 +2,7 @@
  * Public site settings shared by metadata, the sitemap, robots and share cards.
  * Set NEXT_PUBLIC_SITE_URL to the production origin (no trailing slash).
  */
-export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://buzzly.media").replace(/\/$/, "");
+export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://buzzly.in").replace(/\/$/, "");
 
 export const siteName = "Buzzly";
 export const siteTitle = "Buzzly — Building Brands Through Content";

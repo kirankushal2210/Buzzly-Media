@@ -27,8 +27,8 @@ export function MobileNav({ contactHref }: { contactHref: string }) {
         <Dialog.Content className="mobile-drawer" aria-describedby={undefined}>
           <div className="mobile-drawer-head">
             <Dialog.Title className="sr-only">Site menu</Dialog.Title>
-            <Link href="/" className="mobile-drawer-logo" aria-label="Buzzly Media Home" onClick={() => setOpen(false)}>
-              <BuzzlyLogo variant="horizontal" theme="dark" size="sm" />
+            <Link href="/" className="mobile-drawer-logo" onClick={() => setOpen(false)}>
+              <span aria-hidden="true" style={{ display: "contents" }}><BuzzlyLogo variant="horizontal" theme="dark" size="sm" /></span><span className="sr-only">Buzzly Media home</span>
             </Link>
             <Dialog.Close className="mobile-drawer-close" aria-label="Close menu">Close ×</Dialog.Close>
           </div>

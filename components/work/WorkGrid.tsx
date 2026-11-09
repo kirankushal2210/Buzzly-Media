@@ -48,7 +48,7 @@ export function WorkGrid({ initialCategory }: { initialCategory: WorkCategory | 
         {visible.length === 0 && <p className="work-empty">No case studies in this category yet.</p>}
         {visible.map(study => (
           <article className="work-card" key={`${active}-${study.slug}`}>
-            <Link href={`/work/${study.slug}`} aria-label={`Read the ${study.client} case study`}>
+            <Link href={`/work/${study.slug}`}>
               <div className="work-card-media">
                 <InViewVideo src={study.video} poster={study.poster} />
                 <span className="work-card-tag">{study.categoryLabel}</span>

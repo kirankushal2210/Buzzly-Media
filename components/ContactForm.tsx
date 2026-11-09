@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type FocusEvent, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState, useSyncExternalStore, type FocusEvent, type FormEvent } from "react";
 import { validateInquiry, type InquiryErrors, type InquiryField } from "@/lib/inquiry-validation";
 
 const SUCCESS_MESSAGE = "Thanks! Your message has reached Buzzly. Our team will review your project and get back to you shortly.";
@@ -19,6 +19,10 @@ const FIELD_ORDER: InquiryField[] = ["name", "email", "company", "interest", "me
 
 type Status = "idle" | "sending" | "sent" | "error";
 
+const noSubscription = () => () => {};
+/** False in the server HTML and until React has attached the form's handlers. */
+const useHydrated = () => useSyncExternalStore(noSubscription, () => true, () => false);
+
 export function ContactForm() {
   const formRef = useRef<HTMLFormElement>(null);
   const statusRef = useRef<HTMLParagraphElement>(null);
@@ -29,6 +33,7 @@ export function ContactForm() {
   const [errors, setErrors] = useState<InquiryErrors>({});
   const [touched, setTouched] = useState<Partial<Record<InquiryField, boolean>>>({});
   const [deliveryReady, setDeliveryReady] = useState<boolean | null>(null);
+  const hydrated = useHydrated();
   const uid = useId();
   const errorId = (field: InquiryField) => `${uid}-${field}-error`;
 
@@ -144,7 +149,9 @@ export function ContactForm() {
     : null;
 
   return (
-    <form ref={formRef} className="contact-form" onSubmit={submit} onBlur={onBlur} onChange={onChange} noValidate aria-busy={sending}>
+    // method="post": if the browser ever submits natively (before JavaScript runs), the visitor's
+    // details go in the request body, never in the URL, history or request logs.
+    <form ref={formRef} className="contact-form" method="post" onSubmit={submit} onBlur={onBlur} onChange={onChange} noValidate aria-busy={sending}>
       <label><span className="field-label">Your name <span className="field-required" aria-hidden="true">*</span></span>
         <input {...fieldProps("name")} autoComplete="name" required maxLength={100} />
         {fieldError("name")}
@@ -174,7 +181,9 @@ export function ContactForm() {
       </label>
       {/* Honeypot: hidden from people and assistive tech; bots fill it in. */}
       <label className="honeypot" aria-hidden="true">Leave this blank<input name="website" autoComplete="off" tabIndex={-1} /></label>
-      <button type="submit" disabled={sending} aria-disabled={sending}>{sending ? "Sending…" : "Send inquiry ↗"}</button>
+      {/* Disabled until hydrated, so an early click or Enter cannot trigger a native submit. */}
+      <button type="submit" disabled={sending || !hydrated} aria-disabled={sending || !hydrated}>{sending ? "Sending…" : "Send inquiry ↗"}</button>
+      <noscript><p className="contact-preview-note">This form needs JavaScript to send your message. Please enable it and reload the page.</p></noscript>
       {deliveryReady === false && <p className="contact-preview-note">Our inbox is being set up. You can still fill in the form; sending will open shortly.</p>}
       <p ref={statusRef} tabIndex={-1} className={`contact-status${status === "sent" ? " is-success" : status === "error" ? " is-error" : ""}`} role="status" aria-live="polite">{notice}</p>
     </form>

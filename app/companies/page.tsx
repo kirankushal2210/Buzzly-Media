@@ -12,7 +12,7 @@ export default function Companies() {
       <section className="company-stage" aria-label="Buzzly sub-companies">
         {companies.map((company, index) => (
           <article className={`company-feature company-feature-${index + 1}`} key={company.slug}>
-            <Link href={`/companies/${company.slug}`} aria-label={`Explore ${company.name}`}>
+            <Link href={`/companies/${company.slug}`}>
               <div className="company-feature-film">
                 <InViewVideo src={company.video} poster={company.poster} />
                 <span className="company-feature-tag">BUZZLY SUB-COMPANY / 0{index + 1}</span>

@@ -14,7 +14,6 @@ function ShowcaseCard({ study, index }: { study: CaseStudy; index: number }) {
     <article ref={ref} className={`showcase-card${arrived ? " arrived" : ""}`} style={{ ["--accent" as string]: study.accent }}>
       <Link
         href={`/work/${study.slug}`}
-        aria-label={`${study.client}: ${study.title} Read the case study`}
         onMouseEnter={() => preview.current?.start()}
         onMouseLeave={() => preview.current?.stop()}
         onFocus={() => preview.current?.start()}
