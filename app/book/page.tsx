@@ -14,8 +14,9 @@ const expectations = [
   { label: "Duration", text: `${CALL_MINUTES} minutes, online.` },
   { label: "What we’ll cover", text: "Your brand, your audience, and what you want content and distribution to achieve." },
   { label: "Before the call", text: "Add a line about your brand when you book, so we arrive prepared." },
-  { label: "Your time zone", text: "Available times appear in your local time automatically." },
 ];
+// Shown only when online booking is available.
+const timeZoneNote = { label: "Your time zone", text: "Available times appear in your local time automatically." };
 
 export default function Book() {
   const link = bookingLink();
@@ -25,7 +26,7 @@ export default function Book() {
         <aside className="book-details">
           <h2>What to expect</h2>
           <dl>
-            {expectations.map(item => (
+            {(link ? [...expectations, timeZoneNote] : expectations).map(item => (
               <div key={item.label}><dt>{item.label}</dt><dd>{item.text}</dd></div>
             ))}
           </dl>

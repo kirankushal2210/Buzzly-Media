@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "@/components/Link";
 import { BOOKING_EMBED_SCRIPT, BOOKING_ORIGIN, bookingPageUrl } from "@/lib/booking";
 
-type Phase = "loading" | "ready" | "slow" | "failed" | "booked";
+type Phase = "idle" | "loading" | "ready" | "slow" | "failed" | "booked";
 type Booking = { start: Date | null; end: Date | null };
 
 type CalEvent = { detail?: { data?: Record<string, unknown> } };
@@ -70,16 +70,19 @@ function prefillFromUrl() {
 }
 
 export function BookingScheduler({ link }: { link: string | null }) {
-  const [phase, setPhase] = useState<Phase>("loading");
+  const [phase, setPhase] = useState<Phase>("idle");
   const [booking, setBooking] = useState<Booking | null>(null);
   const embedRef = useRef<HTMLDivElement>(null);
   const confirmRef = useRef<HTMLHeadingElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
   const timeZone = useTimeZone();
+  const revealed = phase !== "idle";
 
+  // The calendar (and Cal.com's script) loads only after the visitor presses "Choose a time".
   useEffect(() => {
-    if (!link || !embedRef.current) return;
+    if (!link || !revealed || !embedRef.current) return;
     let settled = false;
-    const slowTimer = window.setTimeout(() => { if (!settled) setPhase("slow"); }, SLOW_AFTER_MS);
+    const slowTimer = window.setTimeout(() => { if (!settled) setPhase(current => (current === "loading" ? "slow" : current)); }, SLOW_AFTER_MS);
     const cal = loadCal(() => { settled = true; setPhase("failed"); });
 
     cal("init", NAMESPACE, { origin: BOOKING_ORIGIN });
@@ -96,8 +99,9 @@ export function BookingScheduler({ link }: { link: string | null }) {
       cssVarsPerTheme: { dark: { "cal-brand": "#ef342d" }, light: { "cal-brand": "#ef342d" } },
     });
     api("on", { action: "linkReady", callback: () => { settled = true; setPhase(current => (current === "booked" ? current : "ready")); } });
-    api("on", { action: "linkFailed", callback: () => { settled = true; setPhase("failed"); } });
+    api("on", { action: "linkFailed", callback: () => { settled = true; setPhase(current => (current === "booked" ? current : "failed")); } });
 
+    // The confirmation screen appears only when Cal.com reports a completed booking.
     const onBooked = (event: CalEvent) => {
       const data = event.detail?.data ?? {};
       setBooking({ start: toDate(data.startTime ?? data.date), end: toDate(data.endTime) });
@@ -107,19 +111,28 @@ export function BookingScheduler({ link }: { link: string | null }) {
     api("on", { action: "bookingSuccessful", callback: onBooked });
 
     return () => window.clearTimeout(slowTimer);
-  }, [link]);
+  }, [link, revealed]); // once per reveal: later phase changes must not re-create the embed
 
   useEffect(() => {
     if (phase === "booked") requestAnimationFrame(() => confirmRef.current?.focus());
   }, [phase]);
 
+  const reveal = () => {
+    setPhase("loading");
+    // The button disappears, so keep keyboard and screen-reader users in the booking panel.
+    requestAnimationFrame(() => headingRef.current?.focus());
+  };
+
   if (!link) {
     return (
-      <div className="book-panel book-unavailable" role="status">
-        <p className="book-kicker">ONLINE BOOKING OPENS SOON</p>
-        <h2>The calendar isn’t live yet.</h2>
-        <p>We’re setting up online booking. In the meantime, send us a short note and we’ll arrange a time for your 15-minute call.</p>
-        <Link className="cta" href="/contact">Send a message instead ↗</Link>
+      <div className="book-panel book-unavailable">
+        <p className="book-kicker">BOOK YOUR CALL</p>
+        <h2>Fifteen minutes, at a time that suits you.</h2>
+        <button type="button" className="book-choose" disabled aria-describedby="book-soon-note">
+          Choose a time <span className="book-soon">Coming soon</span>
+        </button>
+        <p id="book-soon-note" className="book-note">Online booking isn’t open yet. Send us a short note and we’ll arrange your 15-minute call with you directly.</p>
+        <Link className="book-secondary" href="/contact">Send a message instead ↗</Link>
       </div>
     );
   }
@@ -145,21 +158,32 @@ export function BookingScheduler({ link }: { link: string | null }) {
     );
   }
 
+  const calLink = <a href={bookingPageUrl(link)} target="_blank" rel="noopener noreferrer">Open on Cal.com ↗</a>;
+
   return (
     <div className="book-panel book-scheduler" aria-busy={phase === "loading"}>
-      <div className="book-scheduler-head">
-        <p className="book-kicker">CHOOSE A TIME</p>
-        <p className="book-zone">Times are shown in {timeZone ? <strong>{friendlyZone(timeZone)}</strong> : "your local time zone"}. You can change it in the calendar.</p>
-      </div>
-      {(phase === "loading" || phase === "slow") && (
-        <div className="book-skeleton" aria-hidden="true"><span /><span /><span /></div>
+      <p className="book-kicker">BOOK YOUR CALL</p>
+      <h2 ref={headingRef} tabIndex={-1}>{revealed ? "Choose a time." : "Fifteen minutes, at a time that suits you."}</h2>
+      {!revealed ? (
+        <>
+          <p className="book-note">See open slots and book in under a minute. You’ll get a calendar invitation by email.</p>
+          <button type="button" className="book-choose" onClick={reveal}>Choose a time ↓</button>
+        </>
+      ) : (
+        <>
+          <p className="book-zone">Times are shown in {timeZone ? <strong>{friendlyZone(timeZone)}</strong> : "your local time zone"}. You can change it in the calendar.</p>
+          {(phase === "loading" || phase === "slow") && (
+            <div className="book-skeleton" aria-hidden="true"><span /><span /><span /></div>
+          )}
+          <p className="book-status" role="status" aria-live="polite">
+            {phase === "loading" && "Loading available times…"}
+            {phase === "slow" && "The calendar is taking longer than usual. You can also open it on Cal.com below."}
+            {phase === "failed" && <>We couldn’t load the calendar here. Use {calLink} instead, or <Link href="/contact">send us a message</Link>.</>}
+          </p>
+          <div ref={embedRef} className={`book-embed${phase === "ready" ? " is-ready" : ""}`} hidden={phase === "failed"} />
+        </>
       )}
-      <p className="book-status" role="status" aria-live="polite">
-        {phase === "loading" && "Loading available times…"}
-        {phase === "slow" && <>The calendar is taking longer than usual. <a href={bookingPageUrl(link)} target="_blank" rel="noopener noreferrer">Open it on Cal.com ↗</a></>}
-        {phase === "failed" && <>We couldn’t load the calendar here. <a href={bookingPageUrl(link)} target="_blank" rel="noopener noreferrer">Book on Cal.com instead ↗</a> or <Link href="/contact">send us a message</Link>.</>}
-      </p>
-      <div ref={embedRef} className={`book-embed${phase === "ready" ? " is-ready" : ""}`} hidden={phase === "failed"} />
+      <p className="book-fallback">Calendar not working? {calLink}</p>
     </div>
   );
 }

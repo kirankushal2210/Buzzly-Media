@@ -391,6 +391,22 @@
 .book-next{list-style:none;margin:0 0 30px;padding:0;display:grid;gap:14px;counter-reset:book}
 .book-next li{position:relative;padding-left:38px;color:#d8d0c3;line-height:1.6;counter-increment:book}
 .book-next li::before{content:counter(book,decimal-leading-zero);position:absolute;left:0;top:1px;font-size:12px;font-weight:700;color:var(--red);letter-spacing:.06em}
+.book-scheduler h2,.book-unavailable h2{font:400 clamp(32px,3.4vw,50px)/1.02 'Instrument Serif',serif;margin:0 0 14px;color:var(--cream)}
+.book-scheduler h2:focus{outline:none}
+.book-scheduler h2:focus-visible{outline:2px solid var(--cream);outline-offset:6px}
+.book-note{margin:0 0 22px;color:#d8d0c3;line-height:1.6;max-width:520px}
+.book-unavailable .book-note{margin:16px 0 22px}
+.book-choose{display:inline-flex;align-items:center;justify-content:center;gap:14px;min-height:54px;padding:16px 30px;background:var(--red);color:#111;border:0;font:700 15px/1 'DM Sans',sans-serif;letter-spacing:.03em;white-space:nowrap;cursor:pointer;transition:transform .2s,background .2s}
+.book-choose:hover:not(:disabled){background:#ff5149;transform:translateY(-2px)}
+.book-choose:focus-visible{outline:2px solid var(--cream);outline-offset:4px}
+.book-choose:disabled{background:#3a3433;color:#a39b91;cursor:not-allowed}
+.book-soon{display:inline-block;white-space:nowrap;padding:5px 9px;border:1px solid #6a615c;color:var(--cream);font-size:10px;letter-spacing:.14em;text-transform:uppercase}
+.book-secondary{display:inline-block;color:var(--cream);font-size:14px;font-weight:700;border-bottom:1px solid var(--cream);padding-bottom:4px}
+.book-secondary:hover{color:var(--red);border-color:var(--red)}
+.book-scheduler .book-zone{margin:0 0 16px}
+.book-fallback{margin:18px 0 0;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--soft)}
+.book-fallback a{color:var(--cream);text-decoration:underline!important;text-underline-offset:3px}
+@media (max-width:600px){.book-choose{width:100%;padding:16px 18px;gap:10px}.book-panel{padding:22px 18px}}
 @keyframes book-shimmer{from{background-position:100% 0}to{background-position:0 0}}
 @media (max-width:900px){.book-layout{grid-template-columns:1fr;padding-top:40px}.book-layout>.book-panel{order:-1}.book-details{position:static}.book-embed{min-height:560px}.book-skeleton{height:560px;margin-bottom:-560px;grid-template-columns:1fr}.book-skeleton span:first-child{grid-row:auto}}
 @media (prefers-reduced-motion:reduce){.book-embed{transition:none}.book-skeleton span{animation:none}}
