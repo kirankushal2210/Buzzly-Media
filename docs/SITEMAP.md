@@ -28,7 +28,7 @@ Buzzly is a technology-led company builder. It builds brands through content: it
 3. **Hero:** “We build brands through content. Ours and everyone else’s.” Serif display, cream text, dark background, red accents.
 4. **Immediate conversion:** “For ambitious brands ready to scale.” and red “Start a Project” button immediately beneath the headline.
 5. **Positioning:** A strategy-led brand statement; clear explanation of building distribution for own companies and partners; Our Work link.
-6. **Phone-reel story:** positioning statement beside a phone; on scroll the phone centres and plays the three sub-company reels plus a partner brief card, then releases into Work in motion (replaced the expanding film on 15 Nov 2026; see docs/03 §2).
+6. **Phone-reel story:** positioning statement beside a phone; on scroll the phone centres and steps through one reel card per sub-company plus a partner brief card, then releases into Work in motion (replaced the expanding film on 15 Nov 2026). The reels are typographic cards until new vertical films are produced.
 7. **Our companies:** Three supplied videos for De Food Kampney, Buzzly Health, and Buzzly Properties; varied editorial placement.
 8. **Work:** Motion-led sample concepts, visibly labeled until genuine work is approved.
 9. **Buzzly ecosystem:** Own companies, partner offer, and industries.
