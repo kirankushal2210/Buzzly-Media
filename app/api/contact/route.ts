@@ -4,7 +4,7 @@ import { getDb } from "@/db";
 import { contactInquiries } from "@/db/schema";
 import { sendAutoReply, sendInboxNotification, type Inquiry, type SendResult } from "@/lib/email";
 import { validateInquiry } from "@/lib/inquiry-validation";
-import { sendDiscord, sendSlack } from "@/lib/notify";
+import { sendDiscord, sendLeadWebhook, sendSlack, sendTelegram } from "@/lib/notify";
 import { CONTACT_LIMITS, clientIp, hashIp, isRateLimited, isRateLimitedInMemory } from "@/lib/rate-limit";
 import { anyLeadChannel, autoReplyEnabled, ipSalt } from "@/lib/server-env";
 
@@ -23,9 +23,25 @@ function tryGetDb() {
   }
 }
 
+/**
+ * True only when the inquiries table actually answers a query. A database
+ * binding alone isn't enough: before migrations run, every insert would fail.
+ */
+async function databaseUsable(db: ReturnType<typeof tryGetDb>) {
+  if (!db) return false;
+  try {
+    await db.select({ id: contactInquiries.id }).from(contactInquiries).limit(1);
+    return true;
+  } catch (error) {
+    console.error("Contact inquiries: table not usable (run the D1 migrations)", error instanceof Error ? error.message : error);
+    return false;
+  }
+}
+
 /** The form is usable when leads can be stored or delivered somewhere. */
-export function GET() {
-  return json({ ready: Boolean(tryGetDb() || anyLeadChannel()) });
+export async function GET() {
+  if (anyLeadChannel()) return json({ ready: true });
+  return json({ ready: await databaseUsable(tryGetDb()) });
 }
 
 /** Rejects cross-site submissions (CSRF): browsers always send Origin on POST fetches. */
@@ -89,14 +105,17 @@ export async function POST(request: NextRequest) {
   }
 
   // 2. Deliver to every configured channel in parallel.
-  const [email, slack, discord] = await Promise.all([
+  const [email, slack, discord, telegram, webhook] = await Promise.all([
     sendInboxNotification(inquiry, id),
     sendSlack(inquiry, id),
     sendDiscord(inquiry, id),
+    sendTelegram(inquiry, id),
+    sendLeadWebhook(inquiry, id),
   ]);
-  const delivered = [email, slack, discord].some(result => result.status === "sent");
+  const outcomes = { email: statusOf(email), slack: statusOf(slack), discord: statusOf(discord), telegram: statusOf(telegram), webhook: statusOf(webhook) };
+  const delivered = Object.values(outcomes).some(status => status === "sent");
   const received = id !== null || delivered;
-  if (!delivered) console.error("Contact inquiries: no channel delivered this lead", { email: email.status, slack: slack.status, discord: discord.status, stored: id !== null });
+  if (!delivered) console.error("Contact inquiries: no channel delivered this lead", { ...outcomes, stored: id !== null });
 
   // 3. Optional customer confirmation (off by default; see CONTACT_AUTO_REPLY).
   const autoReply: SendResult = received && autoReplyEnabled() ? await sendAutoReply(inquiry, id) : { status: "skipped" };
@@ -110,7 +129,7 @@ export async function POST(request: NextRequest) {
         emailError: email.status === "failed" ? email.error.slice(0, 1000) : null,
         emailedAt: email.status === "sent" ? new Date().toISOString() : null,
         autoReplyStatus: autoReply.status,
-        channels: JSON.stringify({ email: statusOf(email), slack: statusOf(slack), discord: statusOf(discord) }),
+        channels: JSON.stringify(outcomes),
       }).where(eq(contactInquiries.id, id));
     } catch (error) {
       console.error("Contact inquiries: status update failed", error instanceof Error ? error.message : error);
@@ -118,6 +137,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (received) return json({ ok: true });
-  if (!anyLeadChannel()) return json({ error: "Our inbox is being set up. Please try again a little later." }, 503);
+  // Visitor-facing copy stays neutral; the maintenance detail is in the server log above.
+  if (!anyLeadChannel()) return json({ error: "We can’t receive messages right now. Please try again in a little while." }, 503);
   return json({ error: "We couldn’t send your message just now. Please try again in a moment." }, 502);
 }

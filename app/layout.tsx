@@ -68,7 +68,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   // One preload hint per critical font (React dedupes these; <link> tags were emitted twice).
   for (const font of fonts) preload(`/fonts/${font}.woff2`, { as: "font", type: "font/woff2", crossOrigin: "anonymous" });
   return <html lang="en" suppressHydrationWarning><head>
-    {/* On refresh/reload: redirect directly to the homepage and reset scroll to the hero section. */}
+    {/* Owner decision: a browser refresh on any interior page returns to the homepage (so the site always re-enters through the intro). Fresh loads and in-app navigation are untouched; otherwise start at the top unless a #hash targets a section. */}
     <script dangerouslySetInnerHTML={{ __html: "(function(){try{if('scrollRestoration' in history){history.scrollRestoration='manual';}var nav=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{};var isReload=nav.type==='reload'||(window.performance&&window.performance.navigation&&window.performance.navigation.type===1);if(isReload&&window.location.pathname!=='/'){window.location.replace('/');return;}if(!window.location.hash){window.scrollTo(0,0);window.addEventListener('load',function(){window.scrollTo(0,0);});}}catch(e){}})();" }} />
     {/* Enables scroll-reveal styles only when JavaScript runs; content stays visible otherwise. */}
     <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />

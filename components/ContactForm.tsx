@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState, type FocusEvent, type FormEvent } f
 import { validateInquiry, type InquiryErrors, type InquiryField } from "@/lib/inquiry-validation";
 
 const SUCCESS_MESSAGE = "Thanks! Your message has reached Buzzly. Our team will review your project and get back to you shortly.";
+const UNAVAILABLE_MESSAGE = "We can’t receive messages right now. Please try again in a little while.";
 const FIELD_ORDER: InquiryField[] = ["name", "email", "company", "interest", "message"];
 
 type Status = "idle" | "sending" | "sent" | "error";
@@ -79,7 +80,7 @@ export function ContactForm() {
     }
     if (deliveryReady === false) {
       setStatus("error");
-      setNotice("Our inbox is being set up. Please try again a little later.");
+      setNotice(UNAVAILABLE_MESSAGE);
       return;
     }
 
@@ -154,7 +155,7 @@ export function ContactForm() {
       {/* Honeypot: hidden from people and assistive tech; bots fill it in. */}
       <label className="honeypot" aria-hidden="true">Leave this blank<input name="website" autoComplete="off" tabIndex={-1} /></label>
       <button type="submit" disabled={sending} aria-disabled={sending}>{sending ? "Sending…" : "Send inquiry ↗"}</button>
-      {deliveryReady === false && <p className="contact-preview-note">Our inbox is being set up. You can still fill in the form; sending will open shortly.</p>}
+      {deliveryReady === false && <p className="contact-preview-note">{UNAVAILABLE_MESSAGE}</p>}
       <p ref={statusRef} tabIndex={-1} className={`contact-status${status === "sent" ? " is-success" : status === "error" ? " is-error" : ""}`} role="status" aria-live="polite">{notice}</p>
     </form>
   );
