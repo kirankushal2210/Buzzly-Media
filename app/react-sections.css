@@ -141,24 +141,6 @@
 :where(.lightcard,.clients-logo:hover) :focus-visible{outline-color:var(--red,#ef342d)!important}
 :focus:not(:focus-visible){outline:none}
 
-/* ---------- Expanding scroll film controls ---------- */
-.film-controls{bottom:6px;flex-wrap:wrap}
-.film-actions{flex-wrap:wrap}
-.film-controls .film-secondary{background:#151313bf;color:var(--cream);border:1px solid #f5efdf99}
-.film-controls .film-secondary:hover,.film-controls .film-secondary[aria-pressed="true"],.film-controls .film-secondary[aria-expanded="true"]{background:var(--cream);color:var(--bg)}
-.film-time{min-width:110px;text-align:right;font-variant-numeric:tabular-nums}
-.film-scrubber{position:absolute;z-index:3;left:0;right:0;bottom:0;width:100%;height:14px;margin:0;padding:0;background:transparent;-webkit-appearance:none;appearance:none;cursor:pointer}
-.film-scrubber::-webkit-slider-runnable-track{height:4px;background:linear-gradient(to right,var(--red) var(--progress,0%),#ffffff38 var(--progress,0%))}
-.film-scrubber::-moz-range-track{height:4px;background:#ffffff38}
-.film-scrubber::-moz-range-progress{height:4px;background:var(--red)}
-.film-scrubber::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;margin-top:-5px;border-radius:50%;background:var(--cream);border:0;opacity:0;transition:opacity .2s}
-.film-scrubber::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--cream);border:0}
-.film-frame:hover .film-scrubber::-webkit-slider-thumb,.film-scrubber:focus-visible::-webkit-slider-thumb{opacity:1}
-.film-transcript h2{font:400 clamp(32px,3vw,46px)/1 'Instrument Serif',serif;color:var(--cream);margin:10px 0 20px}
-.film-transcript-cta{margin:0 auto 60px;padding-top:20px;padding-bottom:20px;border-bottom:1px solid var(--line)}
-.film-transcript-cta button{background:none;border:0;padding:0;color:var(--cream);font-size:13px;letter-spacing:.1em;text-transform:uppercase}
-.film-transcript-cta button:hover{color:var(--red)}
-@media(max-width:750px){.film-controls{padding:24px 12px 14px;gap:8px}.film-controls>span:first-child{display:none}.film-time{min-width:0}.film-controls .film-secondary{padding:8px 9px}}
 
 /* ---------- Work showcase ---------- */
 .showcase-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:64px 28px;margin-top:40px}
@@ -273,7 +255,6 @@
   .js .showcase-card{opacity:1!important;transform:none!important}
   .hover-preview img,.showcase-title,.clientteaser-outcomes a{transition:none!important}
   .showcase-play{display:none}
-  .film-scroll-hint{display:none}
 }
 
 /* ---------- Legal pages ---------- */
@@ -311,18 +292,6 @@
 .contact-status.is-success{color:var(--cream);border-left:3px solid #3ddc84;padding:12px 16px;background:#3ddc8414}
 .contact-status.is-error{color:#ff7a73}
 
-/* ---------- Expanding film without layout shift ----------
-   The frame fills the sticky area; scroll only changes clip-path and transforms
-   (custom properties set in ExpandingScrollFilm). Defaults match the collapsed
-   state so server-rendered HTML looks identical before JavaScript runs. */
-@media (prefers-reduced-motion: no-preference){
-  .film-frame.is-clip{--ix:15%;--iy:21%;--iy-px:21vh;--r:16px;--vs:.7;--cw:70vw;width:100%;height:100%;min-height:0;max-height:none;border-radius:0;box-shadow:none;background:transparent;clip-path:inset(var(--iy) var(--ix) round var(--r));will-change:clip-path}
-  .film-frame.is-clip video{transform:scale(var(--vs));transform-origin:center;will-change:transform;background:#211c1b}
-  .film-frame.is-clip .film-controls,.film-frame.is-clip .film-scrubber{left:50%;right:auto;width:var(--cw);transform:translate(-50%,calc(-1 * var(--iy-px)));will-change:transform}
-}
-@media (prefers-reduced-motion: no-preference) and (max-width:750px){
-  .film-frame.is-clip{--ix:4%;--iy:22%;--iy-px:22vh;--r:9px;--vs:.92;--cw:92vw}
-}
 
 /* ---------- FAQ Section ---------- */
 .faq-section{max-width:1500px;margin:100px auto 140px;padding:0 clamp(20px,8vw,130px)}

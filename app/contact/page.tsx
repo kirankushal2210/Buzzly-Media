@@ -3,7 +3,7 @@ import Link from "@/components/Link";
 import { Interior } from "@/components/Interior";
 import { ContactForm } from "@/components/ContactForm";
 import { FaqSection } from "@/components/FaqSection";
-import { whatsappLink } from "@/lib/site";
+import { bookingUrl, responsePromise, whatsappLink } from "@/lib/site";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/contact" },
@@ -29,17 +29,29 @@ export default function Contact() {
             </p>
 
             <div className="contact-direct-actions">
-              <h3>Fast-track your project</h3>
-              <p>{whatsappHref ? "Prefer an intro call or direct messaging? Connect with our team directly:" : "Prefer an intro call? Book time with our team directly:"}</p>
+              {(bookingUrl || whatsappHref) && (
+                <>
+                  <h3>Fast-track your project</h3>
+                  <p>
+                    {bookingUrl && whatsappHref
+                      ? "Prefer an intro call or direct messaging? Connect with our team directly:"
+                      : bookingUrl
+                        ? "Prefer an intro call? Book time with our team directly:"
+                        : "Prefer direct messaging? Connect with our team directly:"}
+                  </p>
+                </>
+              )}
 
-              <a
-                className="contact-direct-btn is-calendar"
-                href="https://cal.com/buzzlymedia"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Schedule a 15-Minute Intro Call ↗
-              </a>
+              {bookingUrl && (
+                <a
+                  className="contact-direct-btn is-calendar"
+                  href={bookingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Schedule a 15-Minute Intro Call ↗
+                </a>
+              )}
 
               {whatsappHref && (
                 <a
@@ -54,7 +66,7 @@ export default function Contact() {
 
               <div className="contact-trust-badge">
                 <span className="contact-trust-dot" aria-hidden="true" />
-                <span>Creative directors reply within 24–48 business hours</span>
+                <span>Our team replies to every inquiry within {responsePromise}</span>
               </div>
             </div>
           </div>

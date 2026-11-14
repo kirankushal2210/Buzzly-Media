@@ -64,13 +64,7 @@ export function Hero() {
         <p><span aria-hidden="true">〰</span> For ambitious brands ready to scale. <span aria-hidden="true">〰</span></p>
         <Link className="cta" href="/contact">Start a Project</Link>
       </div>
-      <div className="lede">
-        <div className="hero-statement">
-          <p>A technology-led company builder with content at its core.</p>
-          <small>We build our own businesses and help ambitious partners grow through strategy, storytelling, and distribution.</small>
-          <Link className="outlinecta" href="/work">Our Work</Link>
-        </div>
-      </div>
+      {/* The positioning statement ("A technology-led company builder…") now lives in PhoneReelStory, beside the phone. */}
     </section>
   );
 }

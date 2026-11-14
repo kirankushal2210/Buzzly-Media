@@ -5,8 +5,9 @@ import { usePathname } from "next/navigation";
 import { hasAnchorTarget, scrollToTopNow } from "@/lib/scroll";
 
 /**
- * Ensures that whenever the page is refreshed from anywhere or scrolled down,
- * the user is always returned to the Homepage (Hero Section at /) pinned at the top.
+ * Starts every page at the top, unless the URL has a #hash pointing at a
+ * section. (A browser refresh on an interior page is sent back to "/" by the
+ * inline script in app/layout.tsx before this component runs — owner decision.)
  */
 export function ScrollReset() {
   const pathname = usePathname();
@@ -15,23 +16,6 @@ export function ScrollReset() {
     try {
       if ("scrollRestoration" in history) history.scrollRestoration = "manual";
     } catch { /* unsupported */ }
-
-    // Detect if this visit was triggered by a reload / refresh
-    let isReload = false;
-    try {
-      const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
-      if (nav && nav.type) {
-        isReload = nav.type === "reload";
-      } else if (window.performance && window.performance.navigation) {
-        isReload = window.performance.navigation.type === 1;
-      }
-    } catch { /* navigation API unsupported */ }
-
-    // If reloading while on any subpage, redirect straight to the Homepage
-    if (isReload && pathname !== "/") {
-      window.location.replace("/");
-      return;
-    }
 
     if (!hasAnchorTarget()) {
       scrollToTopNow();

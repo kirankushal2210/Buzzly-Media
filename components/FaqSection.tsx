@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { responsePromise } from "@/lib/site";
 
 interface FaqItem {
   question: string;
@@ -26,7 +27,7 @@ const faqs: FaqItem[] = [
   {
     question: "How do we start a project conversation?",
     answer:
-      "Share your brand, goals, and audience in our inquiry form. We review every brief within two working days and schedule an introductory conversation to explore whether we’re the right creative partner for your goals.",
+      `Share your brand, goals, and audience in our inquiry form. We review every brief within ${responsePromise} and schedule an introductory conversation to explore whether we’re the right creative partner for your goals.`,
   },
 ];
 

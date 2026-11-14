@@ -1,5 +1,5 @@
 import type { Inquiry, SendResult } from "@/lib/email";
-import { discordWebhook, slackWebhook } from "@/lib/server-env";
+import { discordWebhook, leadWebhook, slackWebhook, telegramConfig } from "@/lib/server-env";
 import { siteUrl } from "@/lib/site";
 
 export const interestLabels: Record<string, string> = {
@@ -7,6 +7,7 @@ export const interestLabels: Record<string, string> = {
   brand: "Brand strategy",
   distribution: "Distribution",
   partnership: "Partnership",
+  careers: "Joining the team",
   other: "Something else",
 };
 
@@ -27,16 +28,22 @@ export function escapeDiscord(value: string) {
     .replace(/https?:\/\//gi, match => match.replace("//", "/​/"));
 }
 
-async function postJson(url: string, payload: unknown, label: string): Promise<SendResult> {
+/** Telegram HTML mode: only these three need escaping. */
+export function escapeTelegram(value: string) {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+async function postJson(url: string, payload: unknown, label: string, headers: Record<string, string> = {}): Promise<SendResult> {
   try {
     const response = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...headers },
       body: JSON.stringify(payload),
       cache: "no-store",
       signal: AbortSignal.timeout(8000),
     });
     if (!response.ok) {
+      // Never log the response URL: Telegram and webhook URLs embed secrets.
       const detail = (await response.text()).slice(0, 300);
       console.error(`${label} webhook failed`, response.status, detail);
       return { status: "failed", error: `HTTP ${response.status}: ${detail}` };
@@ -97,4 +104,54 @@ export function sendDiscord(inquiry: Inquiry, reference: number | null): Promise
       footer: { text: "buzzly contact form" },
     }],
   }, "Discord");
+}
+
+/** Telegram bot message to the maintainer's chat. Free, instant on the phone, no email needed. */
+export function sendTelegram(inquiry: Inquiry, reference: number | null): Promise<SendResult> {
+  const config = telegramConfig();
+  if (!config) return Promise.resolve({ status: "skipped" });
+  const { name, email, company, interest, message } = inquiry;
+  const title = `New Buzzly inquiry${reference ? ` #${reference}` : ""}`;
+  const text = [
+    `<b>${escapeTelegram(title)}</b>`,
+    "",
+    `<b>Name:</b> ${escapeTelegram(clip(name, 100))}`,
+    `<b>Email:</b> ${escapeTelegram(clip(email, 200))}`,
+    `<b>Company:</b> ${escapeTelegram(clip(company || "—", 120))}`,
+    `<b>Interest:</b> ${escapeTelegram(interestLabels[interest] ?? interest)}`,
+    "",
+    `<b>Message:</b>`,
+    escapeTelegram(clip(message, 3000)),
+    "",
+    `Reply to ${escapeTelegram(email)} · ${escapeTelegram(siteUrl)}/contact`,
+  ].join("\n");
+  return postJson(`https://api.telegram.org/bot${config.token}/sendMessage`, {
+    chat_id: config.chatId,
+    text: clip(text, 4096), // Telegram's hard limit per message
+    parse_mode: "HTML",
+    disable_web_page_preview: true,
+  }, "Telegram");
+}
+
+/**
+ * Generic JSON webhook (Google Apps Script, Zapier, Make, n8n…). Sends the
+ * plain inquiry so the receiver can append it to a sheet or CRM. If
+ * LEAD_WEBHOOK_SECRET is set it is sent as `X-Buzzly-Secret` so the receiver
+ * can reject posts that don't come from this site.
+ */
+export function sendLeadWebhook(inquiry: Inquiry, reference: number | null): Promise<SendResult> {
+  const config = leadWebhook();
+  if (!config) return Promise.resolve({ status: "skipped" });
+  const payload = {
+    source: "buzzly-contact-form",
+    reference,
+    receivedAt: new Date().toISOString(),
+    name: inquiry.name,
+    email: inquiry.email,
+    company: inquiry.company,
+    interest: inquiry.interest,
+    interestLabel: interestLabels[inquiry.interest] ?? inquiry.interest,
+    message: inquiry.message,
+  };
+  return postJson(config.url, payload, "Lead webhook", config.secret ? { "X-Buzzly-Secret": config.secret } : {});
 }

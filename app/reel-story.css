@@ -1,0 +1,107 @@
+/* ---------- Homepage phone-reel story ----------
+   PhoneReelStory pins .reel-stage and writes transform/opacity straight onto
+   .reel-copy, .reel-rig and .reel-hint; the reel feed follows --reel-index with
+   a CSS transition. Nothing here changes layout while scrolling.
+
+   .reel-slot is layout only and must never be transformed: the script measures
+   it to know how far the phone has to travel. Move .reel-rig instead.
+
+   Everything inside the phone is sized in cqw (1% of the screen's width) with a
+   px fallback first, so the phone can shrink on short or narrow viewports
+   without its contents overflowing. Defaults equal the first frame, so the
+   server-rendered page looks right before any script runs. */
+.reel-story{--reel-vh:1vh;position:relative;height:calc((var(--reel-count,4) + 1) * 100 * var(--reel-vh));margin-top:-10px}
+@supports (height:1svh){.reel-story{--reel-vh:1svh}}
+.reel-stage{--reel-rise:0;position:sticky;top:0;height:calc(100 * var(--reel-vh));min-height:520px;max-width:1500px;margin:0 auto;padding:0 clamp(20px,8vw,130px);box-sizing:border-box;display:grid;grid-template-columns:1fr minmax(300px,.8fr);align-items:center;gap:8vw;overflow:hidden}
+.reel-copy{will-change:opacity,transform}
+.reel-slot{justify-self:center}
+.reel-rig{display:flex;flex-direction:column;align-items:center;gap:20px;transform:translate3d(0,calc(var(--reel-rise) * 100 * var(--reel-vh)),0);will-change:transform}
+
+/* The phone: as wide as the layout allows, but never taller than the stage can show with its tabs. */
+.reel-phone{position:relative;width:min(clamp(230px,21vw,290px),calc((100 * var(--reel-vh) - 150px) * .4663));min-width:190px;aspect-ratio:9/19.3;border-radius:46px;background:#0b0a0a;border:7px solid #272120;box-shadow:0 40px 90px #000a,inset 0 0 0 1px #3a3331}
+.reel-island{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:34%;height:22px;border-radius:14px;background:#0b0a0a;z-index:3}
+.reel-screen{position:absolute;inset:0;border-radius:38px;overflow:hidden;background:#1b1716;container-type:inline-size}
+.reel-feed{list-style:none;margin:0;padding:0;height:100%;transform:translate3d(0,calc(var(--reel-index,0) * -100%),0);transition:transform .8s cubic-bezier(.22,1,.36,1);will-change:transform}
+.reel-item{position:relative;height:100%;overflow:hidden;background:var(--tone,#f5efdf);color:#151313}
+
+/* The card: a poster in the reel's colour */
+.reel-card{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:70px 20px 136px;padding-inline:7.5cqw}
+.reel-card::before{content:'';position:absolute;inset:0;background:radial-gradient(120% 70% at 14% 6%,#ffffff47,transparent 62%),linear-gradient(180deg,transparent 58%,#1513131f);pointer-events:none}
+.reel-card::after{content:'';position:absolute;inset:9px;border:1px solid #15131338;border-radius:30px;pointer-events:none}
+.reel-over{position:relative;font:700 9px/1.2 'DM Sans',sans-serif;font-size:max(9px,3.4cqw);letter-spacing:.14em;text-transform:uppercase;color:#151313c7;margin-bottom:14px}
+.reel-headline{position:relative;margin:0;font:400 52px/.92 'Instrument Serif',serif;font-size:20.5cqw;letter-spacing:-.04em;white-space:nowrap}
+.reel-headline em{font-style:italic;color:var(--tone-accent,#151313)}
+.reel-line{display:block;transform:translate3d(0,.45em,0);opacity:0;transition:transform .8s cubic-bezier(.22,1,.36,1) .16s,opacity .5s ease .16s}
+.reel-headline em.reel-line{transition-delay:.26s}
+.reel-item.is-active .reel-line{transform:none;opacity:1}
+.reel-points{position:relative;list-style:none;margin:22px 0 0;padding:0;display:grid;gap:8px;font:700 10px/1.2 'DM Sans',sans-serif;font-size:max(10px,3.7cqw);letter-spacing:.08em;text-transform:uppercase;opacity:0;transition:opacity .5s ease .36s}
+.reel-item.is-active .reel-points{opacity:1}
+.reel-points span{display:inline-block;width:2.4em;color:#151313a6}
+
+/* Phone chrome around the card */
+.reel-top{position:absolute;top:46px;left:18px;right:18px;display:flex;justify-content:space-between;font:700 9px/1 'DM Sans',sans-serif;font-size:max(9px,3.3cqw);letter-spacing:.14em;color:#151313c7;z-index:2}
+.reel-side{position:absolute;right:14px;bottom:152px;display:flex;flex-direction:column;gap:16px;color:#151313;z-index:2;opacity:.82}
+.reel-side svg{width:21px;height:21px;width:max(18px,7.4cqw);height:max(18px,7.4cqw)}
+.reel-caption{position:absolute;left:18px;right:18px;bottom:26px;z-index:2}
+.reel-kicker{display:block;font:700 9px/1.25 'DM Sans',sans-serif;font-size:max(9px,3.3cqw);letter-spacing:.14em;text-transform:uppercase;color:#151313c7;margin-bottom:8px}
+.reel-title{font:400 24px/1 'Instrument Serif',serif;font-size:max(21px,9.4cqw);letter-spacing:-.02em;margin:0 0 12px}
+.reel-caption a{display:inline-block;background:#151313;color:var(--cream);font:700 10px/1 'DM Sans',sans-serif;font-size:max(10px,3.8cqw);letter-spacing:.04em;padding:9px 12px;text-decoration:none}
+.reel-caption a:hover,.reel-caption a:focus-visible{background:var(--cream);color:#151313}
+/* Narrow phone screens (small handsets, short laptop windows): drop what does not fit instead of wrapping it. */
+@container (max-width:215px){
+  .reel-cta-detail{display:none}
+}
+@container (max-width:190px){
+  .reel-card{padding-top:58px;padding-bottom:150px}
+  .reel-over{margin-bottom:8px}
+  .reel-points{display:block;margin-top:12px;line-height:1.55}
+  .reel-points li{display:inline}
+  .reel-points li:not(:last-child)::after{content:" · "}
+  .reel-points span{display:none}
+}
+
+/* Buttons under the phone: jump to a reel, and show where you are */
+.reel-tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:360px}
+.reel-tabs button{display:inline-flex;align-items:center;gap:7px;background:none;border:1px solid var(--line);color:var(--soft);font:700 10px/1 'DM Sans',sans-serif;letter-spacing:.1em;text-transform:uppercase;padding:8px 11px;border-radius:999px;cursor:pointer}
+.reel-tabs button:hover{color:var(--cream)}
+.reel-tabs button[aria-pressed="true"]{color:var(--cream);border-color:var(--cream)}
+.reel-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.reel-tabs button[aria-pressed="true"] .reel-dot{background:var(--red)}
+
+.reel-hint{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);display:flex;gap:10px;align-items:center;color:var(--cream);font-size:10px;letter-spacing:.18em;white-space:nowrap;pointer-events:none}
+.reel-hint span:last-child{color:var(--red);font-size:18px}
+
+@media(max-width:900px){
+  .reel-stage{grid-template-columns:1fr minmax(240px,.9fr);gap:5vw}
+}
+/* Phones: the statement sits at the top, the phone peeks in from below and rises to the centre as the statement fades. */
+@media(max-width:750px){
+  .reel-story{height:calc((var(--reel-count,4) + .6) * 100 * var(--reel-vh))}
+  .reel-stage{--reel-rise:.3;display:block;padding:0 20px;min-height:0}
+  .reel-copy{position:absolute;top:56px;left:20px;right:20px;z-index:1}
+  .reel-copy p{font-size:clamp(26px,7.5vw,34px);margin-bottom:14px}
+  .reel-copy small{font-size:14px}
+  .reel-copy .outlinecta{margin-top:18px}
+  .reel-slot{position:absolute;inset:0;display:grid;place-items:center}
+  .reel-rig{gap:14px}
+  .reel-phone{width:min(56vw,240px,calc((100 * var(--reel-vh) - 150px) * .4663))}
+  .reel-tabs button span:last-child{display:none}
+  .reel-tabs button{padding:8px}
+  .reel-hint{display:none}
+}
+@media(max-width:750px) and (max-height:620px){
+  .reel-stage{--reel-rise:.44}
+  .reel-copy{top:34px}
+}
+@media(prefers-reduced-motion:reduce){
+  .reel-story{height:auto;margin:40px 0 60px}
+  .reel-stage{position:relative;height:auto;min-height:0;padding-top:30px;padding-bottom:30px;overflow:visible}
+  .reel-copy{position:static}
+  .reel-slot{position:static;display:block;margin-top:34px}
+  .reel-rig{transform:none}
+  .reel-feed,.reel-line,.reel-points{transition:none}
+  .reel-hint{display:none}
+}
+@media(prefers-reduced-motion:reduce) and (min-width:751px){
+  .reel-slot{margin-top:0}
+}

@@ -3,7 +3,9 @@ import { getEnvVar } from "@/lib/runtime-env";
 type StringVar =
   | "RESEND_API_KEY" | "CONTACT_TO_EMAIL" | "CONTACT_FROM_EMAIL"
   | "SLACK_WEBHOOK_URL" | "DISCORD_WEBHOOK_URL"
-  | "CONTACT_AUTO_REPLY" | "CONTACT_IP_SALT";
+  | "TELEGRAM_BOT_TOKEN" | "TELEGRAM_CHAT_ID"
+  | "LEAD_WEBHOOK_URL" | "LEAD_WEBHOOK_SECRET"
+  | "CONTACT_AUTO_REPLY" | "CONTACT_IP_SALT" | "MAINTAINER_TOKEN";
 
 export function serverVar(name: StringVar): string | undefined {
   return getEnvVar(name);
@@ -43,9 +45,65 @@ export function discordWebhook() {
   return webhookUrl("DISCORD_WEBHOOK_URL", ["discord.com", "discordapp.com", "ptb.discord.com", "canary.discord.com"], "/api/webhooks/");
 }
 
+/**
+ * Telegram bot delivery: create a bot with @BotFather (token), message it once,
+ * then read your chat id from https://api.telegram.org/bot<token>/getUpdates.
+ * No email account or domain needed.
+ */
+export function telegramConfig() {
+  const token = serverVar("TELEGRAM_BOT_TOKEN");
+  const chatId = serverVar("TELEGRAM_CHAT_ID");
+  if (!token || !chatId) return null;
+  // Token shape: "<digits>:<35 url-safe chars>"; chat ids are integers (negative for groups).
+  if (!/^\d+:[A-Za-z0-9_-]{30,}$/.test(token) || !/^-?\d+$/.test(chatId)) {
+    console.error("TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID looks malformed; ignoring Telegram.");
+    return null;
+  }
+  return { token, chatId };
+}
+
+/**
+ * Generic JSON webhook owned by the maintainer (Google Apps Script, Zapier,
+ * Make, n8n, Airtable automation…). Lets leads be stored in a spreadsheet on
+ * hosts without a database. HTTPS only; localhost allowed outside production.
+ */
+export function leadWebhook() {
+  const raw = serverVar("LEAD_WEBHOOK_URL");
+  if (!raw) return null;
+  try {
+    const url = new URL(raw);
+    const local = process.env.NODE_ENV !== "production" && (url.hostname === "localhost" || url.hostname === "127.0.0.1");
+    if (!local && url.protocol !== "https:") {
+      console.error("LEAD_WEBHOOK_URL must use https; ignoring it.");
+      return null;
+    }
+    return { url: url.toString(), secret: serverVar("LEAD_WEBHOOK_SECRET") ?? null };
+  } catch {
+    console.error("LEAD_WEBHOOK_URL is not a valid URL; ignoring it.");
+    return null;
+  }
+}
+
+/** Which lead channels are configured (names only, never secrets). */
+export function leadChannels() {
+  return {
+    email: Boolean(emailConfig()),
+    slack: Boolean(slackWebhook()),
+    discord: Boolean(discordWebhook()),
+    telegram: Boolean(telegramConfig()),
+    webhook: Boolean(leadWebhook()),
+  };
+}
+
 /** True when at least one place can receive a lead. */
 export function anyLeadChannel() {
-  return Boolean(emailConfig() || slackWebhook() || discordWebhook());
+  return Object.values(leadChannels()).some(Boolean);
+}
+
+/** Bearer token that unlocks /api/admin/*. Unset means those routes don't exist (404). */
+export function maintainerToken() {
+  const token = serverVar("MAINTAINER_TOKEN");
+  return token && token.length >= 16 ? token : null;
 }
 
 /** Customer confirmation emails are off unless CONTACT_AUTO_REPLY is "true". */

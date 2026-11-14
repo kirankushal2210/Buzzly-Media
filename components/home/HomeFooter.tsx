@@ -57,7 +57,7 @@ export function HomeFooter({ variant = "home" }: { variant?: "home" | "interior"
         </nav>
       </div>
       <div className="footer-grid-wrap"><FooterGrid /></div>
-      <div className="footer-bottom wrap"><span>© {new Date().getFullYear()} Buzzly. All rights reserved.</span><nav className="footer-legal" aria-label="Legal"><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link></nav></div>
+      <div className="footer-bottom wrap"><span>© {new Date().getFullYear()} Buzzly. All rights reserved.</span><nav className="footer-legal" aria-label="Legal and company"><Link href="/careers">Careers</Link><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link></nav></div>
     </footer>
   );
 }

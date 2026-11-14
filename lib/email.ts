@@ -1,5 +1,5 @@
 import { emailConfig } from "@/lib/server-env";
-import { siteUrl } from "@/lib/site";
+import { responsePromise, siteUrl } from "@/lib/site";
 import { interestLabels } from "@/lib/notify";
 
 export type Inquiry = { name: string; email: string; company: string; interest: string; message: string };
@@ -62,7 +62,7 @@ export function sendAutoReply(inquiry: Inquiry, reference: number | null) {
   const text = [
     "Hi there,",
     "",
-    `Thanks for getting in touch with Buzzly about ${topic.toLowerCase()}. We’ve received your message and someone from the team will reply personally.`,
+    `Thanks for getting in touch with Buzzly about ${topic.toLowerCase()}. We’ve received your message and someone from the team will reply personally within ${responsePromise}.`,
     "",
     `${ref}If you have anything to add, just reply to this email.`,
     "",
@@ -76,7 +76,7 @@ export function sendAutoReply(inquiry: Inquiry, reference: number | null) {
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;margin:0 auto">
 <tr><td style="font-size:12px;letter-spacing:3px;color:#ef342d;font-weight:bold;padding-bottom:24px">BUZZLY</td></tr>
 <tr><td style="font-family:Georgia,serif;font-size:40px;line-height:1.05;padding-bottom:20px">We got your message.<br><em style="color:#ef342d">Talk soon.</em></td></tr>
-<tr><td style="font-size:16px;line-height:1.6;color:#d8d0c3;padding-bottom:16px">Thanks for getting in touch about ${escapeHtml(topic.toLowerCase())}. Someone from the Buzzly team will reply to you personally.</td></tr>
+<tr><td style="font-size:16px;line-height:1.6;color:#d8d0c3;padding-bottom:16px">Thanks for getting in touch about ${escapeHtml(topic.toLowerCase())}. Someone from the Buzzly team will reply to you personally within ${escapeHtml(responsePromise)}.</td></tr>
 <tr><td style="font-size:16px;line-height:1.6;color:#d8d0c3;padding-bottom:28px">${escapeHtml(ref)}If you have anything to add, just reply to this email.</td></tr>
 <tr><td style="padding-bottom:32px"><a href="${siteUrl}/work" style="background:#ef342d;color:#111;text-decoration:none;font-weight:bold;padding:13px 20px;display:inline-block">See our work ↗</a></td></tr>
 <tr><td style="border-top:1px solid #403b38;padding-top:18px;font-size:12px;line-height:1.5;color:#8a847b">Buzzly — building brands through content.<br>You’re receiving this because this address was used on the Buzzly contact form. If that wasn’t you, you can ignore this email.</td></tr>

@@ -1,0 +1,153 @@
+<!doctype html>
+<meta charset="utf-8">
+<style>
+@font-face{font-family:"Instrument Serif";src:url("../../public/fonts/instrument-serif-latin.woff2") format("woff2");font-style:normal}
+@font-face{font-family:"Instrument Serif";src:url("../../public/fonts/instrument-serif-italic-latin.woff2") format("woff2");font-style:italic}
+@font-face{font-family:"DM Sans";src:url("../../public/fonts/dm-sans-latin.woff2") format("woff2");font-weight:100 1000}
+*{box-sizing:border-box}
+html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#151313}
+#stage{position:absolute;inset:0;overflow:hidden;background:radial-gradient(60% 55% at 50% 42%,var(--glow) 0,#151313 70%)}
+#cam{position:absolute;left:960px;top:430px;width:0;height:0;perspective:1900px}
+#world,#world *{position:absolute;transform-style:preserve-3d}
+#world{left:0;top:0}
+.flat{transform-style:flat!important}
+#floor{width:3200px;height:3200px;left:-1600px;top:-1600px;background:
+  repeating-linear-gradient(0deg,var(--grid) 0 2px,transparent 2px 100px),
+  repeating-linear-gradient(90deg,var(--grid) 0 2px,transparent 2px 100px);
+  -webkit-mask-image:radial-gradient(closest-side,#000 18%,transparent 78%);mask-image:radial-gradient(closest-side,#000 18%,transparent 78%)}
+#vignette{position:absolute;inset:0;background:radial-gradient(75% 75% at 50% 45%,transparent 55%,#0a0909 100%);pointer-events:none}
+#title{position:absolute;left:0;right:0;top:806px;text-align:center;color:#f5efdf}
+#title .kicker{font:700 22px/1 "DM Sans";letter-spacing:.34em;text-transform:uppercase;color:var(--accent)}
+#title .name{font:400 124px/1 "Instrument Serif";letter-spacing:-.035em;margin-top:22px}
+#title .name em{color:var(--accent)}
+#brand{position:absolute;left:0;right:0;top:54px;text-align:center;font:700 17px/1 "DM Sans";letter-spacing:.34em;color:#f5efdf99}
+.face{backface-visibility:hidden}
+.disc{border-radius:50%}
+.glowdot{border-radius:50%;filter:blur(1px)}
+</style>
+<div id="stage">
+  <div id="cam"><div id="world"><div id="floor"></div></div></div>
+  <div id="vignette"></div>
+  <div id="brand">BUZZLY &nbsp;/&nbsp; SUB-COMPANY</div>
+  <div id="title"><div class="kicker"></div><div class="name"></div></div>
+</div>
+<script>
+const SCENE = new URLSearchParams(location.search).get("scene") || "property";
+const DUR = 10, TAU = Math.PI * 2;
+const world = document.getElementById("world"), floor = document.getElementById("floor"), title = document.getElementById("title");
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const ease = v => { const t = clamp(v); return t * t * (3 - 2 * t); };
+const out = v => 1 - Math.pow(1 - clamp(v), 3);
+/** 0→1 between a..b, holds, then 1→0 between c..d (so the 10 s loop restarts clean). */
+const span = (t, a, b, c, d) => Math.min(out((t - a) / (b - a)), 1 - ease((t - c) / (d - c)));
+const el = (parent, css, cls) => { const e = document.createElement("div"); if (cls) e.className = cls; e.style.cssText = css; parent.appendChild(e); return e; };
+
+/** A box centred on x,z standing on y=0 (y is up). faces: {side, top} CSS backgrounds. */
+function box(parent, w, h, d, x, z, faces, y = 0) {
+  const g = el(parent, `left:0;top:0;width:0;height:0;transform:translate3d(${x}px,${-y}px,${z}px)`);
+  const f = (ww, hh, tr, bg, shade) => el(g, `width:${ww}px;height:${hh}px;left:${-ww / 2}px;top:${-hh}px;transform:${tr};background:${bg};border:${faces.border || "0"};box-shadow:inset 0 0 0 9999px rgba(0,0,0,${shade})`, "face flat");
+  f(w, h, `translateZ(${d / 2}px)`, faces.side, 0);
+  f(w, h, `rotateY(180deg) translateZ(${d / 2}px)`, faces.side, .28);
+  f(d, h, `rotateY(90deg) translateZ(${w / 2}px)`, faces.side, .16);
+  f(d, h, `rotateY(-90deg) translateZ(${w / 2}px)`, faces.side, .16);
+  el(g, `width:${w}px;height:${d}px;left:${-w / 2}px;top:${-d / 2}px;transform:translateY(${-h}px) rotateX(90deg);background:${faces.top};border:${faces.border || "0"}`, "face flat");
+  return g;
+}
+/** A flat disc lying on the ground plane at height y. */
+const disc = (parent, r, y, bg, extra = "") => el(parent, `width:${2 * r}px;height:${2 * r}px;left:${-r}px;top:${-r}px;transform:translateY(${-y}px) rotateX(90deg);background:${bg};${extra}`, "disc flat");
+/** Something that always faces the camera; returns a setter for its 3D position. */
+const boards = [];
+function board(parent, css) { const e = el(parent, css, "flat"); const b = { e, x: 0, y: 0, z: 0, s: 1, o: 1 }; boards.push(b); return b; }
+
+const scenes = {
+  property: {
+    drop: 165, accent: "#e2c486", glow: "#2a2620", grid: "#e2c48633", kicker: "Real estate & property venture", name: "Buzzly <em>Properties</em>",
+    build() {
+      const glass = "linear-gradient(180deg,#31403f,#182020),repeating-linear-gradient(90deg,#e2c48655 0 2px,transparent 2px 46px)";
+      const lit = "repeating-linear-gradient(90deg,#f4dfa9 0 30px,#1b2323 30px 46px),repeating-linear-gradient(0deg,transparent 0 40px,#182020 40px 58px)";
+      const wall = "linear-gradient(180deg,#efe6d2,#bfb49b)";
+      const edge = "2px solid #e2c486";
+      this.parts = [
+        { g: box(world, 760, 26, 560, 0, 0, { side: "#2a2725", top: "linear-gradient(135deg,#34302c,#221f1d)", border: edge }), at: 0.2 },
+        { g: box(world, 330, 190, 300, -150, -60, { side: wall, top: "#d9cfb8", border: edge }, 26), at: 0.7 },
+        { g: box(world, 300, 170, 260, 150, 40, { side: `${lit}`, top: "#22201e", border: edge }, 26), at: 1.1 },
+        { g: box(world, 420, 150, 250, -60, -20, { side: glass, top: "#e9dfc9", border: edge }, 216), at: 1.6 },
+        { g: box(world, 150, 330, 150, 250, -170, { side: lit, top: "#2a2725", border: edge }, 26), at: 2.0 },
+        { g: box(world, 470, 16, 300, -30, -20, { side: "#e2c486", top: "linear-gradient(135deg,#f1e2bd,#cdb47c)", border: "0" }, 366), at: 2.4 },
+      ];
+      this.pool = el(world, "width:250px;height:150px;left:40px;top:120px;transform:translateY(-28px) rotateX(90deg);background:linear-gradient(120deg,#7fd3d0,#2f8f95);border:2px solid #e2c486;box-shadow:0 0 60px #6fd0cc88", "flat");
+      this.trees = [[-330, 210], [-250, 235], [330, 215]].map(([x, z]) => { const trunk = box(world, 10, 46, 10, x, z, { side: "#5b4630", top: "#5b4630" }, 26); const b = board(world, "width:92px;height:92px;left:-46px;top:-46px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#b7d3a2,#3f6b46 70%)"); b.x = x; b.y = 108; b.z = z; return { trunk, b }; });
+    },
+    frame(t) {
+      for (const p of this.parts) { const k = span(t, p.at, p.at + 1.3, 8.9, 9.8); p.g.style.transformOrigin = "0 0"; p.g.style.transform = p.g.style.transform.replace(/ scale3d\([^)]*\)/, "") + ` scale3d(1,${Math.max(.001, k).toFixed(4)},1)`; p.g.style.opacity = clamp(k * 3); }
+      const k = span(t, 2.8, 3.8, 8.9, 9.6); this.pool.style.opacity = k;
+      for (const tr of this.trees) { tr.b.s = k; tr.b.o = k; tr.trunk.style.opacity = k; }
+      return { yaw: -32 + 360 * t / DUR, pitch: -20, zoom: 1.06 + .05 * Math.sin(TAU * t / DUR) };
+    },
+  },
+  health: {
+    drop: 215, accent: "#b5c9b1", glow: "#1f2a25", grid: "#b5c9b12e", kicker: "Health & wellness venture", name: "Buzzly <em>Health</em>",
+    build() {
+      const skin = { side: "linear-gradient(180deg,#e6f1e2,#9fb79b)", top: "#f2f8ef" };
+      this.cross = el(world, "left:0;top:0;width:0;height:0");
+      box(this.cross, 110, 330, 110, 0, 0, skin, 0); box(this.cross, 330, 110, 110, 0, 0, skin, 110);
+      this.rings = [[330, "#b5c9b1"], [420, "#f5efdf66"], [520, "#ef342d"]].map(([r, c], i) => ({ e: el(world, `width:${2 * r}px;height:${2 * r}px;left:${-r}px;top:${-r}px;border-radius:50%;border:${i === 2 ? 3 : 2}px solid ${c};box-shadow:0 0 34px ${c}55`, "flat"), i }));
+      this.dots = [0, 1, 2, 3, 4, 5].map(i => ({ b: board(world, `width:${i % 2 ? 26 : 40}px;height:${i % 2 ? 26 : 40}px;left:-20px;top:-20px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,${i % 3 ? "#b5c9b1" : "#ef342d"} 70%);box-shadow:0 0 30px ${i % 3 ? "#b5c9b1" : "#ef342d"}`), i }));
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1700 300" width="1700" height="300"><path id="ecg" d="M0 150 H330 l40 -18 l34 18 h70 l32 -128 l44 248 l40 -164 l28 44 h150 l40 -18 l34 18 h70 l32 -128 l44 248 l40 -164 l28 44 H1700" fill="none" stroke="#b5c9b1" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+      this.ecg = el(world, "width:1700px;height:300px;left:-850px;top:-330px;transform:translateZ(-420px);filter:drop-shadow(0 0 14px #b5c9b1)", "flat"); this.ecg.innerHTML = svg;
+      this.path = this.ecg.querySelector("path"); this.len = this.path.getTotalLength(); this.path.style.strokeDasharray = `${this.len * .55} ${this.len}`;
+    },
+    frame(t) {
+      const beat = 1 + .05 * Math.max(0, Math.sin(TAU * t / 1.25)) ** 6;
+      const k = span(t, 0.2, 1.6, 9.0, 9.8);
+      this.cross.style.transform = `translateY(${-(150 + 16 * Math.sin(TAU * t / 5))}px) rotateY(${-360 * t / DUR}deg) scale3d(${k * beat},${k * beat},${k * beat})`;
+      for (const r of this.rings) r.e.style.transform = `translateY(-315px) rotateX(${70 + r.i * 18}deg) rotateY(${(r.i % 2 ? -1 : 1) * 360 * t / DUR + r.i * 40}deg)`, r.e.style.opacity = k;
+      for (const d of this.dots) { const a = TAU * (t / DUR) * (d.i % 2 ? -1 : 1) + d.i * TAU / 6, R = 300 + (d.i % 3) * 95; d.b.x = R * Math.cos(a); d.b.z = R * Math.sin(a); d.b.y = 315 + 120 * Math.sin(a * 2 + d.i); d.b.o = k; }
+      this.path.style.strokeDashoffset = -this.len * (t / DUR) * 2; this.ecg.style.opacity = .85 * k;
+      return { yaw: 18 * Math.sin(TAU * t / DUR), pitch: -12, zoom: 1.12 };
+    },
+  },
+  food: {
+    drop: 150, accent: "#e0a465", glow: "#2c2219", grid: "#e0a46526", kicker: "Food & restaurant platform", name: "De Food <em>Kampney</em>",
+    build() {
+      disc(world, 400, 4, "radial-gradient(circle,#3a2d24 0,#241b16 62%,#17110e 100%)", "box-shadow:0 0 0 3px #e0a46566");
+      disc(world, 290, 12, "radial-gradient(circle,#fbf5e6 0 56%,#e9dfc8 57% 64%,#fffaf0 65% 92%,#d9cdb2 93%)");
+      // the dish: a little tower of layers
+      [[120, 20, "#b4532a"], [112, 34, "#d98a3d"], [100, 48, "#f0c35a"], [84, 62, "#7fae5a"], [60, 76, "#ef342d"], [30, 90, "#fbf5e6"]].forEach(([r, y, c]) => disc(world, r, y, `radial-gradient(circle at 38% 32%,#fff6 0,${c} 46%)`, "box-shadow:0 0 0 2px #0002"));
+      this.steam = [0, 1, 2].map(i => ({ b: board(world, "width:90px;height:220px;left:-45px;top:-110px;border-radius:50%;background:radial-gradient(closest-side,#fff7,transparent);filter:blur(14px)"), i }));
+      // the cloche: a dome built from stacked rings
+      this.dome = el(world, "left:0;top:0;width:0;height:0");
+      const R = 250, N = 34;
+      for (let i = 0; i <= N; i++) { const a = (i / N) * Math.PI / 2, r = R * Math.cos(a), y = R * Math.sin(a), l = 38 + 34 * Math.sin(a); disc(this.dome, Math.max(2, r), y, `radial-gradient(circle at 34% 30%,hsl(34 62% ${l + 22}%) 0,hsl(30 58% ${l}%) 55%,hsl(26 55% ${l - 14}%) 100%)`, i ? "" : "box-shadow:0 0 0 6px #f3d9a8"); }
+      disc(this.dome, 26, R + 16, "radial-gradient(circle at 35% 30%,#fff3d6,#c98a45)");
+      this.bits = [0, 1, 2, 3, 4, 5, 6, 7].map(i => ({ b: board(world, `width:${i % 2 ? 44 : 60}px;height:${i % 2 ? 44 : 34}px;left:-28px;top:-20px;border-radius:${i % 2 ? "50%" : "60% 8% 60% 8%"};background:radial-gradient(circle at 35% 30%,#fff8,${["#ef342d", "#6ea04d", "#f0c35a", "#6ea04d"][i % 4]} 60%)`), i }));
+    },
+    frame(t) {
+      const lift = span(t, 1.6, 3.6, 8.2, 9.7);
+      this.dome.style.transform = `translateY(${-(14 + 265 * lift)}px) rotateZ(${-9 * lift}deg)`;
+      for (const s of this.steam) { const p = ((t / 2.5) + s.i / 3) % 1; s.b.x = (s.i - 1) * 46 + 14 * Math.sin(TAU * p); s.b.y = 120 + 200 * p; s.b.z = 0; s.b.o = lift * Math.sin(Math.PI * p) * .9; s.b.s = .7 + p; }
+      for (const b of this.bits) { const a = TAU * t / DUR + b.i * TAU / 8, R = 380 + 40 * (b.i % 2); b.b.x = R * Math.cos(a); b.b.z = R * Math.sin(a); b.b.y = 150 + 60 * Math.sin(TAU * t / 5 + b.i); b.b.o = span(t, .3 + b.i * .1, 1.4 + b.i * .1, 9, 9.8); }
+      return { yaw: 360 * t / DUR * 0 + 14 * Math.sin(TAU * t / DUR), pitch: -24, zoom: 1.0 };
+    },
+  },
+};
+
+const S = scenes[SCENE];
+document.documentElement.style.setProperty("--accent", S.accent);
+document.documentElement.style.setProperty("--glow", S.glow);
+document.documentElement.style.setProperty("--grid", S.grid);
+title.querySelector(".kicker").textContent = S.kicker;
+title.querySelector(".name").innerHTML = S.name;
+floor.style.transform = "rotateX(90deg)";
+S.build();
+
+window.render = t => {
+  t = ((t % DUR) + DUR) % DUR;
+  const cam = S.frame(t);
+  world.style.transform = `translateY(${S.drop}px) scale3d(${cam.zoom},${cam.zoom},${cam.zoom}) rotateX(${cam.pitch}deg) rotateY(${cam.yaw}deg)`;
+  for (const b of boards) { b.e.style.transform = `translate3d(${b.x}px,${-b.y}px,${b.z}px) rotateY(${-cam.yaw}deg) rotateX(${-cam.pitch}deg) scale(${b.s})`; b.e.style.opacity = b.o; }
+  const k = span(t, 1.0, 2.2, 9.0, 9.7);
+  title.style.opacity = k; title.style.transform = `translateY(${(1 - k) * 26}px)`;
+};
+render(5);
+</script>

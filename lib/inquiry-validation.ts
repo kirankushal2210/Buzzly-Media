@@ -4,7 +4,7 @@
  * HTML/markdown escaping happens at each output (email, Slack, Discord).
  */
 export const LIMITS = { name: [2, 100], email: [3, 200], company: [0, 120], message: [20, 5000] } as const;
-export const INTERESTS = ["content", "brand", "distribution", "partnership", "other"] as const;
+export const INTERESTS = ["content", "brand", "distribution", "partnership", "careers", "other"] as const;
 
 export type InquiryField = "name" | "email" | "company" | "interest" | "message";
 export type InquiryErrors = Partial<Record<InquiryField, string>>;
