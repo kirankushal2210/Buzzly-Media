@@ -7,6 +7,7 @@ export const interestLabels: Record<string, string> = {
   brand: "Brand strategy",
   distribution: "Distribution",
   partnership: "Partnership",
+  careers: "Joining the team",
   other: "Something else",
 };
 

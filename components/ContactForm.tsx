@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type FocusEvent, type FormEvent } from "react";
-import { validateInquiry, type InquiryErrors, type InquiryField } from "@/lib/inquiry-validation";
+import { INTERESTS, validateInquiry, type InquiryErrors, type InquiryField } from "@/lib/inquiry-validation";
 
 const SUCCESS_MESSAGE = "Thanks! Your message has reached Buzzly. Our team will review your project and get back to you shortly.";
 const UNAVAILABLE_MESSAGE = "We can’t receive messages right now. Please try again in a little while.";
@@ -30,11 +30,15 @@ export function ContactForm() {
     return () => controller.abort();
   }, []);
 
-  // Prefill the email handed over from the footer quick-inquiry field (?email=).
+  // Prefill from the URL: ?email= (footer quick-inquiry) and ?interest= (e.g. /careers → "Joining the team").
   useEffect(() => {
-    const email = new URLSearchParams(window.location.search).get("email");
+    const params = new URLSearchParams(window.location.search);
+    const email = params.get("email");
     const input = formRef.current?.elements.namedItem("email") as HTMLInputElement | null;
     if (email && input && !input.value) input.value = email.slice(0, 200);
+    const interest = params.get("interest");
+    const select = formRef.current?.elements.namedItem("interest") as HTMLSelectElement | null;
+    if (interest && select && !select.value && (INTERESTS as readonly string[]).includes(interest)) select.value = interest;
   }, []);
 
   const readForm = () => Object.fromEntries(new FormData(formRef.current!).entries()) as Record<string, string>;
@@ -144,6 +148,7 @@ export function ContactForm() {
           <option value="brand">Brand strategy</option>
           <option value="distribution">Distribution</option>
           <option value="partnership">Partnership</option>
+          <option value="careers">Joining the team</option>
           <option value="other">Something else</option>
         </select>
         {fieldError("interest")}

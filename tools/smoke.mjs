@@ -18,7 +18,7 @@ const sendInquiry = args.includes("--inquiry");
 const token = process.env.MAINTAINER_TOKEN;
 const TIMEOUT = 15000;
 
-const PAGES = ["/", "/work", "/work/de-food-kampney", "/services", "/about", "/clients", "/companies", "/companies/buzzly-health", "/contact", "/privacy", "/terms"];
+const PAGES = ["/", "/work", "/work/de-food-kampney", "/services", "/about", "/clients", "/companies", "/companies/buzzly-health", "/contact", "/careers", "/privacy", "/terms"];
 
 const results = [];
 const log = (ok, label, detail = "", level = "fail") => {

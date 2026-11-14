@@ -7,6 +7,7 @@ import "./clients.css";
 import "./companies.css";
 import "./services.css";
 import "./about.css";
+import "./careers.css";
 import "./company-detail.css";
 import "./design-match.css";
 import "./react-sections.css";
