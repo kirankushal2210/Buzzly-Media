@@ -13,7 +13,10 @@
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 migrations apply DB --local --config wrangler.d1-local.jsonc --persist-to .wrangler/state",
-    "db:inquiries:local": "node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config wrangler.d1-local.jsonc --persist-to .wrangler/state --command \"SELECT id, created_at, name, email, interest, status FROM contact_inquiries ORDER BY id DESC LIMIT 20\""
+    "db:inquiries:local": "node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config wrangler.d1-local.jsonc --persist-to .wrangler/state --command \"SELECT id, created_at, name, email, interest, status FROM contact_inquiries ORDER BY id DESC LIMIT 20\"",
+    "test": "node --import ./tests/_register.mjs --test \"tests/*.test.ts\"",
+    "smoke": "node tools/smoke.mjs",
+    "check": "npm run lint && npx tsc --noEmit && npm test"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
