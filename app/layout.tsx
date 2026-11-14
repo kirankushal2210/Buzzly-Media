@@ -11,6 +11,7 @@ import "./careers.css";
 import "./company-detail.css";
 import "./design-match.css";
 import "./react-sections.css";
+import "./reel-story.css";
 import { siteDescription, siteName, siteTitle, siteUrl, socialLinks } from "@/lib/site";
 import { ScrollReset } from "@/components/ScrollReset";
 

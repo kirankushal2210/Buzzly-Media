@@ -1,5 +1,5 @@
 import { HomeHeader, Hero, Splash } from "@/components/HomeIntro";
-import { ExpandingScrollFilm } from "@/components/home/ExpandingScrollFilm";
+import { PhoneReelStory } from "@/components/home/PhoneReelStory";
 import { WorkShowcaseSection } from "@/components/home/WorkShowcaseSection";
 import { EcosystemSection } from "@/components/home/EcosystemSection";
 import { ClientPreviewSection } from "@/components/home/ClientPreviewSection";
@@ -16,7 +16,7 @@ export default function Home() {
         <HomeHeader />
         <main id="top">
           <Hero />
-          <ExpandingScrollFilm />
+          <PhoneReelStory />
           <WorkShowcaseSection />
           <EcosystemSection />
           <ClientPreviewSection />

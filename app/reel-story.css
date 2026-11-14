@@ -1,0 +1,75 @@
+/* ---------- Homepage phone-reel story (replaces the expanding film) ----------
+   Scroll-linked: PhoneReelStory writes --copy, --shift, --feed and --hint on
+   .reel-stage; the CSS only maps them to opacity and transforms, so nothing
+   here ever changes layout. Defaults equal the first frame for SSR. */
+.reel-story{position:relative;height:calc(var(--reel-count,4) * 100vh + 100vh);margin-top:-10px}
+.reel-stage{--copy:1;--shift:0px;--feed:0%;--hint:1;position:sticky;top:0;height:100vh;min-height:560px;max-width:1500px;margin:0 auto;padding:0 clamp(20px,8vw,130px);box-sizing:border-box;display:grid;grid-template-columns:1fr minmax(300px,.8fr);align-items:center;gap:8vw;overflow:hidden}
+.reel-copy{opacity:var(--copy);transform:translateY(calc((1 - var(--copy)) * -24px));will-change:opacity,transform}
+.reel-stage.copy-hidden .reel-copy{visibility:hidden}
+.reel-slot{position:relative;justify-self:center;display:flex;flex-direction:column;align-items:center;gap:22px;transform:translateX(var(--shift));will-change:transform}
+
+/* The phone */
+.reel-phone{position:relative;width:clamp(230px,21vw,290px);aspect-ratio:9/19.3;border-radius:46px;background:#0b0a0a;border:7px solid #272120;box-shadow:0 40px 90px #000a,inset 0 0 0 1px #3a3331}
+.reel-island{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:34%;height:22px;border-radius:14px;background:#0b0a0a;z-index:3}
+.reel-screen{position:absolute;inset:0;border-radius:38px;overflow:hidden;background:#1b1716}
+.reel-feed{list-style:none;margin:0;padding:0;height:100%;transform:translateY(calc(-1 * var(--feed)));will-change:transform}
+.reel-item{position:relative;height:100%;overflow:hidden;background:#211c1b}
+.reel-item::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,#0007 0,transparent 26%,transparent 52%,#000d 100%);pointer-events:none;z-index:1}
+.reel-poster,.reel-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.reel-video{opacity:0;transition:opacity .35s}
+.reel-item.is-active .reel-video{opacity:1}
+.reel-top{position:absolute;top:46px;left:18px;right:18px;display:flex;justify-content:space-between;font:700 10px/1 'DM Sans',sans-serif;letter-spacing:.14em;color:#f5efdfcc;z-index:2}
+.reel-side{position:absolute;right:14px;bottom:128px;display:flex;flex-direction:column;gap:18px;color:var(--cream);z-index:2;opacity:.9}
+.reel-caption{position:absolute;left:18px;right:60px;bottom:28px;z-index:2;color:var(--cream)}
+.reel-kicker{display:block;font:700 10px/1 'DM Sans',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin-bottom:10px}
+.reel-caption h3{font:400 clamp(24px,2vw,30px)/1 'Instrument Serif',serif;letter-spacing:-.02em;margin:0 0 6px}
+.reel-caption p{margin:0 0 12px;font-size:12px;line-height:1.4;color:#d9d1c3}
+.reel-caption a{display:inline-block;background:var(--red);color:#151313;font:700 11px/1 'DM Sans',sans-serif;letter-spacing:.04em;padding:9px 12px;text-decoration:none}
+.reel-caption a:hover{background:var(--cream)}
+
+/* Fourth reel: the partner brief card (no video, pure brand type) */
+.reel-brief{position:absolute;inset:0;background:var(--red);color:#151313;padding:96px 20px 170px;display:flex;flex-direction:column;justify-content:center;z-index:0}
+.reel-brief strong{display:block;font:400 clamp(40px,3.4vw,54px)/.92 'Instrument Serif',serif;letter-spacing:-.04em}
+.reel-brief em{font-style:italic;color:var(--cream)}
+.reel-brief ol{list-style:none;margin:24px 0 0;padding:0;display:grid;gap:9px;font:700 11px/1.2 'DM Sans',sans-serif;letter-spacing:.08em;text-transform:uppercase}
+.reel-brief li span{display:inline-block;width:26px;color:#151313a6}
+.reel-brief ~ .reel-caption .reel-kicker{color:#151313}
+.reel-brief ~ .reel-caption a{background:var(--cream)}
+.reel-brief ~ .reel-caption a:hover{background:#151313;color:var(--cream)}
+
+/* Tabs under the phone double as progress dots */
+.reel-tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:360px}
+.reel-tabs button{display:inline-flex;align-items:center;gap:7px;background:none;border:1px solid var(--line);color:var(--soft);font:700 10px/1 'DM Sans',sans-serif;letter-spacing:.1em;text-transform:uppercase;padding:8px 11px;border-radius:999px;cursor:pointer}
+.reel-tabs button:hover{color:var(--cream)}
+.reel-tabs button[aria-selected="true"]{color:var(--cream);border-color:var(--cream)}
+.reel-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.reel-tabs button[aria-selected="true"] .reel-dot{background:var(--red)}
+
+.reel-hint{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);display:flex;gap:10px;align-items:center;color:var(--cream);font-size:10px;letter-spacing:.18em;white-space:nowrap;opacity:var(--hint);pointer-events:none}
+.reel-hint span:last-child{color:var(--red);font-size:18px}
+
+@media(max-width:900px){
+  .reel-stage{grid-template-columns:1fr minmax(240px,.9fr);gap:5vw}
+  .reel-phone{width:clamp(210px,24vw,260px)}
+}
+@media(max-width:750px){
+  .reel-story{height:calc(var(--reel-count,4) * 100vh + 60vh)}
+  .reel-stage{display:block;padding:0 20px;min-height:0}
+  .reel-copy{position:absolute;top:64px;left:20px;right:20px}
+  .reel-copy p{font-size:clamp(26px,7.5vw,34px);margin-bottom:14px}
+  .reel-copy small{font-size:14px}
+  .reel-copy .outlinecta{margin-top:18px}
+  .reel-slot{position:absolute;left:50%;top:50%;transform:translate(-50%,calc(-50% + var(--copy) * 22vh)) translateX(var(--shift));gap:14px}
+  .reel-phone{width:min(56vw,240px)}
+  .reel-tabs button span:last-child{display:none}
+  .reel-tabs button{padding:8px}
+  .reel-hint{bottom:14px}
+}
+@media(prefers-reduced-motion:reduce){
+  .reel-story{height:auto;margin:40px 0 60px}
+  .reel-stage{position:relative;height:auto;min-height:0;padding-top:30px;padding-bottom:30px;overflow:visible}
+  .reel-copy{opacity:1;transform:none;position:static;visibility:visible!important}
+  .reel-slot{transform:none;position:static}
+  .reel-video{transition:none}
+  .reel-hint{display:none}
+}
