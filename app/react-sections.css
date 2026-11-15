@@ -443,3 +443,8 @@
 @media(prefers-reduced-motion:reduce){
   .loop-sweep,.loop-node circle,.loop-node text{animation:none!important}
 }
+
+/* Client wins: brand names instead of stat numbers (sample brands until real stories are approved). */
+.clientteaser-outcomes strong{font-size:clamp(26px,2.2vw,32px);line-height:1.02}
+.outcome-card.is-text strong{font-size:clamp(32px,2.6vw,42px);line-height:1}
+.outcome-card.is-text div{min-height:280px}

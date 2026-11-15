@@ -1,138 +1,57 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Bookmark, ChevronRight, CircleCheck, Clapperboard, Ellipsis, Heart, House, MessageCircle, Repeat2, Search, Send } from "lucide-react";
+import { Camera, ChevronDown, Clapperboard, Ellipsis, Heart, House, MessageCircle, Music2, Repeat2, Search, Send } from "lucide-react";
 import Link from "@/components/Link";
 import { useMotionPreferences } from "@/hooks/use-in-view";
-import { companies, services } from "@/lib/content";
+import { REEL_DURATION, REEL_TRANSCRIPT, drawStrategyReel, loadReelPhotos, reelToneAt } from "@/components/home/strategy-reel";
 
 /**
  * The homepage story: the positioning statement sits beside a phone. As you
- * scroll, the statement fades, the phone glides to the centre of the stage,
- * the reels inside it advance one by one, and finally the stage releases and
- * scrolls away to reveal "Work in motion".
+ * scroll, the statement fades, the phone glides to the centre, and then the
+ * scroll plays the strategy reel inside it (an Instagram Reels screen) while
+ * the phone keeps growing towards full height. When the reel ends, the stage
+ * releases and the page carries on to "Work in motion".
  *
  * How it stays smooth:
  *  - Progress is read from the section and stage only. The phone sits in
- *    `.reel-slot`, which is NEVER transformed; the motion is applied to
- *    `.reel-rig` inside it. Measuring an element while moving that same
- *    element makes every frame feed back into the next (the phone stops short
- *    of the centre and flips sideways on every scroll event), so keep it so.
+ *    `.reel-slot`, which is NEVER transformed; the glide is applied to
+ *    `.reel-rig` and the growth to `.reel-phone` inside it. Measuring an
+ *    element while moving it makes every frame feed back into the next.
+ *  - Growth targets (scale and vertical offset) are measured once per resize
+ *    with the transforms cleared, never per frame.
  *  - The displayed progress eases toward the scroll position, so mouse-wheel
  *    notches turn into continuous motion instead of jumps.
- *  - Only `transform` and `opacity` change, written straight to three
- *    elements. Reel changes are a CSS transition on the feed, which the
- *    browser runs off the main thread.
- *  - With reduced motion nothing is pinned or moved: a static phone with tabs.
+ *  - The reel is drawn on a canvas as a pure function of time, so scrubbing
+ *    backwards and forwards is exact, and the canvas is sized for the phone's
+ *    largest scale so it stays sharp as it grows.
+ *  - With reduced motion nothing is pinned or moved: a static phone with a
+ *    button that plays the reel at normal speed.
  *
  * Scene map, as a fraction of the pinned scroll distance:
- *   0.00–0.06  scroll hint fades
- *   0.05–0.20  statement fades out
- *   0.08–0.26  phone glides from its slot to the centre (on phones it rises)
- *   0.40 …     second reel; the remaining reels share what is left evenly
+ *   0.00–0.04  scroll hint fades
+ *   0.03–0.11  statement fades out
+ *   0.05–0.15  phone glides from its slot to the centre (on phones it rises)
+ *   0.15–0.95  the phone grows
+ *   0.13–0.96  the reel plays from start to end, then holds on its end card
  *   1.00       the stage releases
- *
- * Inside the phone each reel is a post in an Instagram-style feed (account
- * row, 4:5 media, call-to-action bar, actions, caption). The feed scrolls one
- * post at a time, so the next post's header peeks in below like a real feed.
- * Under the phone, one progress bar per reel fills as you scroll through it.
- *
- * Post images: put the file in `public/media/reels/` and add it to
- * `postImages` below. Until a post has an image, its media slot shows the
- * typographic poster in the company's colour.
  */
 
-type Reel = {
-  id: string;
-  /** Card colour. */
-  tone: string;
-  /** Colour of the italic second headline line (defaults to the ink colour). */
-  accent?: string;
-  over: string;
-  headline: [string, string];
-  points?: string[];
-  kicker: string;
-  title: string;
-  href: string;
-  /** Button verb, plus an optional detail that is dropped when the phone is too narrow for it. */
-  cta: string;
-  ctaDetail?: string;
-  tab: string;
-  /** Account row: name, line under it, and avatar letters. */
-  account: string;
-  accountNote: string;
-  initials: string;
-  caption: string;
-};
-
-/** Images for the posts, keyed by reel id. 4:5 portrait (e.g. 1080×1350) fills the slot exactly. */
-const postImages: Record<string, { src: string; alt: string } | undefined> = {
-  // "de-food-kampney": { src: "/media/reels/de-food-kampney.jpg", alt: "…" },
-};
-
-/** "Food is culture." → ["Food is", "culture."] so the last word can carry the italic. */
-function splitHeadline(text: string): [string, string] {
-  const cut = text.lastIndexOf(" ");
-  return cut > 0 ? [text.slice(0, cut), text.slice(cut + 1)] : [text, ""];
-}
-
-const reels: Reel[] = [
-  ...companies.map<Reel>(company => ({
-    id: company.slug,
-    tone: company.accent,
-    over: "A Buzzly sub-company",
-    headline: splitHeadline(company.word),
-    kicker: company.field,
-    title: company.name,
-    href: `/companies/${company.slug}`,
-    cta: "Explore",
-    ctaDetail: company.name,
-    tab: company.name,
-    account: company.name,
-    accountNote: "Buzzly sub-company",
-    initials: company.name.split(" ").filter(word => word !== "De").map(word => word[0]).join("").slice(0, 2),
-    caption: `${company.word} ${company.field}, founded and built by Buzzly.`,
-  })),
-  {
-    id: "partners",
-    tone: "#ef342d",
-    accent: "#f5efdf",
-    over: "For outside partners",
-    headline: ["Bring us", "the brief."],
-    points: services.map(service => service.title),
-    kicker: "Ambitious brands",
-    title: "Your brand next.",
-    href: "/contact",
-    cta: "Start a Project",
-    tab: "Partners",
-    account: "Buzzly",
-    accountNote: "Open for partners",
-    initials: "B",
-    caption: `Bring us the brief. ${services.map(service => service.title).join(" · ")}.`,
-  },
-];
-
-const HINT_END = 0.06;
-const FADE = [0.05, 0.2] as const;
-const GLIDE = [0.08, 0.26] as const;
-/** The second reel takes over here; the rest split the remaining distance evenly. */
-const REEL_FIRST = 0.4;
+const HINT_END = 0.04;
+const FADE = [0.03, 0.11] as const;
+const GLIDE = [0.05, 0.15] as const;
+const GROW = [0.15, 0.95] as const;
+const REEL = [0.13, 0.96] as const;
 /** How quickly the displayed progress follows the scroll position (time constant, ms). */
 const FOLLOW_MS = 95;
+/** Final phone height as a share of the stage: a little over 1 lets the phone fill the screen edge to edge. */
+const GROW_TO_HEIGHT = 1.05;
+const GROW_TO_WIDTH = 0.94;
 
 const clamp01 = (value: number) => Math.max(0, Math.min(1, value));
 const ease = (value: number) => { const t = clamp01(value); return t * t * (3 - 2 * t); };
-const reelStep = (count: number) => (1 - REEL_FIRST) / Math.max(1, count - 1);
-const reelAt = (progress: number, count: number) =>
-  progress < REEL_FIRST || count < 2 ? 0 : Math.min(count - 1, 1 + Math.floor((progress - REEL_FIRST) / reelStep(count)));
-
-/** How far through reel `index`'s own stretch of the scroll we are (0–1). */
-const reelFill = (progress: number, index: number, count: number) => {
-  const start = index === 0 ? GLIDE[1] : REEL_FIRST + (index - 1) * reelStep(count);
-  const end = index === 0 ? REEL_FIRST : start + reelStep(count);
-  return clamp01((progress - start) / (end - start));
-};
+const range = (value: number, [a, b]: readonly [number, number]) => clamp01((value - a) / (b - a));
 
 export function PhoneReelStory() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -140,48 +59,95 @@ export function PhoneReelStory() {
   const copyRef = useRef<HTMLDivElement>(null);
   const slotRef = useRef<HTMLDivElement>(null);
   const rigRef = useRef<HTMLDivElement>(null);
+  const phoneRef = useRef<HTMLDivElement>(null);
+  const screenRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const hintRef = useRef<HTMLDivElement>(null);
-  const barRefs = useRef<(HTMLElement | null)[]>([]);
-  const [active, setActive] = useState(0);
   const { reducedMotion } = useMotionPreferences();
-  const count = reels.length;
+  const [replaying, setReplaying] = useState(false);
+  /** Draws the reel at time t; set up by the effect, used by the replay button too. */
+  const paintRef = useRef<(t: number, force?: boolean) => void>(() => {});
 
   useEffect(() => {
-    const section = sectionRef.current, stage = stageRef.current, copy = copyRef.current, slot = slotRef.current, rig = rigRef.current, hint = hintRef.current;
-    if (!section || !stage || !copy || !slot || !rig) return;
+    const section = sectionRef.current, stage = stageRef.current, copy = copyRef.current, slot = slotRef.current, rig = rigRef.current;
+    const phone = phoneRef.current, screen = screenRef.current, canvas = canvasRef.current, hint = hintRef.current;
+    if (!section || !stage || !copy || !slot || !rig || !phone || !screen || !canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let maxScale = 1; // phone scale at the end of the growth
+    let lift = 0; // px the phone moves so its centre meets the stage centre while it grows
+    let rise = 0; // how far below centre the phone starts (phones only), in px
+    let lastT = -1;
+    let tone = "";
+
+    const paint = (t: number, force = false) => {
+      if (!force && Math.abs(t - lastT) < 0.004) return;
+      lastT = t;
+      // The Reels chrome turns white over the dark, full-bleed photos.
+      const nextTone = reelToneAt(t);
+      if (nextTone !== tone) { tone = nextTone; screen.dataset.tone = tone; }
+      const scale = canvas.width / 360;
+      ctx.setTransform(scale, 0, 0, scale, 0, 0);
+      drawStrategyReel(ctx, t, 360, (360 * canvas.height) / canvas.width);
+    };
+    paintRef.current = paint;
+
+    /** Size the canvas backing store for the phone's largest scale (capped), keeping the screen's aspect. */
+    const sizeCanvas = () => {
+      const w = screen.clientWidth, h = screen.clientHeight;
+      if (!w || !h) return;
+      const k = Math.min(Math.min(window.devicePixelRatio || 1, 2) * (reducedMotion ? 1 : maxScale), 3.4);
+      canvas.width = Math.round(w * k);
+      canvas.height = Math.round(h * k);
+      paint(lastT < 0 ? 0 : lastT, true);
+    };
+
+    /** Growth targets, measured with our own transforms cleared so the numbers never depend on our output. */
+    const measure = () => {
+      rise = (parseFloat(getComputedStyle(stage).getPropertyValue("--reel-rise")) || 0) * stage.offsetHeight;
+      if (reducedMotion) { maxScale = 1; lift = 0; return; }
+      const rigTransform = rig.style.transform, phoneTransform = phone.style.transform;
+      rig.style.transform = "none"; phone.style.transform = "none";
+      const stageBox = stage.getBoundingClientRect(), phoneBox = phone.getBoundingClientRect();
+      rig.style.transform = rigTransform; phone.style.transform = phoneTransform;
+      maxScale = Math.max(1, Math.min((stageBox.height * GROW_TO_HEIGHT) / phoneBox.height, (stageBox.width * GROW_TO_WIDTH) / phoneBox.width));
+      lift = stageBox.top + stageBox.height / 2 - (phoneBox.top + phoneBox.height / 2);
+    };
+
     if (reducedMotion) {
-      // Hand control back to the stylesheet (static layout); tabs switch reels.
-      for (const element of [copy, rig, hint, ...barRefs.current]) element?.removeAttribute("style");
-      return;
+      // Hand control back to the stylesheet (static layout); show the reel's end card until someone presses play.
+      for (const element of [copy, rig, phone, hint]) element?.removeAttribute("style");
+      measure(); sizeCanvas(); paint(REEL_DURATION, true);
+      const onResize = () => { sizeCanvas(); };
+      window.addEventListener("resize", onResize);
+      document.fonts?.ready.then(() => paint(lastT, true));
+      loadReelPhotos().then(() => paint(lastT, true));
+      return () => window.removeEventListener("resize", onResize);
     }
 
     let frame = 0;
     let lastTime = 0;
     let shown = -1; // eased progress; -1 until the first frame
-    let rise = 0; // how far below centre the phone starts (phones only), in px
-
-    const readRise = () => {
-      rise = (parseFloat(getComputedStyle(stage).getPropertyValue("--reel-rise")) || 0) * stage.offsetHeight;
-    };
 
     /** Scroll progress through the pinned distance. Reads the section and stage only. */
     const target = () => clamp01(-section.getBoundingClientRect().top / Math.max(1, section.offsetHeight - stage.offsetHeight));
 
     const apply = (progress: number) => {
-      const fade = 1 - ease((progress - FADE[0]) / (FADE[1] - FADE[0]));
-      const glide = ease((progress - GLIDE[0]) / (GLIDE[1] - GLIDE[0]));
+      const fade = 1 - ease(range(progress, FADE));
+      const glide = ease(range(progress, GLIDE));
+      const grow = ease(range(progress, GROW));
       // `slot` is never transformed (only `rig` inside it is), so this distance does not depend on our own output.
       const stageBox = stage.getBoundingClientRect();
       const slotBox = slot.getBoundingClientRect();
       const toCentre = stageBox.left + stageBox.width / 2 - (slotBox.left + slotBox.width / 2);
       rig.style.transform = `translate3d(${(toCentre * glide).toFixed(2)}px,${(rise * (1 - glide)).toFixed(2)}px,0)`;
+      phone.style.transform = `translate3d(0,${(lift * grow).toFixed(2)}px,0) scale(${(1 + (maxScale - 1) * grow).toFixed(4)})`;
       copy.style.opacity = fade.toFixed(3);
       copy.style.transform = `translate3d(0,${((fade - 1) * 24).toFixed(2)}px,0)`;
       copy.style.visibility = fade < 0.02 ? "hidden" : "visible";
       if (hint) hint.style.opacity = (1 - ease(progress / HINT_END)).toFixed(2);
-      barRefs.current.forEach((bar, i) => { if (bar) bar.style.transform = `scaleX(${reelFill(progress, i, count).toFixed(3)})`; });
-      const index = reelAt(progress, count);
-      setActive(previous => (previous === index ? previous : index));
+      paint(range(progress, REEL) * REEL_DURATION);
     };
 
     const tick = (now: number) => {
@@ -192,7 +158,7 @@ export function PhoneReelStory() {
       } else {
         const elapsed = lastTime ? Math.min(80, Math.max(0, now - lastTime)) : 16.7;
         shown += (goal - shown) * (1 - Math.exp(-elapsed / FOLLOW_MS));
-        if (Math.abs(goal - shown) < 0.0004) shown = goal;
+        if (Math.abs(goal - shown) < 0.0002) shown = goal;
       }
       lastTime = now;
       apply(shown);
@@ -203,10 +169,13 @@ export function PhoneReelStory() {
       lastTime = 0;
       frame = requestAnimationFrame(tick);
     };
-    const onResize = () => { readRise(); wake(); };
+    const onResize = () => { measure(); sizeCanvas(); lastT = -1; wake(); };
 
-    readRise();
+    measure();
+    sizeCanvas();
     wake();
+    document.fonts?.ready.then(() => paint(lastT < 0 ? 0 : lastT, true));
+    loadReelPhotos().then(() => paint(lastT < 0 ? 0 : lastT, true));
     window.addEventListener("scroll", wake, { passive: true });
     window.addEventListener("resize", onResize);
     return () => {
@@ -214,19 +183,23 @@ export function PhoneReelStory() {
       window.removeEventListener("scroll", wake);
       window.removeEventListener("resize", onResize);
     };
-  }, [count, reducedMotion]);
+  }, [reducedMotion]);
 
-  /** Tab click: scroll to the middle of that reel's stretch (or just switch, with reduced motion). */
-  const show = (index: number) => {
-    const section = sectionRef.current, stage = stageRef.current;
-    if (reducedMotion || !section || !stage) { setActive(index); return; }
-    const progress = index === 0 ? GLIDE[1] + 0.04 : REEL_FIRST + (index - 0.5) * reelStep(count);
-    const top = section.getBoundingClientRect().top + window.scrollY + progress * (section.offsetHeight - stage.offsetHeight);
-    window.scrollTo({ top, behavior: "smooth" });
+  /** Reduced motion only: play the reel once at normal speed, then rest on the end card. */
+  const replay = () => {
+    if (replaying) return;
+    setReplaying(true);
+    const start = performance.now();
+    const step = (now: number) => {
+      const t = (now - start) / 1000;
+      paintRef.current(Math.min(t, REEL_DURATION), true);
+      if (t < REEL_DURATION) requestAnimationFrame(step); else setReplaying(false);
+    };
+    requestAnimationFrame(step);
   };
 
   return (
-    <section className="reel-story" id="film" ref={sectionRef} aria-label="What Buzzly builds" style={{ "--reel-count": count } as CSSProperties}>
+    <section className="reel-story" id="film" ref={sectionRef} aria-label="How Buzzly builds brands through content">
       <div className="reel-stage" ref={stageRef}>
         <div className="reel-copy hero-statement" ref={copyRef}>
           <p>A technology-led company builder with content at its core.</p>
@@ -236,74 +209,43 @@ export function PhoneReelStory() {
 
         <div className="reel-slot" ref={slotRef}>
           <div className="reel-rig" ref={rigRef}>
-            <div className="reel-phone">
+            <div className="reel-phone" ref={phoneRef}>
               <span className="reel-island" aria-hidden="true" />
-              <div className="reel-screen">
+              <div className="reel-screen" ref={screenRef}>
+                <canvas className="reel-canvas" ref={canvasRef} aria-hidden="true" />
                 <div className="ig-status" aria-hidden="true">
                   <span>9:41</span>
                   <span className="ig-status-icons"><i className="ig-signal" /><i className="ig-battery" /></span>
                 </div>
-                <div className="ig-viewport">
-                  <ul className="reel-feed" style={{ "--reel-index": active } as CSSProperties}>
-                    {reels.map((reel, index) => {
-                      const image = postImages[reel.id];
-                      return (
-                        <li
-                          className={`reel-item${index === active ? " is-active" : ""}`}
-                          key={reel.id}
-                          inert={index !== active}
-                          style={{ "--tone": reel.tone, ...(reel.accent ? { "--tone-accent": reel.accent } : {}) } as CSSProperties}
-                        >
-                          <div className="ig-head">
-                            <span className="ig-avatar" aria-hidden="true"><span>{reel.initials}</span></span>
-                            <span className="ig-id"><b>{reel.account}</b><small>{reel.accountNote}</small></span>
-                            <Ellipsis className="ig-more" aria-hidden="true" />
-                          </div>
-                          <div className="ig-media">
-                            {image ? (
-                              <Image src={image.src} alt={image.alt} fill sizes="300px" />
-                            ) : (
-                              <div className="reel-card" aria-hidden="true">
-                                <span className="reel-over">{reel.over}</span>
-                                <p className="reel-headline"><span className="reel-line">{reel.headline[0]}</span><em className="reel-line">{reel.headline[1]}</em></p>
-                                {reel.points && <ol className="reel-points">{reel.points.map((point, i) => <li key={point}><span>0{i + 1}</span>{point}</li>)}</ol>}
-                              </div>
-                            )}
-                            <span className="ig-burst" aria-hidden="true"><Heart /></span>
-                          </div>
-                          <Link className="ig-cta" href={reel.href} aria-label={reel.ctaDetail ? `${reel.cta} ${reel.ctaDetail}` : reel.cta}>
-                            <span>{reel.cta}{reel.ctaDetail && <span className="reel-cta-detail"> {reel.ctaDetail}</span>}</span>
-                            <ChevronRight aria-hidden="true" />
-                          </Link>
-                          <div className="ig-actions" aria-hidden="true">
-                            <Heart className="ig-like" /><MessageCircle /><Repeat2 /><Send />
-                            <Bookmark className="ig-save" />
-                          </div>
-                          <p className="ig-caption"><b>{reel.account}</b> {reel.caption}</p>
-                        </li>
-                      );
-                    })}
-                    <li className="ig-end" aria-hidden="true"><CircleCheck /><b>You&rsquo;re all caught up</b></li>
-                  </ul>
+                <div className="rl-head" aria-hidden="true"><b>Reels</b><ChevronDown /><Camera className="rl-cam" /></div>
+                <div className="rl-side" aria-hidden="true"><Heart /><MessageCircle /><Repeat2 /><Send /><Ellipsis /></div>
+                <div className="rl-foot">
+                  <div className="rl-acct">
+                    <span className="rl-avatar" aria-hidden="true"><Image src="/logo/buzzly-mark.svg" alt="" width={24} height={24} /></span>
+                    <b>buzzly</b>
+                    <Link className="rl-follow" href="/contact">Start a Project</Link>
+                  </div>
+                  <p className="rl-cap">How we build brands through content, from the first idea to the first client.</p>
+                  <span className="rl-audio" aria-hidden="true"><Music2 /> Original audio · Buzzly</span>
                 </div>
                 <div className="ig-nav" aria-hidden="true">
                   <House /><Clapperboard /><Send /><Search />
                   <span className="ig-me"><Image src="/logo/buzzly-mark.svg" alt="" width={24} height={24} /></span>
                 </div>
+                {reducedMotion && (
+                  <button type="button" className="rl-play" onClick={replay} disabled={replaying}>
+                    {replaying ? "Playing…" : "Play the reel"}
+                  </button>
+                )}
               </div>
-            </div>
-            <div className="reel-tabs" role="group" aria-label="Choose a reel">
-              {reels.map((reel, index) => (
-                <button type="button" key={reel.id} aria-pressed={index === active} onClick={() => show(index)}>
-                  <span className="reel-bar" aria-hidden="true"><i ref={element => { barRefs.current[index] = element; }} /></span>
-                  <span className="reel-tab-no" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
-                  <span className="reel-tab-name">{reel.tab}</span>
-                </button>
-              ))}
             </div>
           </div>
         </div>
 
+        <div className="sr-only">
+          <p>The reel in the phone, as text:</p>
+          {REEL_TRANSCRIPT.map(line => <p key={line}>{line}</p>)}
+        </div>
         <div className="reel-hint" ref={hintRef} aria-hidden="true"><span>SCROLL</span><span>↓</span></div>
       </div>
     </section>
