@@ -1,0 +1,295 @@
+<!doctype html>
+<!--
+  "How brands are built through content" — the Buzzly brand-story film.
+  A deterministic canvas animation: window.renderFrame(seconds) draws one
+  frame, so render.mjs can step through it and encode an MP4 with ffmpeg.
+  Open it in a browser (served from the repo root) to preview: it plays live.
+  4:5, 1080×1350, 35 s, silent. Palette and fonts come from the site.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Buzzly brand story</title>
+<style>
+  @font-face { font-family: 'DM Sans'; src: url('/fonts/dm-sans-latin.woff2') format('woff2'); font-weight: 400 700; }
+  @font-face { font-family: 'Instrument Serif'; src: url('/fonts/instrument-serif-latin.woff2') format('woff2'); }
+  @font-face { font-family: 'Instrument Serif'; src: url('/fonts/instrument-serif-italic-latin.woff2') format('woff2'); font-style: italic; }
+  @font-face { font-family: 'Geist Mono'; src: url('/fonts/geist-mono-latin.woff2') format('woff2'); font-weight: 100 900; }
+  html, body { margin: 0; background: #151313; }
+  canvas { display: block; width: 1080px; height: 1350px; }
+</style>
+</head>
+<body>
+<canvas id="film" width="1080" height="1350"></canvas>
+<script>
+const W = 1080, H = 1350, DURATION = 35, FPS = 30;
+const BG = '#151313', CREAM = '#f5efdf', SOFT = '#bbb5a9', RED = '#ef342d', LINE = '#403b38', PANEL = '#211e1d';
+const ctx = document.getElementById('film').getContext('2d');
+const CX = 540, CY = 540;
+
+// ---------- helpers ----------
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const raw = (t, a, b) => clamp((t - a) / (b - a));
+const io = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;      // ease in-out cubic
+const out = x => 1 - Math.pow(1 - x, 3);                                          // ease out cubic
+const back = x => { const c = 1.9; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const seg = (t, a, b, e = io) => e(raw(t, a, b));
+const fade = (t, a, b, c, d) => seg(t, a, b, out) * (1 - seg(t, c, d));           // in over a–b, out over c–d
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let x = Math.imul(seed ^ seed >>> 15, 1 | seed); x = x + Math.imul(x ^ x >>> 7, 61 | x) ^ x; return ((x ^ x >>> 14) >>> 0) / 4294967296; }; }
+const alpha = (hex, a) => hex + Math.round(clamp(a) * 255).toString(16).padStart(2, '0');
+
+function text(str, x, y, font, color, a = 1, align = 'center') {
+  if (a <= 0) return;
+  ctx.save(); ctx.globalAlpha = a; ctx.font = font; ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = 'alphabetic';
+  ctx.fillText(str, x, y); ctx.restore();
+}
+function roundRect(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+
+// ---------- the audience: a field of people, three groups the brand is for ----------
+const R = rng(7);
+const clusters = [{ x: 250, y: 330 }, { x: 830, y: 400 }, { x: 560, y: 770 }];
+const people = [];
+for (let i = 0; i < 560; i++) {
+  const p = { x: 60 + R() * 960, y: 140 + R() * 800, j: R() };
+  let best = 0, bd = 1e9;
+  clusters.forEach((c, k) => { const d = Math.hypot(p.x - c.x, p.y - c.y); if (d < bd) { bd = d; best = k; } });
+  p.cluster = best; p.dist = bd;
+  p.fit = bd < 150 + R() * 70;
+  p.lit = p.fit ? 21.2 + bd / 230 + R() * .7 : Infinity;   // when content reaches them
+  people.push(p);
+}
+// Who passed it on to whom: each reached person links to the nearest person in the group reached before them.
+const reached = people.filter(p => p.fit).sort((a, b) => a.lit - b.lit);
+reached.forEach((p, i) => {
+  let parent = clusters[p.cluster], bd = Math.hypot(p.x - parent.x, p.y - parent.y);
+  for (let k = 0; k < i; k++) { const q = reached[k]; if (q.cluster !== p.cluster) continue; const d = Math.hypot(p.x - q.x, p.y - q.y); if (d < bd) { bd = d; parent = q; } }
+  p.parent = parent;
+});
+// The replies that come back: a sample of reached people send something back to the brand.
+const replies = reached.filter((_, i) => i % 3 === 0).map((p, i) => ({ p, start: 26.1 + (i % 40) * .055 + (i > 40 ? .25 : 0) }));
+
+// Noise words for "Find the idea"
+const noise = ['new', 'best price', 'premium', 'fast', 'trusted', 'for everyone', 'quality', 'innovative', 'world-class', 'affordable', 'next-gen', 'unique', 'leading', 'easy'];
+const RW = rng(21);
+const words = noise.map(w => ({ w, x: CX + (RW() - .5) * 760, y: CY + (RW() - .5) * 520, vx: (RW() - .5) * 26, vy: (RW() - .5) * 18, s: 26 + RW() * 18 }));
+
+// Formats for "Make it visible": [label, w, h, target x]
+const formats = [
+  { label: 'Film', w: 300, h: 169, x: 222 },
+  { label: 'Reel', w: 150, h: 267, x: 470 },
+  { label: 'Post', w: 210, h: 210, x: 690 },
+  { label: 'Story', w: 150, h: 267, x: 910 },
+];
+
+// Grain (fixed tiles, offset per frame)
+const grain = document.createElement('canvas'); grain.width = grain.height = 256;
+{ const g = grain.getContext('2d'), d = g.createImageData(256, 256), r = rng(3); for (let i = 0; i < d.data.length; i += 4) { const v = r() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; } g.putImageData(d, 0, 0); }
+
+const mark = new Image(); mark.src = '/logo/buzzly-mark.svg';
+
+// ---------- pieces ----------
+function caption(t, a, b, l1, l2) {
+  const i1 = seg(t, a, a + .8, out), i2 = seg(t, a + .25, a + 1.05, out), o = seg(t, b - .5, b);
+  text(l1, CX, 1100 + (1 - i1) * 34 - o * 16, "400 84px 'Instrument Serif'", CREAM, i1 * (1 - o));
+  text(l2, CX, 1190 + (1 - i2) * 34 - o * 16, "italic 400 84px 'Instrument Serif'", RED, i2 * (1 - o));
+}
+function chapter(t, a, b, no, name) {
+  const v = fade(t, a, a + .6, b - .4, b);
+  text(no, 74, 1286, "500 22px 'Geist Mono'", RED, v, 'left');
+  text(name, 124, 1286, "500 22px 'Geist Mono'", CREAM, v, 'left');
+}
+function hud(t) {
+  ctx.save(); ctx.strokeStyle = alpha(CREAM, .55); ctx.lineWidth = 2; const m = 40, L = 42;
+  for (const [x, y, dx, dy] of [[m, m, 1, 1], [W - m, m, -1, 1], [m, H - m, 1, -1], [W - m, H - m, -1, -1]]) {
+    ctx.beginPath(); ctx.moveTo(x, y + dy * L); ctx.lineTo(x, y); ctx.lineTo(x + dx * L, y); ctx.stroke();
+  }
+  ctx.restore();
+  text('BUZZLY — HOW BRANDS ARE BUILT', 74, 92, "500 21px 'Geist Mono'", SOFT, .9, 'left');
+  const f = Math.floor(t * FPS), tc = `00:${String(Math.floor(f / FPS)).padStart(2, '0')}:${String(f % FPS).padStart(2, '0')}`;
+  text(tc, W - 74, 92, "500 21px 'Geist Mono'", SOFT, .9, 'right');
+}
+
+function drawPeople(t) {
+  const base = .2 * seg(t, 4.2, 6.2) * (1 - .55 * fade(t, 7.4, 8.2, 18.6, 19.6)) * (1 - .6 * seg(t, 30.4, 31.4));
+  if (base <= 0) return;
+  const linkFade = 1 - .6 * seg(t, 26, 28) - .4 * seg(t, 30.4, 31.2);
+  // links first
+  ctx.save(); ctx.lineWidth = 1.4;
+  for (const p of reached) {
+    const g = seg(t, p.lit - .35, p.lit, out); if (g <= 0) continue;
+    const q = p.parent; ctx.strokeStyle = alpha(CREAM, .32 * linkFade);
+    ctx.beginPath(); ctx.moveTo(q.x, q.y); ctx.lineTo(lerp(q.x, p.x, g), lerp(q.y, p.y, g)); ctx.stroke();
+  }
+  ctx.restore();
+  for (const p of people) {
+    const lit = seg(t, p.lit, p.lit + .4, out);
+    const dim = 1 - .9 * seg(t, 30.4, 31.4);
+    if (lit > 0) {
+      const glow = (1 - seg(t, p.lit + .2, p.lit + 1.2)) * dim;
+      if (glow > 0) { ctx.fillStyle = alpha(RED, .35 * glow); ctx.beginPath(); ctx.arc(p.x, p.y, 4 + 12 * lit, 0, 7); ctx.fill(); }
+      ctx.fillStyle = alpha(CREAM, (.25 + .75 * lit) * dim); ctx.beginPath(); ctx.arc(p.x, p.y, 3.2 + 1.8 * lit, 0, 7); ctx.fill();
+    } else {
+      ctx.fillStyle = alpha(SOFT, base * (.7 + .3 * p.j)); ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, 7); ctx.fill();
+    }
+  }
+}
+
+function drawIdeaDot(t) {
+  const show = seg(t, .3, 1.2, back) * (1 - seg(t, 7.3, 7.9));
+  if (show <= 0) return;
+  const r = 14 * show * (1 - .5 * seg(t, 3.7, 4.8));
+  for (let k = 0; k < 3; k++) {                          // pulse rings while it waits to be seen
+    const ph = ((t - .8 - k * .4) % 1.6) / 1.6; if (t < .8 + k * .4) continue;
+    ctx.strokeStyle = alpha(RED, (1 - ph) * .5 * show * (1 - seg(t, 3.8, 4.6))); ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(CX, CY, r + ph * 90, 0, 7); ctx.stroke();
+  }
+  ctx.fillStyle = RED; ctx.beginPath(); ctx.arc(CX, CY, r, 0, 7); ctx.fill();
+  // "nobody sees it": a faint question of distance — a dashed circle that never reaches anyone
+  const lonely = fade(t, 4.6, 5.6, 6.9, 7.4);
+  if (lonely > 0) { ctx.save(); ctx.setLineDash([6, 10]); ctx.strokeStyle = alpha(SOFT, .45 * lonely); ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(CX, CY, 60 + 20 * lonely, 0, 7); ctx.stroke(); ctx.restore(); }
+}
+
+function drawFindIdea(t) {
+  const inA = seg(t, 7.6, 8.6, out), gather = seg(t, 10.0, 11.0);
+  if (t < 7.6 || t > 13.6) return;
+  for (const w of words) {
+    const dt = t - 7.6, x = lerp(w.x + w.vx * dt, CX, gather), y = lerp(w.y + w.vy * dt, CY, gather);
+    text(w.w, x, y, `500 ${w.s}px 'Geist Mono'`, SOFT, inA * (1 - gather) * .9);
+  }
+  // the one clear idea
+  const one = fade(t, 10.7, 11.5, 12.7, 13.3);
+  text('One thing to remember.', CX, CY + 18, "400 70px 'Instrument Serif'", CREAM, one);
+  const u = seg(t, 11.3, 12.1, out) * (1 - seg(t, 12.7, 13.3));
+  if (u > 0) { ctx.fillStyle = RED; ctx.fillRect(CX - 300, CY + 46, 600 * u, 4); }
+}
+
+function drawFormats(t) {
+  if (t < 12.6 || t > 20.2) return;
+  const film = { w: 560, h: 315 };
+  const appear = seg(t, 12.7, 13.6, out);
+  const split = formats.map((_, i) => seg(t, 14.2 + i * .22, 15.3 + i * .22));
+  const shrink = seg(t, 19.0, 19.8);
+  formats.forEach((f, i) => {
+    const s = split[i];
+    // every format is born from the one film frame in the middle
+    let w = lerp(film.w * appear, f.w, s), h = lerp(film.h * appear, f.h, s), x = lerp(CX, f.x, s), y = CY;
+    if (i > 0 && s <= 0) return;
+    w *= 1 - shrink; h *= 1 - shrink;
+    if (w < 2) return;
+    const a = (i === 0 ? appear : clamp(s * 3)) * (1 - shrink * .6);
+    ctx.save(); ctx.globalAlpha = a;
+    roundRect(x - w / 2, y - h / 2, w, h, f.label === 'Film' ? 6 : 14);
+    ctx.fillStyle = PANEL; ctx.fill(); ctx.strokeStyle = CREAM; ctx.lineWidth = 2; ctx.stroke();
+    ctx.restore();
+    const inner = clamp(s * 2 - .4) * (1 - shrink) || (i === 0 ? appear * (1 - shrink) : 0);
+    if (inner <= 0) return;
+    ctx.save(); ctx.globalAlpha = inner; ctx.translate(x, y); const k = w / (s > 0 ? f.w : film.w);
+    ctx.scale(Math.max(.01, k), Math.max(.01, k));
+    if (f.label === 'Film' || f.label === 'Reel') {                    // play symbol
+      ctx.fillStyle = RED; ctx.beginPath(); ctx.moveTo(-14, -20); ctx.lineTo(22, 0); ctx.lineTo(-14, 20); ctx.closePath(); ctx.fill();
+    }
+    if (f.label === 'Reel') { for (let b = 0; b < 3; b++) { ctx.fillStyle = alpha(CREAM, .5); ctx.beginPath(); ctx.arc(52, 30 + b * 30, 7, 0, 7); ctx.fill(); } }
+    if (f.label === 'Post') {
+      text('One thing', 0, -6, "400 40px 'Instrument Serif'", CREAM, 1);
+      text('to remember.', 0, 34, "italic 400 40px 'Instrument Serif'", RED, 1);
+    }
+    if (f.label === 'Story') { for (let b = 0; b < 3; b++) { ctx.fillStyle = alpha(CREAM, b === 0 ? .9 : .3); ctx.fillRect(-60 + b * 42, -118, 36, 4); } text('Aa', 0, 14, "400 52px 'Instrument Serif'", CREAM, 1); }
+    if (f.label === 'Film') { ctx.fillStyle = alpha(CREAM, .3); ctx.fillRect(-120, 60, 240, 3); ctx.fillStyle = RED; ctx.fillRect(-120, 60, 240 * seg(t, 13.2, 19), 3); }
+    ctx.restore();
+    const lab = clamp(s * 2 - 1) * (1 - shrink);
+    text(f.label.toUpperCase(), x, y + f.h / 2 + 46, "500 20px 'Geist Mono'", SOFT, lab);
+  });
+}
+
+// Content travelling out: each format becomes sparks that fly to one of the groups
+function drawSparks(t) {
+  if (t < 19.6 || t > 22.4) return;
+  formats.forEach((f, i) => {
+    for (let n = 0; n < 7; n++) {
+      const c = clusters[(i + n) % 3], start = 19.7 + n * .05 + i * .06, p = seg(t, start, start + 1.4);
+      if (p <= 0 || p >= 1) continue;
+      const mx = (f.x + c.x) / 2 + (n - 3) * 40, my = Math.min(CY, c.y) - 160;
+      const x = (1 - p) * (1 - p) * f.x + 2 * (1 - p) * p * mx + p * p * c.x;
+      const y = (1 - p) * (1 - p) * CY + 2 * (1 - p) * p * my + p * p * c.y;
+      ctx.fillStyle = alpha(CREAM, .9); ctx.beginPath(); ctx.arc(x, y, 4.5, 0, 7); ctx.fill();
+      ctx.fillStyle = alpha(RED, .3); ctx.beginPath(); ctx.arc(x, y, 11, 0, 7); ctx.fill();
+    }
+  });
+}
+
+// What comes back: replies travel to the centre, and the brand grows from them
+function drawBrand(t) {
+  if (t < 25.9) return;
+  let arrived = 0;
+  for (const r of replies) {
+    const p = seg(t, r.start, r.start + .95, x => x * x);
+    if (p >= 1) { arrived++; continue; }
+    if (p <= 0) continue;
+    const x = lerp(r.p.x, CX, p), y = lerp(r.p.y, CY, p);
+    ctx.fillStyle = RED; ctx.beginPath(); ctx.arc(x, y, 3.6, 0, 7); ctx.fill();
+  }
+  const g = arrived / replies.length;
+  const end = seg(t, 30.4, 31.6);
+  const rad = lerp(12 + 74 * out(g), 0, end);
+  const born = seg(t, 26.0, 26.5, out);
+  if (rad > 1) {
+    ctx.fillStyle = alpha(RED, .16 * born); ctx.beginPath(); ctx.arc(CX, CY, rad * 1.6, 0, 7); ctx.fill();
+    ctx.strokeStyle = alpha(RED, born); ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(CX, CY, rad, 0, 7); ctx.stroke();
+    ctx.fillStyle = alpha(CREAM, born); ctx.beginPath(); ctx.arc(CX, CY, 9 + 10 * g, 0, 7); ctx.fill();
+  }
+  const word = fade(t, 28.2, 28.9, 30.2, 30.7);
+  if (word > 0) { ctx.save(); ctx.globalAlpha = word * .85; ctx.fillStyle = BG; roundRect(CX - 70, CY + rad + 18, 140, 50, 25); ctx.fill(); ctx.restore(); }
+  text('brand', CX, CY + rad + 54, "italic 400 44px 'Instrument Serif'", CREAM, word);
+}
+
+function drawEndCard(t) {
+  const a = seg(t, 30.9, 31.8, out);
+  if (a <= 0) return;
+  if (mark.complete && mark.naturalWidth) {
+    ctx.save(); ctx.globalAlpha = a; const s = 128 * lerp(.85, 1, a); ctx.drawImage(mark, CX - s / 2, 400 - s / 2, s, s); ctx.restore();
+  }
+  const b = seg(t, 31.3, 32.2, out), c = seg(t, 31.7, 32.6, out);
+  text('We build brands', CX, 640 + (1 - b) * 30, "400 104px 'Instrument Serif'", CREAM, b);
+  text('through content.', CX, 748 + (1 - c) * 30, "italic 400 104px 'Instrument Serif'", RED, c);
+  const d = seg(t, 32.4, 33.2, out);
+  ctx.fillStyle = alpha(LINE, d); ctx.fillRect(CX - 200, 820, 400, 2);
+  text('buzzly.in', CX, 884, "500 26px 'Geist Mono'", SOFT, d);
+}
+
+// ---------- frame ----------
+function renderFrame(t) {
+  ctx.globalAlpha = 1; ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
+  drawPeople(t);
+  drawIdeaDot(t);
+  drawFindIdea(t);
+  drawFormats(t);
+  drawSparks(t);
+  drawBrand(t);
+  drawEndCard(t);
+  caption(t, .9, 3.6, 'Every brand starts', 'as an idea.');
+  caption(t, 4.1, 7.3, 'On its own,', 'nobody sees it.');
+  caption(t, 13.4, 18.9, 'One idea.', 'Many forms.');
+  caption(t, 20.0, 25.8, 'Content travels', 'to the people it’s for.');
+  caption(t, 26.4, 30.3, 'Attention becomes trust.', 'Trust becomes a brand.');
+  chapter(t, 7.4, 12.6, '01', 'Find the idea');
+  chapter(t, 12.6, 19.0, '02', 'Make it visible');
+  chapter(t, 19.0, 26.0, '03', 'Help it travel');
+  chapter(t, 26.0, 30.5, '04', 'Earn attention, then trust');
+  hud(t);
+  // film grain
+  ctx.save(); ctx.globalAlpha = .045; ctx.globalCompositeOperation = 'overlay';
+  const f = Math.floor(t * FPS), ox = (f * 73) % 256, oy = (f * 151) % 256;
+  ctx.translate(-ox, -oy); ctx.fillStyle = ctx.createPattern(grain, 'repeat'); ctx.fillRect(0, 0, W + 256, H + 256); ctx.restore();
+}
+window.renderFrame = renderFrame;
+window.FILM = { DURATION, FPS };
+window.ready = Promise.all([document.fonts.load("400 40px 'Instrument Serif'"), document.fonts.load("italic 400 40px 'Instrument Serif'"), document.fonts.load("500 20px 'Geist Mono'"), mark.decode().catch(() => {})]);
+
+// Live preview when opened normally (render.mjs adds ?render to drive it frame by frame)
+if (!location.search.includes('render')) {
+  window.ready.then(() => { const t0 = performance.now(); (function loop(now) { renderFrame(((now - t0) / 1000) % DURATION); requestAnimationFrame(loop); })(t0); });
+}
+</script>
+</body>
+</html>

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { Bookmark, Heart, MessageCircle, Send } from "lucide-react";
+import Image from "next/image";
+import { Bookmark, ChevronRight, CircleCheck, Clapperboard, Ellipsis, Heart, House, MessageCircle, Repeat2, Search, Send } from "lucide-react";
 import Link from "@/components/Link";
 import { useMotionPreferences } from "@/hooks/use-in-view";
 import { companies, services } from "@/lib/content";
@@ -32,8 +33,14 @@ import { companies, services } from "@/lib/content";
  *   0.40 …     second reel; the remaining reels share what is left evenly
  *   1.00       the stage releases
  *
- * Each reel is a typographic card for now. When a vertical film exists for a
- * reel it belongs in this component as a layer above the card.
+ * Inside the phone each reel is a post in an Instagram-style feed (account
+ * row, 4:5 media, call-to-action bar, actions, caption). The feed scrolls one
+ * post at a time, so the next post's header peeks in below like a real feed.
+ * Under the phone, one progress bar per reel fills as you scroll through it.
+ *
+ * Post images: put the file in `public/media/reels/` and add it to
+ * `postImages` below. Until a post has an image, its media slot shows the
+ * typographic poster in the company's colour.
  */
 
 type Reel = {
@@ -52,6 +59,16 @@ type Reel = {
   cta: string;
   ctaDetail?: string;
   tab: string;
+  /** Account row: name, line under it, and avatar letters. */
+  account: string;
+  accountNote: string;
+  initials: string;
+  caption: string;
+};
+
+/** Images for the posts, keyed by reel id. 4:5 portrait (e.g. 1080×1350) fills the slot exactly. */
+const postImages: Record<string, { src: string; alt: string } | undefined> = {
+  // "de-food-kampney": { src: "/media/reels/de-food-kampney.jpg", alt: "…" },
 };
 
 /** "Food is culture." → ["Food is", "culture."] so the last word can carry the italic. */
@@ -72,6 +89,10 @@ const reels: Reel[] = [
     cta: "Explore",
     ctaDetail: company.name,
     tab: company.name,
+    account: company.name,
+    accountNote: "Buzzly sub-company",
+    initials: company.name.split(" ").filter(word => word !== "De").map(word => word[0]).join("").slice(0, 2),
+    caption: `${company.word} ${company.field}, founded and built by Buzzly.`,
   })),
   {
     id: "partners",
@@ -85,6 +106,10 @@ const reels: Reel[] = [
     href: "/contact",
     cta: "Start a Project",
     tab: "Partners",
+    account: "Buzzly",
+    accountNote: "Open for partners",
+    initials: "B",
+    caption: `Bring us the brief. ${services.map(service => service.title).join(" · ")}.`,
   },
 ];
 
@@ -102,6 +127,13 @@ const reelStep = (count: number) => (1 - REEL_FIRST) / Math.max(1, count - 1);
 const reelAt = (progress: number, count: number) =>
   progress < REEL_FIRST || count < 2 ? 0 : Math.min(count - 1, 1 + Math.floor((progress - REEL_FIRST) / reelStep(count)));
 
+/** How far through reel `index`'s own stretch of the scroll we are (0–1). */
+const reelFill = (progress: number, index: number, count: number) => {
+  const start = index === 0 ? GLIDE[1] : REEL_FIRST + (index - 1) * reelStep(count);
+  const end = index === 0 ? REEL_FIRST : start + reelStep(count);
+  return clamp01((progress - start) / (end - start));
+};
+
 export function PhoneReelStory() {
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -109,6 +141,7 @@ export function PhoneReelStory() {
   const slotRef = useRef<HTMLDivElement>(null);
   const rigRef = useRef<HTMLDivElement>(null);
   const hintRef = useRef<HTMLDivElement>(null);
+  const barRefs = useRef<(HTMLElement | null)[]>([]);
   const [active, setActive] = useState(0);
   const { reducedMotion } = useMotionPreferences();
   const count = reels.length;
@@ -118,7 +151,7 @@ export function PhoneReelStory() {
     if (!section || !stage || !copy || !slot || !rig) return;
     if (reducedMotion) {
       // Hand control back to the stylesheet (static layout); tabs switch reels.
-      for (const element of [copy, rig, hint]) element?.removeAttribute("style");
+      for (const element of [copy, rig, hint, ...barRefs.current]) element?.removeAttribute("style");
       return;
     }
 
@@ -146,6 +179,7 @@ export function PhoneReelStory() {
       copy.style.transform = `translate3d(0,${((fade - 1) * 24).toFixed(2)}px,0)`;
       copy.style.visibility = fade < 0.02 ? "hidden" : "visible";
       if (hint) hint.style.opacity = (1 - ease(progress / HINT_END)).toFixed(2);
+      barRefs.current.forEach((bar, i) => { if (bar) bar.style.transform = `scaleX(${reelFill(progress, i, count).toFixed(3)})`; });
       const index = reelAt(progress, count);
       setActive(previous => (previous === index ? previous : index));
     };
@@ -205,37 +239,65 @@ export function PhoneReelStory() {
             <div className="reel-phone">
               <span className="reel-island" aria-hidden="true" />
               <div className="reel-screen">
-                <ul className="reel-feed" style={{ "--reel-index": active } as CSSProperties}>
-                  {reels.map((reel, index) => (
-                    <li
-                      className={`reel-item${index === active ? " is-active" : ""}`}
-                      key={reel.id}
-                      inert={index !== active}
-                      style={{ "--tone": reel.tone, ...(reel.accent ? { "--tone-accent": reel.accent } : {}) } as CSSProperties}
-                    >
-                      <div className="reel-card">
-                        <span className="reel-over">{reel.over}</span>
-                        <p className="reel-headline"><span className="reel-line">{reel.headline[0]}</span><em className="reel-line">{reel.headline[1]}</em></p>
-                        {reel.points && <ol className="reel-points">{reel.points.map((point, i) => <li key={point}><span>0{i + 1}</span>{point}</li>)}</ol>}
-                      </div>
-                      <div className="reel-top" aria-hidden="true"><span>BUZZLY / REELS</span><span>{String(index + 1).padStart(2, "0")} / {String(count).padStart(2, "0")}</span></div>
-                      <div className="reel-side" aria-hidden="true"><Heart strokeWidth={1.6} /><MessageCircle strokeWidth={1.6} /><Send strokeWidth={1.6} /><Bookmark strokeWidth={1.6} /></div>
-                      <div className="reel-caption">
-                        <span className="reel-kicker">{reel.kicker}</span>
-                        <p className="reel-title">{reel.title}</p>
-                        <Link href={reel.href} aria-label={reel.ctaDetail ? `${reel.cta} ${reel.ctaDetail}` : reel.cta}>
-                          {reel.cta}{reel.ctaDetail && <span className="reel-cta-detail"> {reel.ctaDetail}</span>} ↗
-                        </Link>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+                <div className="ig-status" aria-hidden="true">
+                  <span>9:41</span>
+                  <span className="ig-status-icons"><i className="ig-signal" /><i className="ig-battery" /></span>
+                </div>
+                <div className="ig-viewport">
+                  <ul className="reel-feed" style={{ "--reel-index": active } as CSSProperties}>
+                    {reels.map((reel, index) => {
+                      const image = postImages[reel.id];
+                      return (
+                        <li
+                          className={`reel-item${index === active ? " is-active" : ""}`}
+                          key={reel.id}
+                          inert={index !== active}
+                          style={{ "--tone": reel.tone, ...(reel.accent ? { "--tone-accent": reel.accent } : {}) } as CSSProperties}
+                        >
+                          <div className="ig-head">
+                            <span className="ig-avatar" aria-hidden="true"><span>{reel.initials}</span></span>
+                            <span className="ig-id"><b>{reel.account}</b><small>{reel.accountNote}</small></span>
+                            <Ellipsis className="ig-more" aria-hidden="true" />
+                          </div>
+                          <div className="ig-media">
+                            {image ? (
+                              <Image src={image.src} alt={image.alt} fill sizes="300px" />
+                            ) : (
+                              <div className="reel-card" aria-hidden="true">
+                                <span className="reel-over">{reel.over}</span>
+                                <p className="reel-headline"><span className="reel-line">{reel.headline[0]}</span><em className="reel-line">{reel.headline[1]}</em></p>
+                                {reel.points && <ol className="reel-points">{reel.points.map((point, i) => <li key={point}><span>0{i + 1}</span>{point}</li>)}</ol>}
+                              </div>
+                            )}
+                            <span className="ig-burst" aria-hidden="true"><Heart /></span>
+                          </div>
+                          <Link className="ig-cta" href={reel.href} aria-label={reel.ctaDetail ? `${reel.cta} ${reel.ctaDetail}` : reel.cta}>
+                            <span>{reel.cta}{reel.ctaDetail && <span className="reel-cta-detail"> {reel.ctaDetail}</span>}</span>
+                            <ChevronRight aria-hidden="true" />
+                          </Link>
+                          <div className="ig-actions" aria-hidden="true">
+                            <Heart className="ig-like" /><MessageCircle /><Repeat2 /><Send />
+                            <Bookmark className="ig-save" />
+                          </div>
+                          <p className="ig-caption"><b>{reel.account}</b> {reel.caption}</p>
+                        </li>
+                      );
+                    })}
+                    <li className="ig-end" aria-hidden="true"><CircleCheck /><b>You&rsquo;re all caught up</b></li>
+                  </ul>
+                </div>
+                <div className="ig-nav" aria-hidden="true">
+                  <House /><Clapperboard /><Send /><Search />
+                  <span className="ig-me"><Image src="/logo/buzzly-mark.svg" alt="" width={24} height={24} /></span>
+                </div>
               </div>
             </div>
             <div className="reel-tabs" role="group" aria-label="Choose a reel">
               {reels.map((reel, index) => (
                 <button type="button" key={reel.id} aria-pressed={index === active} onClick={() => show(index)}>
-                  <span className="reel-dot" aria-hidden="true" /><span>{reel.tab}</span>
+                  <span className="reel-bar" aria-hidden="true"><i ref={element => { barRefs.current[index] = element; }} /></span>
+                  <span className="reel-tab-no" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                  <span className="reel-tab-name">{reel.tab}</span>
                 </button>
               ))}
             </div>
