@@ -1,10 +1,8 @@
-import Image from "next/image";
 import type { Metadata } from "next";
 import Link from "@/components/Link";
 import { Interior } from "@/components/Interior";
 import { QuoteSlider } from "@/components/clients/QuoteSlider";
-import { clientLogos, testimonials } from "@/lib/clients";
-import { caseStudies } from "@/lib/work";
+import { clientLogos, clientWins, testimonials } from "@/lib/clients";
 
 export const metadata: Metadata = {
   title: "Client Confessions and Wins",
@@ -32,23 +30,19 @@ export default function Clients() {
       <section className="outcome-section" aria-labelledby="outcomes-title">
         <header>
           <div><p className="interior-eyebrow">BUZZLY / OUTCOMES</p><h2 id="outcomes-title">You win.<br /><em>We grin.</em></h2></div>
-          <p>Every story starts with a brief and ends with something you can point to. Partner work sits alongside the sub-companies Buzzly owns and builds itself, which are clearly marked. Open a card for the full problem, solution, and results.</p>
+          <p>Every story starts with a brief and ends with something you can point to. The brands below are fictional samples that show the kind of work we do; they will be replaced with real client stories as each one is approved.</p>
         </header>
         <div className="outcome-grid">
-          {caseStudies.map(study => {
-            const headline = study.stats[study.illustrative ? 1 : 0];
-            return (
-              <Link key={study.slug} className="outcome-card" href={`/work/${study.slug}`} style={{ ["--accent" as string]: study.accent }}>
-                <Image src={study.poster} alt="" width={960} height={540} sizes="(max-width: 750px) 100vw, (max-width: 1000px) 50vw, 25vw" />
-                <div>
-                  <span>{study.isSubCompany ? "Buzzly sub-company · Owned venture" : study.categoryLabel}</span>
-                  <strong>{headline.value}</strong>
-                  <p>{headline.label} — {study.client}{study.isSubCompany ? ", owned by Buzzly" : ""}</p>
-                  <small>{study.illustrative ? "Illustrative scenario · not a client result" : study.isSubCompany ? "Not a client · Read the story ↗" : "Read the case study ↗"}</small>
-                </div>
-              </Link>
-            );
-          })}
+          {clientWins.map(win => (
+            <Link key={win.company} className="outcome-card is-text" href="/contact" style={{ ["--accent" as string]: win.accent }}>
+              <div>
+                <span>{win.field}{win.sample ? " · Sample" : ""}</span>
+                <strong>{win.company}</strong>
+                <p>{win.win}</p>
+                <small>{win.services.join(" / ")}{win.sample ? " · Fictional brand, not a client result" : ""} · Want a story like this? ↗</small>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 
