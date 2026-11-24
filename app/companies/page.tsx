@@ -14,7 +14,7 @@ export default function Companies() {
           <article className={`company-feature company-feature-${index + 1}`} key={company.slug}>
             <Link href={`/companies/${company.slug}`} aria-label={`Explore ${company.name}`}>
               <div className="company-feature-film">
-                <InViewVideo src={company.video} poster={company.poster} />
+                <InViewVideo src={company.promo} poster={company.promoPoster} />
                 <span className="company-feature-tag">BUZZLY SUB-COMPANY / 0{index + 1}</span>
                 <span className="company-feature-arrow" aria-hidden="true">↗</span>
                 <strong>{company.name}</strong>

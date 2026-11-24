@@ -1,3 +1,4 @@
+import { companies } from "@/lib/content";
 import type { Metadata } from "next";
 import Link from "@/components/Link";
 import { notFound } from "next/navigation";
@@ -28,6 +29,7 @@ export default async function CaseStudyPage({ params }: { params: Promise<{ slug
   const index = caseStudies.findIndex(s => s.slug === study.slug);
   const next = caseStudies[(index + 1) % caseStudies.length];
 
+  const promo = companies.find(company => company.slug === study.slug);
   return (
     <Interior eyebrow={`BUZZLY / CASE STUDY / ${study.categoryLabel.toUpperCase()}`} title={study.title} intro={study.summary}>
       <section className="case-meta" aria-label="Project details">
@@ -37,7 +39,7 @@ export default async function CaseStudyPage({ params }: { params: Promise<{ slug
       </section>
 
       <section className="case-film">
-        <InViewVideo src={study.video} poster={study.poster} controls label={`${study.client} film`} />
+        <InViewVideo src={promo?.promo ?? study.video} poster={promo?.promoPoster ?? study.poster} controls label={`${study.client} ${promo ? "promo" : "film"}`} />
         {study.illustrative && (
           <p className="case-notice"><b>ILLUSTRATIVE CAMPAIGN.</b> This story shows Buzzly’s process. Its numbers are a possible outcome, not client results or a guarantee.</p>
         )}

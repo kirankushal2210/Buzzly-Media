@@ -88,8 +88,8 @@ export function BuzzlyLogo({
   className = "",
   showMedia = true,
 }: BuzzlyLogoProps) {
-  const textColor = theme === "dark" ? "#F5EFDF" : "#1A0926";
-  const goldColor = "#E5A93B";
+  const textColor = theme === "dark" ? "var(--logo-ink, #F5EFDF)" : "#1A0926";
+  const goldColor = "var(--logo-gold, #E5A93B)";
 
   const sizeMap = {
     sm: { mark: 26, text: "1.15rem", subText: "0.45rem", gap: "0.5rem" },

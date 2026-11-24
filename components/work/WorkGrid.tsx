@@ -4,6 +4,10 @@ import Link from "@/components/Link";
 import { useEffect, useState } from "react";
 import { InViewVideo } from "@/components/InViewVideo";
 import { caseStudies, isCategory, workCategories, type WorkCategory } from "@/lib/work";
+import { companies } from "@/lib/content";
+
+/** Each sub-company case study shows its square motion-graphics promo; anything without one keeps its own film. */
+const promoFor = (slug: string) => companies.find(company => company.slug === slug);
 
 /**
  * Filterable case-study grid. Filtering is instant on the client; the active
@@ -50,7 +54,7 @@ export function WorkGrid({ initialCategory }: { initialCategory: WorkCategory | 
           <article className="work-card" key={`${active}-${study.slug}`}>
             <Link href={`/work/${study.slug}`} aria-label={`Read the ${study.client} case study`}>
               <div className="work-card-media">
-                <InViewVideo src={study.video} poster={study.poster} />
+                <InViewVideo src={promoFor(study.slug)?.promo ?? study.video} poster={promoFor(study.slug)?.promoPoster ?? study.poster} />
                 <span className="work-card-tag">{study.categoryLabel}</span>
                 {study.illustrative && <span className="work-card-flag">Illustrative</span>}
               </div>

@@ -1,0 +1,106 @@
+/* Lead qualification: direct-response hero, proof card, shared lead form, booking state.
+   Uses the existing tokens only (--bg, --cream, --soft, --red, --line) and the
+   site's three faces: Instrument Serif, DM Sans, Geist Mono. */
+
+/* ---------- Hero ---------- */
+.leadhero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(32px,5vw,80px);align-items:center;padding-top:clamp(44px,6vw,84px);padding-bottom:clamp(40px,5vw,70px)}
+.leadhero-copy{animation:riseIn .75s .1s both}
+.leadhero h1{margin:22px 0 24px;font:400 clamp(44px,5.4vw,84px)/.98 'Instrument Serif',serif;letter-spacing:-.035em;color:var(--cream);text-wrap:balance}
+.leadhero h1 em{color:var(--red);font-weight:400}
+.leadhero-sub{margin:0 0 30px;max-width:560px;color:var(--soft);font:400 17px/1.55 'DM Sans',sans-serif}
+.leadhero-action{display:flex;flex-direction:column;align-items:flex-start;gap:14px}
+
+.leadhero-action small{max-width:440px;color:var(--soft);font:400 13px/1.5 'DM Sans',sans-serif}
+
+/* ---------- Proof card: reel still + sample report ---------- */
+.leadhero-proof{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1fr);border:1px solid var(--line);background:var(--surface);animation:riseIn .75s .3s both}
+.leadhero-reel{position:relative;margin:0;overflow:hidden;background:#0b0a0a;border-right:1px solid var(--line)}
+/* At least 9:16, and as tall as the report beside it when that is taller. */
+.leadhero-reel:before{content:"";display:block;padding-top:177.78%}
+/* Taller than the frame and pinned to the top, so the poster's own title sits under the caption bar. */
+.leadhero-reel img{object-fit:cover;object-position:50% 0;height:130% !important}
+.leadhero-reel-tag{position:absolute;z-index:1;top:12px;left:12px;padding:5px 8px;background:#151313cc;border:1px solid var(--line);color:var(--cream);font:500 10px/1 'Geist Mono',monospace;letter-spacing:.08em;text-transform:uppercase}
+.leadhero-reel figcaption{position:absolute;z-index:1;left:0;right:0;bottom:0;padding:12px 14px 14px;background:#151313e6;border-top:1px solid var(--line);color:var(--cream);font:400 22px/1.05 'Instrument Serif',serif}
+.leadhero-reel figcaption small{display:block;margin-top:6px;color:var(--soft);font:400 11px/1.3 'DM Sans',sans-serif}
+.leadhero-output{display:flex;flex-direction:column;padding:18px 20px 20px;min-width:0}
+.leadhero-output-tag{margin:0 0 6px;color:var(--red);font:500 10px/1.5 'Geist Mono',monospace;letter-spacing:.08em;text-transform:uppercase}
+.leadhero-output dl{margin:0;display:flex;flex-direction:column;flex:1}
+.leadhero-output dl>div{padding:16px 0;border-top:1px solid var(--line)}
+.leadhero-output dl>div:last-child{padding-bottom:0;margin-top:auto}
+.leadhero-output dt{margin-bottom:8px;color:var(--soft);font:500 10px/1.4 'Geist Mono',monospace;letter-spacing:.08em;text-transform:uppercase}
+.leadhero-output dd{margin:0;color:var(--cream);font:400 14px/1.4 'DM Sans',sans-serif}
+.leadhero-metric strong{display:block;font:400 clamp(44px,4.4vw,64px)/.95 'Instrument Serif',serif;letter-spacing:-.03em}
+.leadhero-metric span{display:block;margin-top:6px;color:var(--soft);font-size:12px}
+.leadhero-output ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.leadhero-output li{display:flex;justify-content:space-between;gap:10px;font-size:13px}
+.leadhero-output li em{font:500 10px/1.8 'Geist Mono',monospace;font-style:normal;letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+.leadhero-output li.is-live em{color:var(--cream)}
+.leadhero-alert dd{display:flex;align-items:center;gap:10px;font-size:13px}
+.leadhero-alert-dot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--red)}
+
+/* ---------- Lead form section (homepage anchor) ---------- */
+.leadform{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(36px,7vw,110px);align-items:start;padding-top:clamp(80px,10vw,150px);padding-bottom:clamp(80px,10vw,150px);border-top:1px solid var(--line);scroll-margin-top:20px}
+.leadform-lead h2{margin:18px 0 22px;font:400 clamp(54px,6.4vw,96px)/.92 'Instrument Serif',serif;letter-spacing:-.04em;color:var(--cream)}
+.leadform-lead h2 em{color:var(--red);font-weight:400}
+.leadform-lead p:last-child{max-width:420px;margin:0;color:var(--soft);font:400 16px/1.55 'DM Sans',sans-serif}
+
+/* ---------- Lead form (fields come from the shared primitives in ui.css) ---------- */
+.lead-form{display:grid;gap:18px;font-family:'DM Sans',sans-serif}
+.lead-submit{justify-self:start;margin-top:4px}
+.lead-honeypot{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
+.lead-status{margin:0;min-height:1.4em;color:var(--soft);font-size:14px;line-height:1.5}
+.lead-status.is-error{color:var(--error)}
+.lead-context{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding-bottom:4px}
+.lead-context-clear{background:none;border:0;padding:0;color:var(--muted);font:400 12px 'DM Sans',sans-serif;text-decoration:underline;cursor:pointer}
+.lead-context-clear:hover{color:var(--cream)}
+.lead-whatsapp{justify-self:start;display:inline-block;color:var(--soft);font:400 13px/1.5 'DM Sans',sans-serif;text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px;transition:color .2s,border-color .2s}
+.lead-whatsapp:hover,.lead-whatsapp:focus-visible{color:var(--cream);border-color:var(--cream)}
+.leadform-lead .bz-badge{margin-top:22px}
+
+/* ---------- Confirmation and slot picker ---------- */
+.lead-confirmation{display:grid;gap:16px;font-family:'DM Sans',sans-serif;color:var(--cream)}
+.lead-confirmation-tag{margin:0;color:var(--red);font:500 11px/1.5 'Geist Mono',monospace;letter-spacing:.08em;text-transform:uppercase;overflow-wrap:anywhere}
+.lead-confirmation h3{margin:0;font:400 clamp(30px,3.2vw,46px)/1.05 'Instrument Serif',serif;letter-spacing:-.02em;outline:none}
+.lead-confirmation>p{margin:0;color:var(--soft);font-size:15px;line-height:1.55}
+.slot-picker{display:grid;gap:22px;padding:22px}
+.slot-group{margin:0;padding:0;border:0;display:grid;gap:12px;min-width:0}
+.slot-group legend{padding:0;margin-bottom:12px}
+.slot-actions{display:flex;flex-wrap:wrap;align-items:center;gap:14px}
+.slot-receipt{display:grid;gap:14px;padding:24px;justify-items:start}
+.slot-receipt-when{margin:0;font:400 clamp(26px,2.6vw,36px)/1.1 'Instrument Serif',serif;color:var(--cream)}
+.slot-receipt dl{margin:0;display:grid;gap:10px;width:100%;border-top:1px solid var(--line);padding-top:14px}
+.slot-receipt dl div{display:flex;justify-content:space-between;gap:16px;font-size:14px}
+.slot-receipt dt{color:var(--soft)}
+.slot-receipt dd{margin:0;text-align:right;overflow-wrap:anywhere}
+
+/* ---------- Hero reel video and retention curve ---------- */
+.leadhero-reel-video{position:absolute;inset:0;width:100%;height:130%;object-fit:cover;object-position:50% 0;display:block}
+.leadhero-curve{display:block;width:100%;height:56px;margin:10px 0 6px;overflow:visible}
+.leadhero-curve .curve-grid{stroke:var(--line);stroke-width:1}
+.leadhero-curve .curve-hook{stroke:var(--soft);stroke-width:1;stroke-dasharray:3 3;vector-effect:non-scaling-stroke}
+.leadhero-curve polyline{fill:none;stroke-width:2;vector-effect:non-scaling-stroke;stroke-linejoin:round}
+.leadhero-curve .curve-before{stroke:var(--muted)}
+.leadhero-curve .curve-after{stroke:var(--red)}
+.curve-legend{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-top:0!important;color:var(--soft);font:500 10px/1.4 'Geist Mono',monospace!important;letter-spacing:.04em;text-transform:uppercase}
+.curve-legend i{display:inline-block;width:12px;height:2px;margin-right:6px;vertical-align:middle}
+.curve-legend i.is-after{background:var(--red)}
+.curve-legend i.is-before{background:var(--muted)}
+.curve-legend em{font-style:normal;border-left:1px dashed var(--soft);padding-left:6px}
+
+@media(max-width:1000px){
+  .leadhero{grid-template-columns:1fr}
+  .leadhero-proof{max-width:560px}
+  .leadform{grid-template-columns:1fr}
+}
+@media(max-width:750px){
+  .leadhero h1{font-size:clamp(38px,10.5vw,56px)}
+  .leadhero-sub{font-size:16px}
+  .leadhero-action .bz-btn{width:100%;justify-content:flex-start;text-align:left}
+  .leadhero-output{padding:14px 14px 16px}
+  .leadhero-output dl>div{padding:12px 0}
+  .lead-submit{justify-self:stretch}
+  .slot-picker,.slot-receipt{padding:16px}
+}
+@media(prefers-reduced-motion:reduce){
+  .leadhero-copy,.leadhero-proof{animation:none}
+}

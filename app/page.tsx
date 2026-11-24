@@ -1,13 +1,14 @@
 import { HomeHeader, Hero, Splash } from "@/components/HomeIntro";
 import { PhoneReelStory } from "@/components/home/PhoneReelStory";
-import { WorkShowcaseSection } from "@/components/home/WorkShowcaseSection";
 import { EcosystemSection } from "@/components/home/EcosystemSection";
-import { ClientPreviewSection } from "@/components/home/ClientPreviewSection";
-import { ContentLine, Manifesto, ServiceBillboard, StoryFlow } from "@/components/home/ApproachSections";
+import { ClientProof, ContentLine } from "@/components/home/HomeSections";
+import { ServiceBillboard } from "@/components/home/ApproachSections";
 import { HomeFooter } from "@/components/home/HomeFooter";
+import { HomeContact } from "@/components/home/HomeContact";
 
 export const metadata = { alternates: { canonical: "/" } };
 
+/** Brand landing page. Every call to action scrolls to the in-page contact form (#start-project). */
 export default function Home() {
   return (
     <>
@@ -17,13 +18,11 @@ export default function Home() {
         <main id="top">
           <Hero />
           <PhoneReelStory />
-          <WorkShowcaseSection />
           <EcosystemSection />
-          <ClientPreviewSection />
+          <ClientProof />
           <ServiceBillboard />
-          <Manifesto />
-          <StoryFlow />
           <ContentLine />
+          <HomeContact />
         </main>
         <HomeFooter />
       </div>

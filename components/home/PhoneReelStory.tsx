@@ -223,7 +223,7 @@ export function PhoneReelStory() {
                   <div className="rl-acct">
                     <span className="rl-avatar" aria-hidden="true"><Image src="/logo/buzzly-mark.svg" alt="" width={24} height={24} /></span>
                     <b>buzzly</b>
-                    <Link className="rl-follow" href="/contact">Start a Project</Link>
+                    <a className="rl-follow" href="#start-project">Start a Project</a>
                   </div>
                   <p className="rl-cap">How we build brands through content, from the first idea to the first client.</p>
                   <span className="rl-audio" aria-hidden="true"><Music2 /> Original audio · Buzzly</span>

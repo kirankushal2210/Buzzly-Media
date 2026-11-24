@@ -1,18 +1,59 @@
-.clients-page-process{border-top:1px solid #403b38;max-width:1500px;margin:auto;padding:100px clamp(20px,8vw,130px) 120px;display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(45px,7vw,120px)}
+.clients-page-process{border-top:1px solid var(--line);max-width:1500px;margin:auto;padding:100px clamp(20px,8vw,130px) 120px;display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(45px,7vw,120px)}
 .clients-page-process h2,.clients-page-film h2,.clients-page-wins h2{font:clamp(70px,8vw,132px)/.9 'Instrument Serif',serif;letter-spacing:-.045em;margin:35px 0}
-.clients-page-process h2 em,.clients-page-film h2 em,.clients-page-wins h2 em{color:#ef342d;font-weight:400}
-.clients-page-process-heading>p:last-child{font-size:18px;line-height:1.55;color:#bbb5a9;max-width:520px}
-.clients-page-process-steps{align-self:end;border-top:1px solid #403b38}
-.clients-page-process-steps>div{display:grid;grid-template-columns:130px 1fr;gap:25px;border-bottom:1px solid #403b38;padding:27px 0}
-.clients-page-process-steps span{font-size:11px;letter-spacing:.12em;font-weight:700;color:#ef342d}
+.clients-page-process h2 em,.clients-page-film h2 em,.clients-page-wins h2 em{color:var(--red);font-weight:400}
+.clients-page-process-heading>p:last-child{font-size:18px;line-height:1.55;color:var(--soft);max-width:520px}
+.clients-page-process-steps{align-self:end;border-top:1px solid var(--line)}
+.clients-page-process-steps>div{display:grid;grid-template-columns:130px 1fr;gap:25px;border-bottom:1px solid var(--line);padding:27px 0}
+.clients-page-process-steps span{font-size:11px;letter-spacing:.12em;font-weight:700;color:var(--red)}
 .clients-page-process-steps p{font:clamp(20px,2vw,30px)/1.15 'Instrument Serif',serif;margin:0}
-.clients-page-film{max-width:1500px;margin:auto;padding:80px clamp(20px,8vw,130px) 120px;display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(35px,6vw,100px);align-items:center;border-top:1px solid #403b38}
+.clients-page-film{max-width:1500px;margin:auto;padding:80px clamp(20px,8vw,130px) 120px;display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(35px,6vw,100px);align-items:center;border-top:1px solid var(--line)}
 .clients-page-film h2{font-size:clamp(66px,7vw,112px)}
-.clients-page-film p:not(.interior-eyebrow){font-size:16px;line-height:1.6;color:#bbb5a9;max-width:430px}
-.clients-page-film a,.clients-page-wins a{display:inline-block;margin-top:25px;padding:15px 20px;background:#ef342d;color:#151313;text-decoration:none;font-weight:700;font-size:13px}
+.clients-page-film p:not(.interior-eyebrow){font-size:16px;line-height:1.6;color:var(--soft);max-width:430px}
+.clients-page-film a,.clients-page-wins a{display:inline-block;margin-top:25px;padding:15px 20px;background:var(--red);color:var(--on-red);text-decoration:none;font-weight:700;font-size:13px}
 .clients-page-film video{width:100%;aspect-ratio:16/10;object-fit:cover;background:#2b1017}
-.clients-page-wins{max-width:1500px;margin:auto;min-height:600px;padding:100px clamp(20px,8vw,130px) 150px;border-top:1px solid #403b38}
+.clients-page-wins{max-width:1500px;margin:auto;min-height:600px;padding:100px clamp(20px,8vw,130px) 150px;border-top:1px solid var(--line)}
 .clients-page-wins h2{font-size:clamp(80px,10vw,155px)}
-.clients-page-wins>p:not(.interior-eyebrow){max-width:620px;color:#bbb5a9;line-height:1.55;font-size:18px}
+.clients-page-wins>p:not(.interior-eyebrow){max-width:620px;color:var(--soft);line-height:1.55;font-size:18px}
 @media(max-width:850px){.clients-page-process,.clients-page-film{grid-template-columns:1fr;gap:35px}.clients-page-process{padding-top:80px}.clients-page-process-steps{align-self:auto}.clients-page-film{padding-top:70px}.clients-page-wins{min-height:0;padding-top:80px;padding-bottom:110px}}
 @media(max-width:550px){.clients-page-process h2,.clients-page-film h2{font-size:clamp(60px,13vw,85px)}.clients-page-process-steps>div{grid-template-columns:1fr;gap:8px}.clients-page-wins h2{font-size:clamp(72px,15vw,110px)}}
+
+/* ---------- /clients: conversion layout (pick your problem → stories → process → form) ---------- */
+.cs-pick,.cs-stories{border-top:1px solid var(--line);max-width:1500px;margin:auto;padding:clamp(64px,8vw,110px) clamp(20px,8vw,130px)}
+.cs-pick-head,.cs-stories-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px clamp(30px,6vw,90px);align-items:end;margin-bottom:clamp(36px,5vw,64px)}
+.cs-pick-head .interior-eyebrow,.cs-stories-head .interior-eyebrow{grid-column:1/-1;margin:0}
+.cs-pick-head h2,.cs-stories-head h2{margin:0;font:400 clamp(52px,6.4vw,104px)/.9 'Instrument Serif',serif;letter-spacing:-.045em;color:var(--cream)}
+.cs-pick-head h2 em,.cs-stories-head h2 em{color:var(--red);font-weight:400}
+.cs-pick-head>p:not(.interior-eyebrow),.cs-stories-head>p{margin:0;max-width:460px;color:var(--soft);font:400 17px/1.55 'DM Sans',sans-serif}
+.cs-disclosure{font-size:14px!important;border-left:2px solid var(--red);padding-left:14px}
+.cs-pick-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.cs-pick-item{all:unset;box-sizing:border-box;width:100%;height:100%;min-height:150px;display:flex;flex-direction:column;justify-content:space-between;gap:24px;padding:clamp(22px,3vw,34px);background:var(--bg);cursor:pointer;transition:background .2s,color .2s}
+.cs-pick-before{font:400 clamp(26px,2.6vw,38px)/1.08 'Instrument Serif',serif;color:var(--cream);letter-spacing:-.02em}
+.cs-pick-go{font:700 12px/1 'DM Sans',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+.cs-pick-item:hover,.cs-pick-item:focus-visible{background:var(--red)}
+.cs-pick-item:hover .cs-pick-before,.cs-pick-item:focus-visible .cs-pick-before,.cs-pick-item:hover .cs-pick-go,.cs-pick-item:focus-visible .cs-pick-go{color:var(--on-red)}
+.cs-pick-item:focus-visible{outline:2px solid var(--cream);outline-offset:-4px}
+.cs-story-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.cs-story{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.3fr) minmax(0,.9fr);gap:clamp(24px,4vw,64px);padding:clamp(36px,4.5vw,60px) 0;border-bottom:1px solid var(--line)}
+.cs-story-id .bz-mono{color:var(--accent,var(--red));font-size:12px;letter-spacing:.14em}
+.cs-story-id h3{margin:14px 0 8px;font:400 clamp(38px,3.6vw,56px)/.95 'Instrument Serif',serif;letter-spacing:-.03em;color:var(--cream)}
+.cs-story-id p{margin:0;color:var(--muted);font-size:13px}
+.cs-story-id .cs-story-shift{margin-top:22px;color:var(--soft);font:400 19px/1.35 'Instrument Serif',serif}
+.cs-story-shift s{color:var(--muted)}
+.cs-story-shift em{color:var(--cream)}
+.cs-story-arc{margin:0;display:grid;gap:0}
+.cs-story-arc>div{display:grid;grid-template-columns:96px minmax(0,1fr);gap:18px;padding:16px 0;border-top:1px solid var(--line)}
+.cs-story-arc>div:first-child{border-top:0;padding-top:4px}
+.cs-story-arc dt{font:700 11px/1.6 'DM Sans',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.cs-story-arc>div:last-child dt{color:var(--red)}
+.cs-story-arc dd{margin:0;color:var(--soft);font:400 17px/1.45 'DM Sans',sans-serif}
+.cs-story-arc>div:last-child dd{color:var(--cream);font:400 clamp(22px,2vw,28px)/1.2 'Instrument Serif',serif}
+.cs-story-foot{display:flex;flex-direction:column;align-items:flex-start;gap:18px}
+.cs-story-foot blockquote{margin:0;padding-left:16px;border-left:2px solid var(--accent,var(--red))}
+.cs-story-foot blockquote p{margin:0 0 8px;color:var(--cream);font:400 20px/1.3 'Instrument Serif',serif}
+.cs-story-foot cite{font:400 12px/1.4 'DM Sans',sans-serif;font-style:normal;color:var(--muted)}
+.cs-story-services{margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.cs-story-cta{margin-top:auto;border:0;cursor:pointer;font-family:'DM Sans',sans-serif;text-align:left}
+.interior .homecontact.wrap{max-width:1500px;margin:auto;padding-left:clamp(20px,8vw,130px);padding-right:clamp(20px,8vw,130px)}
+@media(max-width:1100px){.cs-story{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr)}.cs-story-foot{grid-column:1/-1}}
+@media(max-width:750px){.cs-pick-head,.cs-stories-head{grid-template-columns:1fr}.cs-pick-list{grid-template-columns:1fr}.cs-pick-item{min-height:0}.cs-story{grid-template-columns:1fr}.cs-story-arc>div{grid-template-columns:1fr;gap:6px}}
+@media(prefers-reduced-motion:reduce){.cs-pick-item{transition:none}}

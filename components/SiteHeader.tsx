@@ -4,12 +4,15 @@ import Link from "@/components/Link";
 import { usePathname } from "next/navigation";
 import { BuzzlyLogo } from "@/components/BuzzlyLogo";
 import { MobileNav } from "@/components/MobileNav";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { ClientPortalLink } from "@/components/ClientPortalLink";
 import { primaryNav } from "@/lib/site";
 
 /** Shared header for the homepage and interior pages. */
 export function SiteHeader({ variant }: { variant: "home" | "interior" }) {
   const pathname = usePathname();
   const home = variant === "home";
+
   return (
     <header className={`wrap ${home ? "home-site-header" : "interior-site-header"}`}>
       <nav className="leftnav" aria-label="Primary">
@@ -32,10 +35,13 @@ export function SiteHeader({ variant }: { variant: "home" | "interior" }) {
         </Link>
       )}
       <div className="rightnav">
+        <ThemeToggle showLabel={false} />
+        {/* Client Login only appears inside the Clients section; Let's Connect on home scrolls to the in-page form. */}
+        <ClientPortalLink className="clientlogin">Client Login</ClientPortalLink>
         {home
-          ? <a className="topcontact" href="#contact">Let’s Connect ↗</a>
+          ? <a className="topcontact" href="#start-project">Let’s Connect ↗</a>
           : <Link className="topcontact" href="/contact">Let’s Connect ↗</Link>}
-        <MobileNav contactHref="/contact" />
+        <MobileNav contactHref={home ? "#start-project" : "/contact"} />
       </div>
     </header>
   );

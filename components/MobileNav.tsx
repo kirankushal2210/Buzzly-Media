@@ -2,9 +2,11 @@
 
 import Link from "@/components/Link";
 import { usePathname } from "next/navigation";
+import { ClientPortalLink } from "@/components/ClientPortalLink";
 import { useState } from "react";
 import { Dialog } from "radix-ui";
 import { BuzzlyLogo } from "@/components/BuzzlyLogo";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { primaryNav } from "@/lib/site";
 import { companies } from "@/lib/content";
 
@@ -54,7 +56,11 @@ export function MobileNav({ contactHref }: { contactHref: string }) {
               <Link key={company.slug} href={`/companies/${company.slug}`} onClick={() => setOpen(false)}>{company.name} ↗</Link>
             ))}
           </div>
-          <Link className="cta mobile-drawer-cta" href={contactHref} onClick={() => setOpen(false)}>Let’s Connect ↗</Link>
+          {contactHref.startsWith("#")
+            ? <a className="cta mobile-drawer-cta" href={contactHref} onClick={() => setOpen(false)}>Let’s Connect ↗</a>
+            : <Link className="cta mobile-drawer-cta" href={contactHref} onClick={() => setOpen(false)}>Let’s Connect ↗</Link>}
+          <ClientPortalLink className="mobile-drawer-login" onClick={() => setOpen(false)}>Client Login</ClientPortalLink>
+          <ThemeToggle />
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

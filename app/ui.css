@@ -1,0 +1,90 @@
+/* Shared UI primitives (components/ui/core/).
+   Surface and field colours are the values the contact form already used,
+   named once here so every form, card and portal view uses the same ones. */
+:root {
+  --surface: #1b1818;
+  --field: #211e1d;
+  --field-line: #5c5350;
+  --muted: #8e877c;
+}
+
+/* ---------- Button ---------- */
+.bz-btn{min-height:44px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:10px;border:1px solid transparent;border-radius:0;font:700 13px/1.2 'DM Sans',sans-serif;letter-spacing:.02em;text-decoration:none;cursor:pointer;transition:transform .2s,background .2s,color .2s,border-color .2s;text-align:center}
+.bz-btn:disabled,.bz-btn[aria-disabled="true"]{opacity:.55;cursor:wait;transform:none}
+.bz-btn-sm{padding:9px 14px;font-size:12px}
+.bz-btn-md{padding:14px 22px}
+.bz-btn-lg{padding:17px 26px;font-size:14px}
+.bz-btn-primary{background:var(--red);color:var(--on-red)}
+.bz-btn-primary:hover:not(:disabled){background:var(--red-hover);transform:translateY(-2px)}
+.bz-btn-secondary{background:transparent;color:var(--cream);border-color:var(--field-line)}
+.bz-btn-secondary:hover:not(:disabled){border-color:var(--cream)}
+.bz-btn-ghost{background:transparent;color:var(--soft);padding-left:0;padding-right:0;border-bottom:1px solid var(--line);font-weight:500}
+.bz-btn-ghost:hover:not(:disabled){color:var(--cream);border-bottom-color:var(--cream)}
+.bz-btn:focus-visible{outline:2px solid var(--cream);outline-offset:3px}
+
+/* ---------- Surface card ---------- */
+.bz-card{background:var(--surface);border:1px solid var(--line);color:var(--cream);font-family:'DM Sans',sans-serif;box-sizing:border-box}
+.bz-card-flat{background:transparent}
+
+/* ---------- Badge ---------- */
+.bz-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border:1px solid var(--line);font:500 10px/1.2 'Geist Mono',monospace;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;color:var(--soft)}
+.bz-badge-accent{color:var(--red);border-color:var(--red)}
+.bz-badge-solid{background:var(--red);border-color:var(--red);color:var(--on-red)}
+.bz-badge-cream{background:var(--cream);border-color:var(--cream);color:var(--bg)}
+.bz-badge-muted{color:var(--muted)}
+
+/* ---------- Fields ---------- */
+.bz-field{display:grid;gap:8px;font:400 12px/1.4 'DM Sans',sans-serif;color:var(--cream)}
+.bz-field-required{color:var(--red)}
+.bz-input{min-height:44px;width:100%;box-sizing:border-box;padding:14px;background:var(--field);border:1px solid var(--field-line);border-radius:0;color:var(--cream);font:400 15px/1.3 'DM Sans',sans-serif}
+.bz-input::placeholder{color:var(--muted)}
+.bz-input:focus-visible{outline:2px solid var(--cream);outline-offset:1px}
+.bz-input:disabled{opacity:.6}
+.bz-input[aria-invalid="true"]{border-color:var(--red);box-shadow:inset 3px 0 0 var(--red)}
+.bz-select:invalid{color:var(--muted)}
+.bz-select option{color:var(--cream);background:var(--field)}
+.bz-textarea{min-height:110px;resize:vertical}
+.bz-field-hint{color:var(--muted);font-size:12px}
+.bz-field-error{color:var(--error);font-size:13px;line-height:1.4}
+.bz-field-error:before{content:"! ";font-weight:700}
+
+/* Choice chips: radio inputs styled as bordered buttons (slot picker, readiness audit). */
+.bz-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;border:0}
+.bz-chip{position:relative;display:inline-flex}
+.bz-chip input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.bz-chip span{min-height:44px;box-sizing:border-box;justify-content:center;display:inline-flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 13px;border:1px solid var(--field-line);background:var(--field);color:var(--cream);font:400 13px/1.3 'DM Sans',sans-serif;cursor:pointer;transition:border-color .2s,background .2s}
+.bz-chip span small{color:var(--muted);font:500 10px/1.3 'Geist Mono',monospace;letter-spacing:.06em;text-transform:uppercase}
+.bz-chip:hover span{border-color:var(--soft)}
+.bz-chip input:checked+span{border-color:var(--red);box-shadow:inset 0 0 0 1px var(--red)}
+.bz-chip input:checked+span small{color:var(--red)}
+.bz-chip input:focus-visible+span{outline:2px solid var(--cream);outline-offset:2px}
+.bz-chip input:disabled+span{opacity:.5;cursor:not-allowed}
+
+.bz-eyebrow{margin:0;color:var(--red);font:700 11px/1.4 'DM Sans',sans-serif;letter-spacing:.16em;text-transform:uppercase}
+.bz-mono{font:500 11px/1.4 'Geist Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+
+@media(prefers-reduced-motion:reduce){.bz-btn{transition:none}.bz-btn:hover{transform:none!important}}
+
+/* ---------- Marquee (components/ui/core/Marquee.tsx) ---------- */
+/* Two identical halves; moving the track by -50% lands the second half exactly where the first began. */
+.bz-marquee{position:relative;overflow:hidden;
+  /* Edge fade: content dissolves into the background at both sides. */
+  -webkit-mask-image:linear-gradient(to right,transparent 0,#000 9%,#000 91%,transparent 100%);
+          mask-image:linear-gradient(to right,transparent 0,#000 9%,#000 91%,transparent 100%)}
+.bz-marquee-track{display:flex;width:max-content;animation:bz-marquee var(--marquee-duration,40s) linear infinite;will-change:transform}
+.bz-marquee-group{display:flex;align-items:center;flex:none;gap:var(--marquee-gap,56px);margin:0;
+  /* Trailing gap equal to the inner gap, so the seam between halves is the same distance as every other gap. */
+  padding:0 var(--marquee-gap,56px) 0 0;list-style:none}
+.bz-marquee-group>li{flex:none}
+/* Pause on hover (pointer devices) and while anything inside has keyboard focus. */
+@media (hover:hover){.bz-marquee:hover .bz-marquee-track{animation-play-state:paused}}
+.bz-marquee:focus-within .bz-marquee-track{animation-play-state:paused}
+@keyframes bz-marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.bz-marquee-reverse .bz-marquee-track{animation-direction:reverse}
+/* Reduced motion: no movement, no fade; one static set that wraps onto lines. */
+@media (prefers-reduced-motion:reduce){
+  .bz-marquee{-webkit-mask-image:none;mask-image:none}
+  .bz-marquee-track{animation:none;width:100%;transform:none}
+  .bz-marquee-group{flex:1 1 100%;min-width:0;flex-wrap:wrap;justify-content:center;row-gap:20px;padding:0 16px}
+  .bz-marquee-group+.bz-marquee-group,.bz-marquee-group>li[aria-hidden="true"]{display:none}
+}

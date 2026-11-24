@@ -48,16 +48,6 @@ export const primaryNav: NavLink[] = [
  */
 export const responsePromise = "two working days";
 
-/**
- * Footer status indicator. Update these when availability changes; set
- * `accepting` to false to show a muted "booked" state instead.
- */
-export const studioStatus = {
-  accepting: true,
-  label: "Taking on new projects",
-  detail: `Replies to new inquiries within ${responsePromise}`,
-};
-
 const trimmed = (value: string | undefined) => value?.trim() || null;
 
 /**
@@ -70,6 +60,16 @@ export const socialLinks: string[] = (process.env.NEXT_PUBLIC_SOCIAL_LINKS || ""
   .split(",")
   .map(link => link.trim())
   .filter(link => /^https:\/\//.test(link));
+
+/** Instagram, YouTube and LinkedIn profiles from NEXT_PUBLIC_SOCIAL_LINKS; a channel is hidden until its URL is set. */
+export const socialProfiles: { label: "Instagram" | "YouTube" | "LinkedIn"; href: string }[] = ([
+  ["Instagram", /(^|\.)instagram\.com$/],
+  ["YouTube", /(^|\.)(youtube\.com|youtu\.be)$/],
+  ["LinkedIn", /(^|\.)linkedin\.com$/],
+] as const).flatMap(([label, host]) => {
+  const href = socialLinks.find(link => { try { return host.test(new URL(link).hostname); } catch { return false; } });
+  return href ? [{ label, href }] : [];
+});
 
 /**
  * Public booking page for intro calls (Cal.com, Calendly, etc.) from

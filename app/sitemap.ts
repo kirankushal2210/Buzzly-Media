@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { companies } from "@/lib/content";
 import { siteUrl } from "@/lib/site";
 import { caseStudies } from "@/lib/work";
+import { playbooks } from "@/data/insights";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
@@ -18,6 +19,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     page("/companies", 0.7),
     ...companies.map(company => page(`/companies/${company.slug}`, 0.6)),
     page("/contact", 0.9),
+    page("/insights", 0.7, "weekly"),
+    ...playbooks.map(playbook => page(`/insights/${playbook.slug}`, 0.6)),
     page("/careers", 0.5),
     page("/privacy", 0.2, "yearly"),
     page("/terms", 0.2, "yearly"),

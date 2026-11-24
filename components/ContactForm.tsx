@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type FocusEvent, type FormEvent } from "react";
+import { decodeAudit, scoreContentEngine } from "@/lib/audit-engine";
+import { tierBySlug } from "@/lib/engagements";
 import { INTERESTS, validateInquiry, type InquiryErrors, type InquiryField } from "@/lib/inquiry-validation";
 
 const SUCCESS_MESSAGE = "Thanks! Your message has reached Buzzly. Our team will review your project and get back to you shortly.";
@@ -8,6 +10,10 @@ const UNAVAILABLE_MESSAGE = "We can’t receive messages right now. Please try a
 const FIELD_ORDER: InquiryField[] = ["name", "email", "company", "interest", "message"];
 
 type Status = "idle" | "sending" | "sent" | "error";
+
+/** Window event other components fire to pre-fill this form (e.g. a client story's "I want results like…" button). */
+export const PREFILL_EVENT = "buzzly:prefill-contact";
+export type PrefillDetail = { interest?: string; message?: string };
 
 export function ContactForm() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -30,7 +36,8 @@ export function ContactForm() {
     return () => controller.abort();
   }, []);
 
-  // Prefill from the URL: ?email= (footer quick-inquiry) and ?interest= (e.g. /careers → "Joining the team").
+  // Prefill from the URL: ?email= (footer quick-inquiry), ?interest= (e.g. /careers → "Joining the team"),
+  // ?scope= (a tier's "Select This Scope") and ?audit= (the Content Engine Score diagnostic).
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const email = params.get("email");
@@ -39,6 +46,31 @@ export function ContactForm() {
     const interest = params.get("interest");
     const select = formRef.current?.elements.namedItem("interest") as HTMLSelectElement | null;
     if (interest && select && !select.value && (INTERESTS as readonly string[]).includes(interest)) select.value = interest;
+    const tier = tierBySlug(params.get("scope"));
+    const answers = decodeAudit(params.get("audit"));
+    const lines = [
+      tier && `Scope I’m interested in: ${tier.name}`,
+      answers && `My Content Engine Score: ${scoreContentEngine(answers).score}/100 (diagnostic ${params.get("audit")})`,
+    ].filter(Boolean);
+    const textarea = formRef.current?.elements.namedItem("message") as HTMLTextAreaElement | null;
+    if (lines.length && textarea && !textarea.value) textarea.value = `${lines.join("\n")}\n\n`;
+  }, []);
+
+  // Pre-fill on request from elsewhere on the page, then put the cursor in the first empty field.
+  useEffect(() => {
+    const onPrefill = (event: Event) => {
+      const { interest, message } = (event as CustomEvent<PrefillDetail>).detail ?? {};
+      const form = formRef.current;
+      if (!form) return;
+      const select = form.elements.namedItem("interest") as HTMLSelectElement | null;
+      if (interest && select && (INTERESTS as readonly string[]).includes(interest)) select.value = interest;
+      const textarea = form.elements.namedItem("message") as HTMLTextAreaElement | null;
+      if (message && textarea) textarea.value = message.slice(0, 5000);
+      const firstEmpty = (["name", "email"] as const).map(name => form.elements.namedItem(name) as HTMLInputElement | null).find(input => input && !input.value);
+      window.setTimeout(() => (firstEmpty ?? textarea)?.focus({ preventScroll: true }), 450);
+    };
+    window.addEventListener(PREFILL_EVENT, onPrefill);
+    return () => window.removeEventListener(PREFILL_EVENT, onPrefill);
   }, []);
 
   const readForm = () => Object.fromEntries(new FormData(formRef.current!).entries()) as Record<string, string>;

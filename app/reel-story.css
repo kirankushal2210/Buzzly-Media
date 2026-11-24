@@ -11,11 +11,11 @@
    with a px fallback first, so the phone can shrink on short or narrow
    viewports without its contents overflowing. Defaults equal the first frame,
    so the server-rendered page looks right before any script runs. */
-.reel-story{--reel-vh:1vh;--reel-screens:9;position:relative;height:calc(var(--reel-screens) * 100 * var(--reel-vh));margin-top:-10px}
+.reel-story{--reel-vh:1vh;--reel-screens:9;position:relative;height:calc(var(--reel-screens) * 100 * var(--reel-vh));margin-top:16px}
 @supports (height:1svh){.reel-story{--reel-vh:1svh}}
-.reel-stage{--reel-rise:0;position:sticky;top:0;height:calc(100 * var(--reel-vh));min-height:520px;max-width:1500px;margin:0 auto;padding:0 clamp(20px,8vw,130px);box-sizing:border-box;display:grid;grid-template-columns:1fr minmax(300px,.8fr);align-items:center;gap:8vw;overflow:hidden}
-.reel-copy{will-change:opacity,transform}
-.reel-slot{justify-self:center}
+.reel-stage{--reel-rise:0;position:sticky;top:0;height:calc(100 * var(--reel-vh));min-height:520px;max-width:1500px;margin:0 auto;padding:16px 20px 0;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow:hidden}
+.reel-copy{display:none !important}
+.reel-slot{justify-self:center;margin:0 auto;display:flex;align-items:center;justify-content:center}
 .reel-rig{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;transform:translate3d(0,calc(var(--reel-rise) * 100 * var(--reel-vh)),0)}
 
 /* The phone: as wide as the layout allows, but never taller than the stage can show. */
@@ -46,8 +46,8 @@
 .ig-nav{position:absolute;left:0;right:0;bottom:0;height:13cqw;display:flex;align-items:flex-start;justify-content:space-around;padding:2.6cqw 4cqw 0;background:#fff;border-top:1px solid #1513131f;z-index:2}
 .ig-nav svg{width:6.2cqw;height:6.2cqw;stroke-width:1.7}
 .ig-nav svg:nth-child(2){stroke-width:2.4}
-.ig-me{width:6.6cqw;height:6.6cqw;border-radius:50%;overflow:hidden;background:#151313}
-.ig-nav::after{content:'';position:absolute;left:50%;bottom:1.6cqw;width:34%;height:1.3cqw;margin-left:-17%;border-radius:1cqw;background:#151313;opacity:.85}
+.ig-me{width:6.6cqw;height:6.6cqw;border-radius:50%;overflow:hidden;background:var(--bg)}
+.ig-nav::after{content:'';position:absolute;left:50%;bottom:1.6cqw;width:34%;height:1.3cqw;margin-left:-17%;border-radius:1cqw;background:var(--bg);opacity:.85}
 .rl-play{position:absolute;left:50%;top:22%;transform:translateX(-50%);z-index:3;background:#151313;color:#fff;border:0;border-radius:999px;padding:10px 16px;font:600 13px/1 'DM Sans',sans-serif;cursor:pointer}
 .rl-play:disabled{opacity:.6;cursor:default}
 @container (max-width:200px){
@@ -58,23 +58,19 @@
 .reel-hint span:last-child{color:var(--red);font-size:18px}
 
 @media(max-width:900px){
-  .reel-stage{grid-template-columns:1fr minmax(240px,.9fr);gap:5vw}
+  .reel-stage{gap:0}
 }
-/* Phones: the statement sits at the top, the phone peeks in from below and rises to the centre as the statement fades. */
+/* Phones: centered directly below the form in the main vertical flow */
 @media(max-width:750px){
-  .reel-story{--reel-screens:8}
-  .reel-stage{--reel-rise:.3;display:block;padding:0 20px;min-height:0}
-  .reel-copy{position:absolute;top:56px;left:20px;right:20px;z-index:1}
-  .reel-copy p{font-size:clamp(26px,7.5vw,34px);margin-bottom:14px}
-  .reel-copy small{font-size:14px}
-  .reel-copy .outlinecta{margin-top:18px}
-  .reel-slot{position:absolute;inset:0;display:grid;place-items:center}
+  .reel-story{--reel-screens:8;margin-top:12px}
+  .reel-stage{--reel-rise:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:12px 20px 0;min-height:0}
+  .reel-copy{display:none !important}
+  .reel-slot{position:relative;inset:auto;display:flex;align-items:center;justify-content:center;margin:0 auto}
   .reel-phone{width:min(56vw,240px,calc((100 * var(--reel-vh) - 120px) * .4663))}
   .reel-hint{display:none}
 }
 @media(max-width:750px) and (max-height:620px){
-  .reel-stage{--reel-rise:.44}
-  .reel-copy{top:34px}
+  .reel-stage{--reel-rise:0}
 }
 @media(prefers-reduced-motion:reduce){
   .reel-story{height:auto;margin:40px 0 60px}

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "@/components/Link";
 import { useEffect, useState } from "react";
 import { BuzzlyLogo } from "@/components/BuzzlyLogo";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -59,12 +58,15 @@ export function Hero() {
   return (
     <section className="intro wrap">
       <div className="eyebrow">BUZZLY / BUILDING BRANDS THROUGH CONTENT</div>
-      <h1><span>We build brands</span><span>through content.</span><em>Ours and everyone else’s.</em></h1>
+      <h1>
+        <span>We build brands</span>
+        <span>through content.</span>
+        <em>Ours and everyone else’s.</em>
+      </h1>
       <div className="herooffer">
         <p><span aria-hidden="true">〰</span> For ambitious brands ready to scale. <span aria-hidden="true">〰</span></p>
-        <Link className="cta" href="/contact">Start a Project</Link>
+        <a className="cta" href="#start-project">Start a Project</a>
       </div>
-      {/* The positioning statement ("A technology-led company builder…") now lives in PhoneReelStory, beside the phone. */}
     </section>
   );
 }

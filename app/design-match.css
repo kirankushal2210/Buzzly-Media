@@ -16,7 +16,7 @@
 @media(max-width:750px){.home-site-header{position:relative;z-index:5}.home-site-header .leftnav.is-open{display:flex;flex-direction:column;align-items:flex-start;position:absolute;z-index:20;top:85px;left:0;right:0;background:var(--bg);padding:28px;gap:20px;border-bottom:1px solid var(--line)}.home-site-header .leftnav.is-open .navlink{font-size:16px}}
 
 .work-design-match .samplecard h2{font-size:17px;font-weight:500;margin:15px 0 4px}
-.contact-preview-note{margin:0 0 6px;padding-left:12px;border-left:2px solid #ef342d;color:#bbb5a9;font-size:12px;line-height:1.5}
+.contact-preview-note{margin:0 0 6px;padding-left:12px;border-left:2px solid var(--red);color:var(--soft);font-size:12px;line-height:1.5}
 .clientstrip{overflow:hidden;scroll-snap-type:none}
 .clientstrip-track.is-animated{min-width:0;animation:clientMarquee 55s linear infinite;animation-play-state:paused}
 .clientstrip-track.is-animated.is-visible{animation-play-state:running}

@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Link from "@/components/Link";
 import { Interior } from "@/components/Interior";
+import { LeadFaq } from "@/components/LeadFaq";
 import { ContactForm } from "@/components/ContactForm";
-import { FaqSection } from "@/components/FaqSection";
-import { bookingUrl, responsePromise, whatsappLink } from "@/lib/site";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/contact" },
@@ -12,7 +11,6 @@ export const metadata: Metadata = {
 };
 
 export default function Contact() {
-  const whatsappHref = whatsappLink();
   return (
     <Interior
       eyebrow="BUZZLY / START A PROJECT"
@@ -24,58 +22,18 @@ export default function Contact() {
           <div>
             <h2>Start the conversation.</h2>
             <p>
-              Share your business, audience, and goals. We will use these details only to respond to your inquiry. See our{" "}
+              Tell us a little about your brand and what you want content to do for it. We read every message and reply personally. We use these details only to respond to your inquiry. See our{" "}
               <Link href="/privacy">Privacy Policy</Link>.
             </p>
-
-            <div className="contact-direct-actions">
-              {(bookingUrl || whatsappHref) && (
-                <>
-                  <h3>Fast-track your project</h3>
-                  <p>
-                    {bookingUrl && whatsappHref
-                      ? "Prefer an intro call or direct messaging? Connect with our team directly:"
-                      : bookingUrl
-                        ? "Prefer an intro call? Book time with our team directly:"
-                        : "Prefer direct messaging? Connect with our team directly:"}
-                  </p>
-                </>
-              )}
-
-              {bookingUrl && (
-                <a
-                  className="contact-direct-btn is-calendar"
-                  href={bookingUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Schedule a 15-Minute Intro Call ↗
-                </a>
-              )}
-
-              {whatsappHref && (
-                <a
-                  className="contact-direct-btn is-whatsapp"
-                  href={whatsappHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Chat on WhatsApp ↗
-                </a>
-              )}
-
-              <div className="contact-trust-badge">
-                <span className="contact-trust-dot" aria-hidden="true" />
-                <span>Our team replies to every inquiry within {responsePromise}</span>
-              </div>
-            </div>
+            <p>Not sure which scope fits? <Link href="/services#readiness-audit">Get your Content Engine Score</Link> or <Link href="/services">compare the three tiers</Link>.</p>
           </div>
-
-          <ContactForm />
+          <div id="lead-form" className="contact-lead-form">
+            <ContactForm />
+          </div>
         </div>
       </section>
 
-      <FaqSection title="Common Questions Before You Reach Out" />
+      <LeadFaq />
     </Interior>
   );
 }

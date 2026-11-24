@@ -1,7 +1,7 @@
 import Link from "@/components/Link";
+import { ClientPortalLink } from "@/components/ClientPortalLink";
 import { companies } from "@/lib/content";
-import { studioStatus } from "@/lib/site";
-import { QuickInquiry } from "@/components/home/QuickInquiry";
+import { socialProfiles } from "@/lib/site";
 
 const fanLines = Array.from({ length: 21 }, (_, i) => -400 + i * 100);
 const arcLines = [12, 47, 91, 134, 171];
@@ -15,31 +15,15 @@ function FooterGrid() {
   );
 }
 
-/** Site footer. On the homepage, section links scroll in-page; elsewhere they go to the matching route. */
-export function HomeFooter({ variant = "home" }: { variant?: "home" | "interior" }) {
+/** Site footer for interior pages: navigation, sub-companies, owned channels and legal links. */
+export function HomeFooter({ variant = "home" }: { variant?: "home" | "interior" | string } = {}) {
   const home = variant === "home";
   return (
     <footer className="sitefooter" id="contact">
       <FooterGrid />
       <div className="footer-intro wrap">
         <p>Buzzly builds brands through content, bringing together strategy, storytelling, and distribution for our own sub-companies and ambitious outside partners.</p>
-        <Link className="cta" href="/contact">Let’s Connect</Link>
-      </div>
-      <div className="footer-live wrap">
-        <div className={`footer-status${studioStatus.accepting ? " is-open" : ""}`} role="status">
-          <span className="footer-status-dot" aria-hidden="true" />
-          <div><strong>{studioStatus.label}</strong><small>{studioStatus.detail}</small></div>
-        </div>
-        <ul className="footer-building" aria-label="Sub-companies currently in build">
-          {companies.map(company => (
-            <li key={company.slug} style={{ ["--accent" as string]: company.accent }}>
-              <span className="footer-status-dot is-small" aria-hidden="true" />
-              <Link href={`/companies/${company.slug}`}>{company.name}</Link>
-              <small>Sub-company in build</small>
-            </li>
-          ))}
-        </ul>
-        <QuickInquiry />
+        {home ? <a className="cta" href="#start-project">Let’s Connect</a> : <Link className="cta" href="/contact">Let’s Connect</Link>}
       </div>
       <div className="footer-main wrap">
         <a className="footer-wordmark" href="#top" aria-label="Buzzly — back to top">Buzzly<span>.</span></a>
@@ -50,14 +34,28 @@ export function HomeFooter({ variant = "home" }: { variant?: "home" | "interior"
         </nav>
         <nav aria-label="Footer navigation">
           <Link href="/work">Work</Link>
-          {home ? <a href="#clients">Clients</a> : <Link href="/clients">Clients</Link>}
+          <Link href="/services">Services</Link>
           <Link href="/about">About</Link>
-          {home ? <a href="#how">How we work</a> : <Link href="/services">How we work</Link>}
-          <Link href="/contact">Contact</Link>
+          <Link href="/insights">Insights</Link>
+          <Link href="/clients">Clients</Link>
+          {home ? <a href="#start-project">Contact</a> : <Link href="/contact">Contact</Link>}
+          <ClientPortalLink className="footer-portal">Client Portal</ClientPortalLink>
         </nav>
+        {socialProfiles.length > 0 && (
+          <nav aria-label="Buzzly channels" className="footer-social">
+            {socialProfiles.map(profile => <a key={profile.label} href={profile.href} target="_blank" rel="noopener noreferrer">{profile.label} ↗</a>)}
+          </nav>
+        )}
       </div>
       <div className="footer-grid-wrap"><FooterGrid /></div>
-      <div className="footer-bottom wrap"><span>© {new Date().getFullYear()} Buzzly. All rights reserved.</span><nav className="footer-legal" aria-label="Legal and company"><Link href="/careers">Careers</Link><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link></nav></div>
+      <div className="footer-bottom wrap">
+        <span>© {new Date().getFullYear()} Buzzly Media · Hyderabad, Telangana, India</span>
+        <nav className="footer-legal" aria-label="Legal and company">
+          <Link href="/privacy">Privacy Policy</Link>
+          <Link href="/terms">Terms of Service</Link>
+          <Link href="/refund">Refund Policy</Link>
+        </nav>
+      </div>
     </footer>
   );
 }

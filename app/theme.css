@@ -1,0 +1,82 @@
+/*
+ * Light / dark theme (lib/theme.ts, components/ThemeToggle.tsx).
+ * Dark is the original Buzzly look and the default; every dark value below
+ * equals the colour it replaced. Light flips the same variables.
+ * Note: --cream is the main text colour (cream on dark, ink on light).
+ */
+:root {
+  color-scheme: dark;
+  --red-hover: #ff5149;
+  --error: #ff7a73;
+  --body: #d8d0c3;
+  --tile: #2b2727;
+  --on-red: #101010;
+  --logo-ink: #f5efdf;
+  --logo-gold: #e5a93b;
+  --text-on-red: #f5efdf;
+  --footer-bg: #171616;
+  --card: #1b1716;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f5efdf;
+  --cream: #171414;
+  --soft: #5e5750;
+  --muted: #6f675d;
+  --line: #d6ccba;
+  --panel: #ebe3d2;
+  --surface: #fbf7ee;
+  --field: #fffcf5;
+  --field-line: #b8ad9a;
+  /* Deeper red so small red text stays readable on cream (4.8:1). */
+  --red: #c8261e;
+  --red-hover: #a91f18;
+  --error: #b3261e;
+  --body: #3a3430;
+  --tile: #e7dfcf;
+  --on-red: #fffaf0;
+  --logo-ink: #171414;
+  --logo-gold: #8a5e10;
+  --text-on-red: #fffaf0;
+  --footer-bg: #efe9dc;
+  --card: #fbf7ee;
+}
+
+/* Brief colour fade when the theme changes (toggle or the 6 PM / 6 AM switch). */
+:root.theme-fading,
+:root.theme-fading *,
+:root.theme-fading *::before,
+:root.theme-fading *::after {
+  transition: background-color .4s ease, color .4s ease, border-color .4s ease, fill .4s ease, stroke .4s ease !important;
+}
+
+body { background: var(--bg); color: var(--cream); }
+
+/* ---------- Toggle ---------- */
+.theme-toggle {
+  display: inline-flex; align-items: center; gap: 7px; min-height: 44px; min-width: 44px; padding: 0 12px;
+  background: transparent; border: 1px solid var(--line); border-radius: 999px; color: var(--soft);
+  font: 500 12px/1 'DM Sans', sans-serif; cursor: pointer; transition: color .2s, border-color .2s;
+}
+.theme-toggle:hover { color: var(--cream); border-color: var(--soft); }
+.theme-toggle:focus-visible { outline: 2px solid var(--cream); outline-offset: 2px; }
+/* Compact icon-only version (header, portal): a 32px circle, with an invisible
+   margin so the tap area is still 44px. */
+.theme-toggle--icon { position: relative; width: 32px; height: 32px; min-width: 0; min-height: 0; padding: 0; justify-content: center; gap: 0; }
+.theme-toggle--icon::before { content: ""; position: absolute; inset: -6px; }
+.theme-toggle--icon svg { width: 15px; height: 15px; }
+.home-site-header .theme-toggle, .interior-site-header .theme-toggle { margin-right: 12px; }
+.mobile-drawer .theme-toggle { margin-top: 18px; align-self: flex-start; }
+@media (max-width: 750px) {
+  .home-site-header .theme-toggle, .interior-site-header .theme-toggle { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .theme-toggle { transition: none; } }
+
+/* Small text coloured with a sub-company accent: darker on a light page so it stays readable. */
+:root[data-theme="light"] :is(.eco-flow small, .eco-flow-arrow, .storycard-act b, .outcome-card strong, .clientteaser-outcomes strong, .film-no) {
+  color: color-mix(in srgb, var(--accent, var(--red)) 52%, #000);
+}
+
+/* Red buttons inside link-styled blocks keep light text on red in both themes. */
+.case-next a.cta { color: var(--text-on-red); }
