@@ -22,6 +22,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     page("/insights", 0.7, "weekly"),
     ...playbooks.map(playbook => page(`/insights/${playbook.slug}`, 0.6)),
     page("/careers", 0.5),
+    page("/team", 0.5),
     page("/privacy", 0.2, "yearly"),
     page("/terms", 0.2, "yearly"),
   ];

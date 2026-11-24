@@ -4,7 +4,8 @@ import { Interior } from "@/components/Interior";
 import { companies } from "@/lib/content";
 import { InViewVideo } from "@/components/InViewVideo";
 import { TechStack } from "@/components/TechStack";
-import { Button, SurfaceCard } from "@/components/ui/core";
+import { Button } from "@/components/ui/core";
+import { TeamCrew } from "@/components/team/TeamCrew";
 
 export const metadata: Metadata = { alternates: { canonical: "/about" }, title: "About", description: "Buzzly is a technology-led company builder with content at its core: film direction, distribution strategy and web, AI and technology operations under one roof." };
 
@@ -15,11 +16,6 @@ const principles = [
   { title: "Speed With Taste", copy: "High-output publishing cadences without sacrificing editorial restraint or brand clarity." },
 ];
 
-const pods = [
-  { name: "Brand & Film Direction", focus: "Positioning, scripts, shoots and the edit." },
-  { name: "Distribution & Growth Strategy", focus: "Publishing cadence, platforms, and what gets pushed next." },
-  { name: "Web, AI & Technology Operations", focus: "Landing pages, lead routing, hook analysis and automation." },
-];
 
 export default function About() {
   return (
@@ -47,20 +43,8 @@ export default function About() {
           <h2 id="studio-title">Three pods.<br /><em>One roof.</em></h2>
           <p>Most brands hire a production house, a social agency and a web developer, then spend their week making them talk to each other. At Buzzly these three pods work as one team.</p>
         </div>
-        <ul className="studio-pods">
-          {pods.map((pod, index) => (
-            <SurfaceCard as="li" key={pod.name} className="studio-pod">
-              <span className="bz-mono">Pod 0{index + 1}</span>
-              <h3>{pod.name}</h3>
-              <p>{pod.focus}</p>
-              {/* TODO: Swap in founder/team headshots and bios when ready */}
-              <div className="studio-slot" aria-label="Team profile coming soon">
-                <span className="studio-slot-photo" aria-hidden="true" />
-                <span className="studio-slot-text">Team profile coming soon</span>
-              </div>
-            </SurfaceCard>
-          ))}
-        </ul>
+        <TeamCrew />
+        <p className="studio-more"><Link href="/team">Meet the team ↗</Link> · <Link href="/careers">Join us ↗</Link></p>
       </section>
 
       <TechStack id="about-stack" />

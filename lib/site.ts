@@ -40,6 +40,8 @@ export const primaryNav: NavLink[] = [
   { href: "/services", label: "Services", caret: true },
   { href: "/companies", label: "Our sub-companies" },
   { href: "/clients", label: "Clients" },
+  { href: "/team", label: "Team" },
+  { href: "/careers", label: "Careers" },
 ];
 
 /**

@@ -36,3 +36,92 @@
 .careers-close p{font-size:18px;line-height:1.5;color:var(--soft);max-width:650px;margin:0 auto}
 @media(max-width:900px){.careers-manifesto{grid-template-columns:1fr;padding-bottom:90px;gap:30px}.careers-why-grid{grid-template-columns:1fr;gap:34px}.careers-steps ol{grid-template-columns:1fr 1fr}.careers-empty{grid-template-columns:1fr}.careers-empty div:last-child{justify-self:start;text-align:left}.careers-role{grid-template-columns:1fr;gap:16px}.careers-close{padding:100px 20px}}
 @media(max-width:600px){.careers-steps ol{grid-template-columns:1fr}.careers-manifesto,.careers-why,.careers-areas,.careers-roles,.careers-steps{padding-left:20px;padding-right:20px}}
+
+/* ---------- Team (shared by /team, /about, /careers) ---------- */
+.team-section{max-width:1500px;margin:auto;padding:0 clamp(20px,8vw,130px) clamp(70px,8vw,110px)}
+.team-join{border-top:1px solid var(--line);max-width:1500px;margin:auto;padding:clamp(70px,8vw,110px) clamp(20px,8vw,130px) 130px;text-align:center}
+.team-join h2{font:400 clamp(52px,7vw,104px)/.92 'Instrument Serif',serif;letter-spacing:-.04em;margin:22px 0;color:var(--cream)}
+.team-join h2 em{color:var(--red);font-weight:400}
+.team-join>p:not(.interior-eyebrow){color:var(--soft);font-size:18px;margin:0 0 28px}
+.team-join-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.studio-more{margin:24px 0 0;font-size:14px;color:var(--soft)}
+.studio-more a{color:var(--cream)}
+
+/* ---------- Careers: team teaser, apply buttons, application form ---------- */
+.careers-team{border-top:1px solid var(--line);max-width:1500px;margin:auto;padding:70px clamp(20px,8vw,130px) 110px}
+.careers-team-head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px 30px;margin-bottom:36px}
+.careers-team-head>span{flex-basis:100%;font-size:11px;letter-spacing:.12em;color:var(--red);font-weight:700}
+.careers-team-head h2{margin:0;font:clamp(44px,5vw,78px)/.95 'Instrument Serif',serif;letter-spacing:-.035em}
+.careers-team-head a{color:var(--cream);font-size:14px;font-weight:700}
+.careers-apply-btn{display:inline-block;margin-top:25px;color:var(--on-red);background:var(--red);padding:15px 21px;border:0;cursor:pointer;font:700 13px 'DM Sans',sans-serif}
+.careers-apply-btn:hover{background:var(--cream);color:var(--bg)}
+.careers-apply-btn:focus-visible{outline:2px solid var(--cream);outline-offset:3px}
+.careers-apply{border-top:1px solid var(--line);max-width:1500px;margin:auto;padding:clamp(70px,8vw,110px) clamp(20px,8vw,130px) 130px;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(36px,6vw,100px);scroll-margin-top:16px}
+.careers-apply-lead>span{font-size:11px;letter-spacing:.12em;color:var(--red);font-weight:700}
+.careers-apply-lead h2{font:400 clamp(52px,6vw,96px)/.92 'Instrument Serif',serif;letter-spacing:-.04em;margin:22px 0;color:var(--cream)}
+.careers-apply-lead h2 em{color:var(--red);font-weight:400}
+.careers-apply-lead p{color:var(--soft);font-size:17px;line-height:1.55;max-width:440px}
+.careers-apply-privacy{font-size:14px!important}
+.careers-apply-privacy a{color:var(--cream)}
+.careers-form{min-width:0}
+.careers-form-row{display:grid;grid-template-columns:1fr 1fr;gap:17px}
+@media(max-width:1000px){.careers-apply{grid-template-columns:1fr}}
+@media(max-width:600px){.careers-form-row{grid-template-columns:1fr}}
+
+/* ---------- Team: "Behind your brand there are experts" ---------- */
+.crew{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.6fr);gap:clamp(24px,4vw,64px);align-items:center;padding:clamp(56px,7vw,100px) 0}
+.crew-title{margin:0 0 clamp(26px,3vw,40px);font:600 clamp(30px,2.9vw,44px)/1.08 'DM Sans',sans-serif;letter-spacing:-.03em;color:var(--cream)}
+.crew-title em{font:italic 400 1.12em/1 'Instrument Serif',serif;letter-spacing:-.02em;color:var(--red)}
+.crew-roles{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.crew-roles button{all:unset;box-sizing:border-box;position:relative;display:grid;gap:2px;width:100%;padding:9px 0 9px 18px;cursor:pointer}
+.crew-roles button::before{content:"";position:absolute;left:2px;top:21px;width:6px;height:6px;border-radius:50%;border:1px solid var(--red);opacity:0;transition:opacity .2s,background .2s}
+.crew-role-title{font:400 clamp(22px,1.9vw,28px)/1.05 'Instrument Serif',serif;color:var(--cream);transition:color .2s}
+.crew-role-line{font:400 12.5px/1.4 'DM Sans',sans-serif;color:var(--muted)}
+.crew-roles button:hover::before,.crew-roles button.is-active::before{opacity:1}
+.crew-roles button.is-active::before{background:var(--red)}
+.crew-roles button:hover .crew-role-title,.crew-roles button.is-active .crew-role-title{color:var(--red)}
+.crew-roles button:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.crew-stage{position:relative;isolation:isolate;min-width:0;container-type:inline-size}
+.crew-word{position:absolute;inset:0;z-index:-1;margin:0;pointer-events:none;user-select:none;font:italic 400 40cqw/.8 'Instrument Serif',serif;letter-spacing:-.05em;color:var(--cream)}
+.crew-word span{position:absolute;white-space:nowrap}
+.crew-word span:first-child{right:3%;top:-3%}
+.crew-word span:last-child{left:-1%;bottom:-2%}
+.crew-faces{list-style:none;margin:0;padding:0}
+.crew-face{position:relative;overflow:hidden;background:var(--red);cursor:pointer;outline:none;aspect-ratio:1/1.12;box-shadow:0 18px 40px rgba(0,0,0,.18);transition:opacity .25s,transform .3s}
+.crew-face img{width:100%;height:100%;object-fit:cover;object-position:center bottom;display:block}
+.crew-face-mark{position:absolute;inset:0;display:grid;place-items:center;color:var(--text-on-red);font:italic 400 clamp(54px,5.4vw,88px)/1 'Instrument Serif',serif;opacity:.85}
+.crew-face-caption{position:absolute;left:0;right:0;bottom:0;padding:36px 12px 12px;background:linear-gradient(transparent,rgba(16,16,16,.85));color:#f5efdf;display:grid;gap:3px;opacity:0;transform:translateY(8px);transition:opacity .25s,transform .25s}
+.crew-face-caption strong{font:400 21px/1.05 'Instrument Serif',serif}
+.crew-face-caption span{font:700 10px/1.35 'DM Sans',sans-serif;letter-spacing:.12em;text-transform:uppercase}
+.crew-face:hover .crew-face-caption,.crew-face:focus-visible .crew-face-caption,.crew-face.is-active .crew-face-caption{opacity:1;transform:none}
+.crew-face:hover,.crew-face.is-active{transform:translateY(-6px)}
+.crew-face:focus-visible{box-shadow:0 0 0 3px var(--cream)}
+.crew-face.is-dim{opacity:.35}
+/* Scattered layout (up to 8 people): tiles float over the giant words. */
+.crew-stage.is-scattered{aspect-ratio:1.2;max-height:78vh}
+.is-scattered .crew-face{position:absolute;width:21%}
+.is-scattered .crew-face:nth-child(1){left:30%;top:6%}
+.is-scattered .crew-face:nth-child(2){left:77%;top:0}
+.is-scattered .crew-face:nth-child(3){left:56%;top:36%}
+.is-scattered .crew-face:nth-child(4){left:12%;top:52%}
+.is-scattered .crew-face:nth-child(5){left:79%;top:62%}
+.is-scattered .crew-face:nth-child(6){left:38%;top:70%}
+.is-scattered .crew-face:nth-child(7){left:2%;top:12%}
+.is-scattered .crew-face:nth-child(8){left:60%;top:84%}
+.is-scattered .crew-face:hover,.is-scattered .crew-face.is-active{z-index:2}
+/* More than 8 people: a staggered grid instead. */
+.crew-stage:not(.is-scattered) .crew-faces{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;padding:30px 0 50px}
+.crew-stage:not(.is-scattered) .crew-face:nth-child(even){margin-top:40px}
+@media(max-width:900px){
+  .crew{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .crew-stage.is-scattered{aspect-ratio:auto;max-height:none}
+  .crew-stage .crew-faces{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:30cqw 0 34cqw}
+  .is-scattered .crew-face{position:relative;width:auto;left:auto!important;top:auto!important}
+  .crew-stage .crew-face:nth-child(3n+2){margin-top:28px}
+  .crew-face-caption strong{font-size:16px}
+  .crew-word span:first-child{top:0}
+  .crew-word span:last-child{bottom:0}
+}
+@media(prefers-reduced-motion:reduce){.crew-face,.crew-face-caption,.crew-role-title,.crew-roles button::before{transition:none}}

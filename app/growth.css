@@ -321,3 +321,23 @@
 .case-film video { aspect-ratio: 1; max-width: 860px; margin: 0 auto; }
 /* Label moved to the top corner so it no longer covers the player controls. */
 .company-detail-film>span{top:16px;bottom:auto;left:16px}
+
+/* ---------- Landing: problem, how it works, FAQ ---------- */
+.landing-problem,.landing-steps{padding-top:clamp(80px,10vw,140px);padding-bottom:clamp(80px,10vw,140px);border-top:1px solid var(--line)}
+.landing-head h2{margin:16px 0 clamp(36px,5vw,64px);font:400 clamp(54px,7vw,100px)/.95 'Instrument Serif',serif;letter-spacing:-.04em;color:var(--cream)}
+.landing-head h2 em{color:var(--red);font-weight:400}
+.landing-pains{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--line)}
+.landing-pains li{padding:28px clamp(0px,3vw,40px) 30px 0;border-bottom:1px solid var(--line)}
+.landing-pains li:nth-child(2n){padding-left:clamp(20px,3vw,40px);border-left:1px solid var(--line)}
+.landing-pains h3{margin:0 0 10px;font:400 clamp(26px,2.4vw,36px)/1.05 'Instrument Serif',serif;letter-spacing:-.015em;color:var(--cream)}
+.landing-pains p{margin:0;max-width:520px;color:var(--soft);font:400 16px/1.5 'DM Sans',sans-serif}
+.landing-cost{margin:clamp(36px,5vw,56px) 0 0;max-width:900px;color:var(--cream);font:italic 400 clamp(24px,2.4vw,34px)/1.2 'Instrument Serif',serif}
+.landing-cost .eyebrow{display:block;margin-bottom:12px;font-style:normal;font-family:'DM Sans',sans-serif}
+.landing-step-list{list-style:none;margin:0 0 clamp(36px,5vw,56px);padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(20px,3vw,40px)}
+.landing-step-list li{border-top:2px solid var(--red);padding-top:22px}
+.landing-step-no{display:block;color:var(--red);font:700 12px/1 'DM Sans',sans-serif;letter-spacing:.19em}
+.landing-step-list h3{margin:16px 0 10px;font:400 clamp(26px,2.2vw,34px)/1.05 'Instrument Serif',serif;letter-spacing:-.015em;color:var(--cream)}
+.landing-step-list p{margin:0;color:var(--soft);font:400 16px/1.5 'DM Sans',sans-serif}
+.landing-faq .leadfaq-head .eyebrow{margin:0}
+@media(max-width:1000px){.landing-step-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.landing-pains,.landing-step-list{grid-template-columns:1fr}.landing-pains li,.landing-pains li:nth-child(2n){padding-left:0;padding-right:0;border-left:0}}

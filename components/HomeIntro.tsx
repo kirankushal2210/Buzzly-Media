@@ -64,7 +64,7 @@ export function Hero() {
         <em>Ours and everyone else’s.</em>
       </h1>
       <div className="herooffer">
-        <p><span aria-hidden="true">〰</span> For ambitious brands ready to scale. <span aria-hidden="true">〰</span></p>
+        <p><span aria-hidden="true">〰</span> Strategy, shoots and distribution in one team, so you never juggle three agencies again. <span aria-hidden="true">〰</span></p>
         <a className="cta" href="#start-project">Start a Project</a>
       </div>
     </section>

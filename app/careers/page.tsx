@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "@/components/Link";
 import { Interior } from "@/components/Interior";
-import { applyHref, careerAreas, hiringSteps, openRoles, whyBuzzly } from "@/lib/careers";
+import { careerAreas, hiringSteps, openRoles, whyBuzzly } from "@/lib/careers";
+import { ApplicationForm } from "@/components/careers/ApplicationForm";
+import { ApplyButton } from "@/components/careers/ApplyButton";
+import { TeamCrew } from "@/components/team/TeamCrew";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/careers" },
@@ -44,7 +47,7 @@ export default function Careers() {
               <ul>{role.responsibilities.map(item => <li key={item}>{item}</li>)}</ul>
               <h4>What we are looking for</h4>
               <ul>{role.lookingFor.map(item => <li key={item}>{item}</li>)}</ul>
-              <Link href={`${applyHref}&role=${encodeURIComponent(role.title)}`}>Apply for this role ↗</Link>
+              <ApplyButton role={role.title}>Apply for this role ↗</ApplyButton>
             </div>
           </article>
         )) : (
@@ -53,9 +56,17 @@ export default function Careers() {
               <h3>We still read <em>every</em> open application.</h3>
               <p>Tell us what you make, link to work you are proud of, and say which of the areas above fits you. When a role opens that matches, you will be the first we write to.</p>
             </div>
-            <div><Link href={applyHref}>Send an open application ↗</Link></div>
+            <div><ApplyButton role="Open application">Send an open application ↗</ApplyButton></div>
           </div>
         )}
+      </section>
+
+      <section className="careers-team" id="team" aria-labelledby="careers-team-heading">
+        <div className="careers-team-head">
+          <span id="careers-team-heading">THE TEAM</span>
+          <Link href="/team">Meet the whole team ↗</Link>
+        </div>
+        <TeamCrew />
       </section>
 
       <section className="careers-steps" aria-labelledby="careers-steps-heading">
@@ -65,7 +76,15 @@ export default function Careers() {
         </ol>
       </section>
 
-      <section className="careers-close"><span>BUZZLY / CAREERS</span><h2>Make things<br /><em>people want to watch.</em></h2><p>Content can give a business a story people understand. We are looking for the people who can tell it.</p><Link href={applyHref}>Write to us ↗</Link></section>
+      <section className="careers-apply" id="apply" aria-labelledby="careers-apply-heading">
+        <div className="careers-apply-lead">
+          <span>BUZZLY / APPLY</span>
+          <h2 id="careers-apply-heading">Make things<br /><em>people want to watch.</em></h2>
+          <p>Content can give a business a story people understand. We are looking for the people who can tell it. Pick a role, or send an open application.</p>
+          <p className="careers-apply-privacy">We use these details only to consider your application. See our <Link href="/privacy">Privacy Policy</Link>.</p>
+        </div>
+        <ApplicationForm roles={openRoles.map(role => role.title)} areas={careerAreas.map(area => area.title)} />
+      </section>
     </Interior>
   );
 }

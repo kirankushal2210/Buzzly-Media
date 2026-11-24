@@ -38,6 +38,8 @@ export function HomeFooter({ variant = "home" }: { variant?: "home" | "interior"
           <Link href="/about">About</Link>
           <Link href="/insights">Insights</Link>
           <Link href="/clients">Clients</Link>
+          <Link href="/team">Team</Link>
+          <Link href="/careers">Careers</Link>
           {home ? <a href="#start-project">Contact</a> : <Link href="/contact">Contact</Link>}
           <ClientPortalLink className="footer-portal">Client Portal</ClientPortalLink>
         </nav>

@@ -39,11 +39,11 @@ export const whyBuzzly = [
 
 /** What happens after someone writes in. Kept short and honest; the owner adjusts it as the process matures. */
 export const hiringSteps = [
-  { title: "Write to us", copy: "Use the contact form with “Joining the team” selected. Tell us what you make and link to work you are proud of." },
+  { title: "Apply", copy: "Use the application form on this page. Tell us what you make and link to work you are proud of." },
   { title: "A short call", copy: "If there is a fit, we set up an introductory conversation about the work and what you are looking for." },
   { title: "A practical conversation", copy: "We talk through a real piece of Buzzly work together, so both sides see how we think." },
   { title: "A clear answer", copy: "We reply to everyone who reaches the call stage, either way." },
 ];
 
-/** Where an application goes: the contact form with the careers interest pre-selected. */
-export const applyHref = "/contact?interest=careers";
+/** Where an application goes: the application form on /careers. */
+export const applyHref = "/careers#apply";
