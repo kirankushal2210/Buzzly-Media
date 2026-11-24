@@ -26,13 +26,13 @@ export const GROUPS: Group[] = [
   { label: "Sales", views: [
     { href: "/admin/leads", label: "Leads", icon: Users, description: "Everyone who might become a client" },
     { href: "/admin/sales", label: "Sales & calls", icon: Handshake, description: "Pipeline board and every sales call" },
+    { href: "/admin/calling", label: "Cold calling", icon: PhoneCall, description: "Prospects, brand previews and the call copilot" },
   ] },
   { label: "Clients", views: [
     { href: "/admin/clients", label: "Clients", icon: Building2, description: "Packages, retainers, renewals and monthly content promises" },
     { href: "/admin/content", label: "Content planner", icon: CalendarCheck, description: "What each client was promised, what is posted, and what to do today" },
   ] },
   { label: "Growth", views: [
-    { href: "/admin/calling", label: "Cold calling", icon: PhoneCall, description: "Prospects, brand previews and the call copilot" },
     { href: "/admin/outreach", label: "Outreach", icon: Send, description: "Outreach campaigns and creator shortlist" },
     { href: "/admin/research", label: "Research", icon: FlaskConical, description: "Competitor ads and landing-page tests" },
   ] },
