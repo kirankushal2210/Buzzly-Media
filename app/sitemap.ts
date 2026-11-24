@@ -25,5 +25,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     page("/team", 0.5),
     page("/privacy", 0.2, "yearly"),
     page("/terms", 0.2, "yearly"),
+    page("/refund", 0.2, "yearly"),
   ];
 }

@@ -1,9 +1,12 @@
 import { leadFaqs } from "@/lib/engagements";
+import { JsonLd } from "@/components/JsonLd";
+import { faqPage } from "@/lib/structured-data";
 
 /** Server-rendered FAQ: native <details>, so every answer is in the initial HTML and works without JavaScript. */
 export function LeadFaq() {
   return (
     <section className="leadfaq" aria-labelledby="leadfaq-title">
+      <JsonLd data={faqPage("/contact", leadFaqs)} />
       <div className="leadfaq-head">
         <p className="interior-eyebrow">BEFORE YOU SEND IT</p>
         <h2 id="leadfaq-title">Straight answers.</h2>

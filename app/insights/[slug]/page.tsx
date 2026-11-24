@@ -7,6 +7,8 @@ import { InteriorHeader } from "@/components/InteriorHeader";
 import { Badge, Button, SurfaceCard } from "@/components/ui/core";
 import { formatPlaybookDate, playbookBySlug, playbooks } from "@/data/insights";
 import { tierBySlug } from "@/lib/engagements";
+import { JsonLd } from "@/components/JsonLd";
+import { article, breadcrumbs } from "@/lib/structured-data";
 
 export function generateStaticParams() {
   return playbooks.map(({ slug }) => ({ slug }));
@@ -34,6 +36,7 @@ export default async function PlaybookPage({ params }: { params: Promise<{ slug:
   return (
     <div className="interior">
       <InteriorHeader />
+      <JsonLd data={[article(playbook), breadcrumbs([{ name: "Insights", path: "/insights" }, { name: playbook.title, path: `/insights/${playbook.slug}` }])]} />
       <main id="top" className="playbook">
         <article className="playbook-column">
           <Link href="/insights" className="playbook-back">← All Playbooks</Link>

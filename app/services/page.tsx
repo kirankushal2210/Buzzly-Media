@@ -5,6 +5,9 @@ import { ContentReadinessAudit } from "@/components/ContentReadinessAudit";
 import { TechStack } from "@/components/TechStack";
 import { Badge, Button, SurfaceCard } from "@/components/ui/core";
 import { engagementTiers } from "@/lib/engagements";
+import { JsonLd } from "@/components/JsonLd";
+import { breadcrumbs, serviceCatalog } from "@/lib/structured-data";
+import { services } from "@/lib/content";
 
 export const metadata: Metadata = { alternates: { canonical: "/services" }, title: "Services", description: "Three engagement tiers, the tech and distribution stack behind them, and a free content engine score for your brand." };
 
@@ -19,6 +22,7 @@ const steps = [
 export default function Services() {
   return (
     <Interior eyebrow="BUZZLY / WHAT WE DO" title="We know what moves brands." intro="Strategy, content, social media, and distribution work together to help brands earn attention and build lasting reach.">
+      <JsonLd data={[breadcrumbs([{ name: "Services", path: "/services" }]), serviceCatalog(services)]} />
       <section className="services-banner" aria-label="Buzzly services"><span>CONTENT</span><span>SOCIAL</span><span>DISTRIBUTION</span></section>
 
       <section className="tiers" aria-labelledby="tiers-title">

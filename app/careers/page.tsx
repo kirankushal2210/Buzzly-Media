@@ -5,6 +5,8 @@ import { careerAreas, hiringSteps, openRoles, whyBuzzly } from "@/lib/careers";
 import { ApplicationForm } from "@/components/careers/ApplicationForm";
 import { ApplyButton } from "@/components/careers/ApplyButton";
 import { TeamCrew } from "@/components/team/TeamCrew";
+import { JsonLd } from "@/components/JsonLd";
+import { breadcrumbs, jobPosting } from "@/lib/structured-data";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/careers" },
@@ -16,6 +18,7 @@ export default function Careers() {
   const hasRoles = openRoles.length > 0;
   return (
     <Interior eyebrow="BUZZLY / CAREERS" title="Build brands with us." intro="We build our own sub-companies and help ambitious partners grow theirs. If you make content, run channels, shape strategy or build the technology behind it, we would like to hear from you.">
+      <JsonLd data={[breadcrumbs([{ name: "Careers", path: "/careers" }]), ...openRoles.map(jobPosting)]} />
       <section className="careers-manifesto"><span>WHO WE LOOK FOR ↗</span><p>People who would rather build a brand than talk about one.</p></section>
 
       <section className="careers-why" aria-labelledby="careers-why-heading">

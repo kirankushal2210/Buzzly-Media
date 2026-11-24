@@ -17,6 +17,8 @@ export type OpenRole = {
   summary: string;
   responsibilities: string[];
   lookingFor: string[];
+  /** ISO date the role was opened, e.g. "2026-12-01" (used by Google for Jobs). */
+  datePosted: string;
 };
 
 export const openRoles: OpenRole[] = [];

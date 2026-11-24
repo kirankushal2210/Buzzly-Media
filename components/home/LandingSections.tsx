@@ -1,4 +1,6 @@
 import { Reveal } from "@/components/Reveal";
+import { JsonLd } from "@/components/JsonLd";
+import { faqPage } from "@/lib/structured-data";
 
 /**
  * Landing-page sections that complete the structure:
@@ -64,7 +66,7 @@ export function HowItWorks() {
   );
 }
 
-const faqs = [
+export const faqs = [
   { question: "How quickly will I hear back?", answer: "We reply personally to every inquiry that comes through the form." },
   { question: "Do I need a studio or my own team?", answer: "No. We are based in Hyderabad and usually shoot on location at your business: the kitchen, clinic, site or office your customers already know. Shoots in other cities are planned as part of your scope." },
   { question: "Who approves the content?", answer: "You do. You approve every script before shoot day and every edit before it is published, with one point of contact for feedback." },
@@ -75,6 +77,7 @@ const faqs = [
 export function LandingFaq() {
   return (
     <Reveal className="leadfaq landing-faq" id="faq" aria-labelledby="landing-faq-title">
+      <JsonLd data={faqPage("", faqs)} />
       <div className="leadfaq-head">
         <p className="eyebrow">BUZZLY / QUESTIONS</p>
         <h2 id="landing-faq-title">Straight answers.</h2>

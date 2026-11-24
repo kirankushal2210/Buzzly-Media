@@ -19,6 +19,7 @@ import "./theme.css";
 import { siteDescription, siteName, siteTitle, siteUrl, socialLinks } from "@/lib/site";
 import { ScrollReset } from "@/components/ScrollReset";
 import { THEME_BOOT_SCRIPT } from "@/lib/theme";
+import { companies } from "@/lib/content";
 
 const shareDescription = "We build brands through content—our own sub-companies and ambitious outside partners’ businesses.";
 
@@ -56,6 +57,10 @@ const structuredData = {
       slogan: "Building brands through content.",
       ...(socialLinks.length ? { sameAs: socialLinks } : {}),
       contactPoint: { "@type": "ContactPoint", contactType: "sales", url: `${siteUrl}/contact`, availableLanguage: ["en"] },
+      address: { "@type": "PostalAddress", addressLocality: "Hyderabad", addressRegion: "Telangana", addressCountry: "IN" },
+      areaServed: "IN",
+      knowsAbout: ["Brand strategy", "Content production", "Short-form video", "Social media management", "Content distribution", "Creator marketing", "Web and AI technology for marketing"],
+      subOrganization: companies.map(company => ({ "@type": "Organization", "@id": `${siteUrl}/companies/${company.slug}#organization`, name: company.name, url: `${siteUrl}/companies/${company.slug}` })),
     },
     {
       "@type": "WebSite",
