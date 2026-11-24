@@ -5,7 +5,7 @@ import { HomeContact } from "@/components/home/HomeContact";
 import { clientWins } from "@/lib/clients";
 
 export const metadata: Metadata = {
-  title: "Clients",
+  title: "How Brands Grow Through Content: Client Stories",
   description: "Where the brands we build with start, what we change, and where they end up. Tell us where you are and we’ll show you the next move.",
   alternates: { canonical: "/clients" },
 };

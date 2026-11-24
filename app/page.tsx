@@ -7,7 +7,11 @@ import { HomeFooter } from "@/components/home/HomeFooter";
 import { HomeContact } from "@/components/home/HomeContact";
 import { HowItWorks, LandingFaq, ProblemSection } from "@/components/home/LandingSections";
 
-export const metadata = { alternates: { canonical: "/" } };
+export const metadata = {
+  alternates: { canonical: "/" },
+  title: { absolute: "Social Media & Content Agency in Hyderabad | Buzzly" },
+  description: "Buzzly is a Hyderabad content studio: brand strategy, short-form video, social media and distribution under one roof, for our own ventures and ambitious brands.",
+};
 
 /**
  * Brand landing page, in conversion order: hero (result without the fear) →

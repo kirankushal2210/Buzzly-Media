@@ -7,7 +7,7 @@ import { TechStack } from "@/components/TechStack";
 import { Button } from "@/components/ui/core";
 import { TeamCrew } from "@/components/team/TeamCrew";
 
-export const metadata: Metadata = { alternates: { canonical: "/about" }, title: "About", description: "Buzzly is a technology-led company builder with content at its core: film direction, distribution strategy and web, AI and technology operations under one roof." };
+export const metadata: Metadata = { alternates: { canonical: "/about" }, title: "About Buzzly, a Content-Led Company Builder", description: "Buzzly is a technology-led company builder with content at its core: film direction, distribution strategy and web, AI and technology operations under one roof." };
 
 const principles = [
   { title: "Distribution Over Decoration", copy: "Cinema-grade craft only works when engineered for watch-time retention and buyer conversion." },

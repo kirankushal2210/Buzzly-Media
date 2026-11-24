@@ -23,6 +23,17 @@
       "port": 8787
     },
     {
+      "name": "buzzly-next-dev",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "next",
+        "dev",
+        "-p",
+        "3201"
+      ],
+      "port": 3201
+    },
+    {
       "name": "buzzly-next",
       "runtimeExecutable": "npx",
       "runtimeArgs": [

@@ -6,8 +6,8 @@ import { ContactForm } from "@/components/ContactForm";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/contact" },
-  title: "Contact",
-  description: "Start a conversation with Buzzly about content, social media, brand strategy, or distribution.",
+  title: "Contact Buzzly: Start a Content Project",
+  description: "Tell Buzzly what you’re building. Content, social media, brand strategy or distribution: one message, and a person from our team replies.",
 };
 
 export default function Contact() {

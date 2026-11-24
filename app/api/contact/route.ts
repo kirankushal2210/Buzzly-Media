@@ -7,6 +7,30 @@ import { validateInquiry } from "@/lib/inquiry-validation";
 import { sendDiscord, sendLeadWebhook, sendSlack, sendTelegram } from "@/lib/notify";
 import { CONTACT_LIMITS, clientIp, hashIp, isRateLimited, isRateLimitedInMemory } from "@/lib/rate-limit";
 import { anyLeadChannel, autoReplyEnabled, ipSalt } from "@/lib/server-env";
+import { crmConfigured, getCrm } from "@/db/crm";
+
+const CRM_INTEREST: Record<string, string> = {
+  content: "Content and social media", brand: "Brand strategy", distribution: "Distribution", partnership: "Partnership", other: "Something else",
+};
+
+/** Saves a sales enquiry as a new CRM lead. Job applications are not leads. Never throws. */
+async function saveLeadToCrm(inquiry: Inquiry) {
+  if (inquiry.interest === "careers") return false;
+  try {
+    const crm = await getCrm();
+    if (!crm) return false;
+    await crm.create("leads", {
+      name: inquiry.name, email: inquiry.email, ...(inquiry.company ? { company: inquiry.company } : {}),
+      source: "Website", interest: CRM_INTEREST[inquiry.interest] ?? "Something else", status: "New",
+      notes: `Website enquiry ${new Date().toISOString().slice(0, 10)}:
+${inquiry.message}`.slice(0, 5000),
+    });
+    return true;
+  } catch (error) {
+    console.error("Contact inquiries: CRM save failed", error instanceof Error ? error.message : error);
+    return false;
+  }
+}
 
 const MAX_BODY_BYTES = 8000;
 const noStore = { "Cache-Control": "no-store" };
@@ -40,7 +64,7 @@ async function databaseUsable(db: ReturnType<typeof tryGetDb>) {
 
 /** The form is usable when leads can be stored or delivered somewhere. */
 export async function GET() {
-  if (anyLeadChannel()) return json({ ready: true });
+  if (anyLeadChannel() || (crmConfigured() && (await getCrm()))) return json({ ready: true });
   return json({ ready: await databaseUsable(tryGetDb()) });
 }
 
@@ -104,18 +128,19 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // 2. Deliver to every configured channel in parallel.
-  const [email, slack, discord, telegram, webhook] = await Promise.all([
+  // 2. Deliver to every configured channel in parallel, and add the lead to the CRM.
+  const [email, slack, discord, telegram, webhook, inCrm] = await Promise.all([
     sendInboxNotification(inquiry, id),
     sendSlack(inquiry, id),
     sendDiscord(inquiry, id),
     sendTelegram(inquiry, id),
     sendLeadWebhook(inquiry, id),
+    saveLeadToCrm(inquiry),
   ]);
   const outcomes = { email: statusOf(email), slack: statusOf(slack), discord: statusOf(discord), telegram: statusOf(telegram), webhook: statusOf(webhook) };
   const delivered = Object.values(outcomes).some(status => status === "sent");
-  const received = id !== null || delivered;
-  if (!delivered) console.error("Contact inquiries: no channel delivered this lead", { ...outcomes, stored: id !== null });
+  const received = id !== null || delivered || inCrm;
+  if (!delivered) console.error("Contact inquiries: no channel delivered this lead", { ...outcomes, stored: id !== null, crm: inCrm });
 
   // 3. Optional customer confirmation (off by default; see CONTACT_AUTO_REPLY).
   const autoReply: SendResult = received && autoReplyEnabled() ? await sendAutoReply(inquiry, id) : { status: "skipped" };

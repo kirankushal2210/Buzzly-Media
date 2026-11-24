@@ -4,7 +4,7 @@ import { WorkGrid } from "@/components/work/WorkGrid";
 import { isCategory } from "@/lib/work";
 
 export const metadata: Metadata = {
-  title: "Work",
+  title: "Work: Brand Films and Content in Motion",
   description: "Case studies from Buzzly: brand, film, and content work across food, health, real estate, and partner campaigns.",
   alternates: { canonical: "/work" },
 };

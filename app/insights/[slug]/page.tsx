@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const playbook = playbookBySlug(slug);
   if (!playbook) notFound();
   return {
-    title: playbook.title,
+    title: playbook.seoTitle,
     description: playbook.subtitle,
     alternates: { canonical: `/insights/${slug}` },
     openGraph: { type: "article", title: playbook.title, description: playbook.subtitle, publishedTime: playbook.publishedAt },

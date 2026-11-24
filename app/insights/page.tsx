@@ -6,7 +6,7 @@ import { playbooks } from "@/data/insights";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/insights" },
-  title: "Insights",
+  title: "Insights: Content and Distribution Playbooks",
   description: "Tactical playbooks from Buzzly on short-form scripting, distribution and turning organic content into inbound pipeline.",
 };
 

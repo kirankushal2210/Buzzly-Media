@@ -9,6 +9,8 @@ const production = process.env.NODE_ENV === "production";
  */
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // The local-development CRM database (PGlite) loads its own files at runtime; bundling breaks that.
+  serverExternalPackages: ["@electric-sql/pglite"],
   images: {
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 60 * 60 * 24 * 30,

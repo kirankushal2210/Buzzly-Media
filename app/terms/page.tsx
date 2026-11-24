@@ -5,7 +5,7 @@ import { legal } from "@/lib/legal";
 
 export const metadata: Metadata = {
   title: "Terms of Use",
-  description: "The terms that apply when you use the Buzzly website.",
+  description: "The terms that apply when you use the Buzzly website: our content, illustrative work, acceptable use, inquiries, liability and governing law.",
   alternates: { canonical: "/terms" },
 };
 

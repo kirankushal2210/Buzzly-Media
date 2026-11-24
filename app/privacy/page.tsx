@@ -5,7 +5,7 @@ import { legal } from "@/lib/legal";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "How Buzzly collects, uses, and protects the information you share through this website.",
+  description: "How Buzzly collects, uses and protects the details you share through this website and its forms, who we share them with, and the rights you have.",
   alternates: { canonical: "/privacy" },
 };
 

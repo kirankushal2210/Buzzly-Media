@@ -1,86 +1,76 @@
+import Link from "@/components/Link";
 import { Reveal } from "@/components/Reveal";
-import { Marquee } from "@/components/ui/core";
 import { clientWins, type ClientWin } from "@/lib/clients";
 
-/** One client's story as a three-act storyboard: before → the move → after, closing on their own words. */
-function StoryCard({ win }: { win: ClientWin }) {
-  const { story } = win;
-  const acts = [
-    ["01", "Before", story.before],
-    ["02", "The move", story.move],
-    ["03", "After", story.after],
-  ] as const;
-  return (
-    <article className="storycard" style={{ ["--accent" as string]: win.accent }}>
-      <div className="storycard-head">
-        <span className="storycard-field">{win.field}{win.sample && <em> · Sample</em>}</span>
-        <h3>{win.company}</h3>
-      </div>
-      <ol className="storycard-acts">
-        {acts.map(([number, label, text]) => (
-          <li key={number}>
-            <span className="storycard-act"><b>{number}</b> {label}</span>
-            <p>{text}</p>
-          </li>
-        ))}
-      </ol>
-      {story.quote && (
-        <blockquote className="storycard-quote">
-          “{story.quote}”
-          <cite>{story.by}, {win.company}</cite>
-        </blockquote>
-      )}
-      <div className="storycard-services">{win.services.join(" + ")}</div>
-    </article>
-  );
-}
-
-/** The whole story in one line: the old state struck through, the new state in italic. */
-function StoryShift({ win }: { win: ClientWin }) {
+/** One client's before → after as a card for the corridor walls. */
+function ConfessionCard({ win, tone }: { win: ClientWin; tone: number }) {
   const [from, to] = win.story.shift;
   return (
-    <span className="storyshift">
-      <s>{from}</s>
-      <span className="storyshift-arrow" aria-label="became">→</span>
-      <em>{to}</em>
-      <span className="storyshift-meta">{win.company}{win.sample && " · Sample"}</span>
-      <span className="storyshift-star" aria-hidden="true">✳</span>
+    <span className={`corridor-card corridor-confession tone-${tone}`}>
+      <span className="corridor-field">{win.field}</span>
+      <span className="corridor-shift"><s>{from}</s><em>{to}</em></span>
+      <span className="corridor-company">{win.company}{win.sample && <i> · Sample</i>}</span>
     </span>
   );
 }
 
+/** Real production stills from public/media/reel. */
+const STILLS = [
+  "/media/reel/film-camera-rig.jpg",
+  "/media/reel/edit-timeline.jpg",
+  "/media/reel/plan-notebook.jpg",
+  "/media/reel/film-camera-operator.jpg",
+  "/media/reel/post-phone.jpg",
+  "/media/reel/edit-desk.jpg",
+];
+const PER_WALL = 14;
+
 /**
- * Client stories: a slow row of storyboard cards (before → the move → after)
- * over a faster counter-scrolling row of one-line transformations.
- * Entries are samples until real client stories are approved (see lib/clients.ts).
+ * Client Confessions and Wins as a corridor: two walls of cards (client
+ * before → after stories and real production stills) flowing out of a
+ * vanishing point towards the viewer, with the headline above and the
+ * caption below. Pure CSS 3D (app/growth.css, .corridor-*); paused for
+ * reduced motion. Stories stay in the page text for screen readers and search.
  */
 export function ClientProof() {
   const anySample = clientWins.some(win => win.sample);
+  const deck = Array.from({ length: PER_WALL }, (_, i) => i % 2 === 0
+    ? { kind: "story" as const, win: clientWins[(i / 2) % clientWins.length], tone: (i / 2) % 4 }
+    : { kind: "still" as const, src: STILLS[((i - 1) / 2) % STILLS.length] });
+  const wall = (side: "left" | "right") => deck.map((card, i) => {
+    // the right wall runs half a step behind the left, with the deck turned around
+    const item = side === "left" ? card : deck[(PER_WALL - 1 - i + 3) % PER_WALL];
+    const slot = side === "left" ? i : i + 0.5;
+    return (
+      <span key={`${side}-${i}`} className={`corridor-slot is-${side}`} style={{ ["--slot" as string]: slot }}>
+        {item.kind === "story"
+          ? <ConfessionCard win={item.win} tone={item.tone} />
+          // eslint-disable-next-line @next/next/no-img-element -- decorative stills inside a CSS 3D scene
+          : <img className="corridor-card corridor-still" src={item.src} alt="" loading="lazy" decoding="async" />}
+      </span>
+    );
+  });
+
   return (
-    <Reveal className="clientproof" id="clients" aria-labelledby="clients-title">
-      <div className="wrap clientproof-head">
-        <p className="eyebrow">BUZZLY / PEOPLE WE BUILD WITH</p>
-        <h2 id="clients-title">Client<br /><em>Confessions</em><span> and Wins.</span></h2>
-        <p className="clientproof-lede">Every brand arrives with a before. Here is what happened next.</p>
-        {anySample && <p className="clientproof-note">Sample brands and stories, shown as placeholders until our first client stories are approved.</p>}
+    <Reveal className="clientproof corridor-section" id="clients" aria-labelledby="clients-title">
+      <div className="corridor" aria-hidden="true" style={{ ["--count" as string]: PER_WALL }}>
+        {wall("left")}
+        {wall("right")}
       </div>
-      <Marquee
-        className="storymarquee"
-        label="Client stories"
-        duration={110}
-        gap={28}
-        repeat={2}
-        items={clientWins.map(win => <StoryCard key={win.company} win={win} />)}
-      />
-      <Marquee
-        className="shiftmarquee"
-        label="Before and after, in one line"
-        reverse
-        duration={92}
-        gap={40}
-        repeat={2}
-        items={clientWins.map(win => <StoryShift key={win.company} win={win} />)}
-      />
+      <div className="corridor-head">
+        <p className="eyebrow">BUZZLY / PEOPLE WE BUILD WITH</p>
+        <h2 id="clients-title">Client <em>Confessions</em><br />and Wins.</h2>
+      </div>
+      <div className="corridor-caption">
+        <p>Every brand arrives with a before. Here is what happened next.</p>
+        <p><Link href="/clients" className="clientproof-more">Read every client story in full ↗</Link></p>
+        {anySample && <p className="corridor-note">Sample brands and stories, shown as placeholders until our first client stories are approved.</p>}
+      </div>
+      <ul className="sr-only">
+        {clientWins.map(win => (
+          <li key={win.company}>{win.company}{win.sample ? " (sample)" : ""}: {win.story.before} {win.story.move} {win.story.after}</li>
+        ))}
+      </ul>
     </Reveal>
   );
 }

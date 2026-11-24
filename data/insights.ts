@@ -11,6 +11,8 @@ export type PlaybookCategory = "Strategy" | "Content Engine" | "Distribution";
 export interface Playbook {
   slug: string;
   title: string;
+  /** Shorter title for search results (under ~50 characters before " | Buzzly"). */
+  seoTitle: string;
   subtitle: string;
   category: PlaybookCategory;
   readTime: string; // e.g. "5 min read"
@@ -25,6 +27,7 @@ export const PLAYBOOK_CATEGORIES: PlaybookCategory[] = ["Strategy", "Content Eng
 export const playbooks: Playbook[] = [
   {
     slug: "why-production-fails-without-distribution",
+    seoTitle: "Why Production Fails Without Distribution",
     title: "Why Cinema-Grade Production Fails Without a Distribution Engine",
     subtitle: "A beautiful film nobody sees is a cost, not an asset. How to plan distribution before the camera rolls, so every shoot keeps paying back.",
     category: "Strategy",
@@ -92,6 +95,7 @@ export const playbooks: Playbook[] = [
   },
   {
     slug: "engineering-the-first-three-seconds",
+    seoTitle: "How to Script the First 3 Seconds of a Reel",
     title: "Engineering the First 3 Seconds: How We Script Short-Form Video for Retention",
     subtitle: "The opening decides whether anything else in your video is seen. A practical scripting method for hooks that hold attention.",
     category: "Content Engine",
@@ -180,6 +184,7 @@ export const playbooks: Playbook[] = [
   },
   {
     slug: "turning-organic-views-into-b2b-pipeline",
+    seoTitle: "Turn Organic Views Into B2B Pipeline",
     title: "Turning Organic Views Into Inbound B2B Pipeline Without Paid Ad Bloat",
     subtitle: "Organic content can bring in qualified B2B enquiries if you design the path from view to conversation. A step-by-step approach.",
     category: "Distribution",

@@ -10,8 +10,8 @@ import { breadcrumbs, jobPosting } from "@/lib/structured-data";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/careers" },
-  title: "Careers",
-  description: "Work at Buzzly: content, social, strategy, distribution and technology roles across the brands we own and the partners we help grow. Open roles and open applications.",
+  title: "Careers at Buzzly: Content, Social and Tech",
+  description: "Work at Buzzly in content, social, strategy, distribution or technology, on the brands we own and the partners we grow. See open roles or apply.",
 };
 
 export default function Careers() {

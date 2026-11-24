@@ -4,7 +4,7 @@ import { Interior } from "@/components/Interior";
 import { companies } from "@/lib/content";
 import { InViewVideo } from "@/components/InViewVideo";
 
-export const metadata: Metadata = { alternates: { canonical: "/companies" }, title: "Our sub-companies", description: "Meet the three dedicated sub-companies Buzzly Media is building: De Food Kampney, Buzzly Health, and Buzzly Properties." };
+export const metadata: Metadata = { alternates: { canonical: "/companies" }, title: "Our Sub-Companies in Food, Health and Property", description: "Meet the three dedicated sub-companies Buzzly Media is building: De Food Kampney, Buzzly Health, and Buzzly Properties." };
 
 export default function Companies() {
   return (
@@ -24,6 +24,15 @@ export default function Companies() {
           </article>
         ))}
         <div className="company-stage-outro"><span>01 — 03 / OUR SUB-COMPANIES</span><p>Own the idea.<br /><em>Build the reach.</em></p></div>
+      </section>
+      <section className="companies-why" aria-labelledby="companies-why-title">
+        <span className="interior-eyebrow">WHY WE BUILD OUR OWN</span>
+        <h2 id="companies-why-title">Skin in the game.</h2>
+        <div className="companies-why-body">
+          <p>Buzzly builds and runs its own ventures in food, healthcare and real estate with the same engine it offers to partner brands. Strategy finds the idea. Content gives it a form people can see. Distribution helps it reach the people it is made for.</p>
+          <p>Running our own companies means every method is tried on our own brands, with our own time and budget, before we recommend it to anyone else. The three pods behind them (brand and film direction, distribution and growth strategy, and web, AI and technology) work as one team.</p>
+          <p><Link href="/about">How Buzzly works ↗</Link> <Link href="/services">What we do for partner brands ↗</Link> <Link href="/work">See the work ↗</Link></p>
+        </div>
       </section>
     </Interior>
   );

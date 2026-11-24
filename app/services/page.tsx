@@ -8,8 +8,9 @@ import { engagementTiers } from "@/lib/engagements";
 import { JsonLd } from "@/components/JsonLd";
 import { breadcrumbs, serviceCatalog } from "@/lib/structured-data";
 import { services } from "@/lib/content";
+import { playbooks } from "@/data/insights";
 
-export const metadata: Metadata = { alternates: { canonical: "/services" }, title: "Services", description: "Three engagement tiers, the tech and distribution stack behind them, and a free content engine score for your brand." };
+export const metadata: Metadata = { alternates: { canonical: "/services" }, title: "Social Media, Content & Distribution Services", description: "Strategy, short-form content, social media management and distribution in three engagement tiers, plus a free content engine score for your brand." };
 
 const steps = [
   { number: "01", title: "Find the idea.", copy: "We learn what the business wants to build, who it needs to reach, and what should make people care." },
@@ -51,6 +52,16 @@ export default function Services() {
       <section className="services-story">
         <div className="services-story-lead"><span className="interior-eyebrow">HOW IT MOVES / 01 — 05</span><h2>From the first conversation to the next chapter.</h2><p>Every brand starts with a different challenge. This is how Buzzly turns an idea into content and helps it find an audience.</p><Link href="/contact">Start a Project ↗</Link></div>
         <div className="services-steps">{steps.map(step => <article key={step.number}><span>{step.number}</span><h3>{step.title}</h3><p>{step.copy}</p></article>)}</div>
+      </section>
+
+      <section className="services-reading" aria-labelledby="services-reading-title">
+        <span className="interior-eyebrow">FURTHER READING</span>
+        <h2 id="services-reading-title">How we think about the work.</h2>
+        <ul>
+          {playbooks.map(playbook => (
+            <li key={playbook.slug}><Link href={`/insights/${playbook.slug}`}>{playbook.title} ↗</Link><p>{playbook.subtitle}</p></li>
+          ))}
+        </ul>
       </section>
 
       <TechStack />

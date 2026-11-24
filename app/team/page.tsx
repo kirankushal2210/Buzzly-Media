@@ -6,7 +6,7 @@ import { openRoles } from "@/lib/careers";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/team" },
-  title: "Team",
+  title: "Our Team: Film, Growth and Tech Under One Roof",
   description: "The people behind Buzzly: brand and film direction, distribution and growth strategy, and web, AI and technology operations under one roof.",
 };
 
@@ -21,6 +21,7 @@ export default function Team() {
       <section className="team-join">
         <p className="interior-eyebrow">BUZZLY / JOIN US</p>
         <h2>Want your name<br /><em>on this page?</em></h2>
+        <p className="team-join-about">New here? Read <Link href="/about">what Buzzly is and how we work</Link>.</p>
         <p>{roles ? `We’re hiring for ${roles} ${roles === 1 ? "role" : "roles"} right now.` : "Nothing is open right now, but we read every open application."}</p>
         <div className="team-join-actions">
           <Link className="cta" href="/careers#open-roles">{roles ? "See open roles ↗" : "See careers ↗"}</Link>

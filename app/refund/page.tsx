@@ -5,7 +5,7 @@ import { legal } from "@/lib/legal";
 
 export const metadata: Metadata = {
   title: "Refund & Cancellation Policy",
-  description: "The refund, cancellation, and engagement policies of Buzzly Media.",
+  description: "Buzzly Media’s refund and cancellation policy for retained services and custom production, what results we can and can’t promise, and how to reach us.",
   alternates: { canonical: "/refund" },
 };
 

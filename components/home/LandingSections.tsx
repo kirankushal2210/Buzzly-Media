@@ -1,3 +1,4 @@
+import Link from "@/components/Link";
 import { Reveal } from "@/components/Reveal";
 import { JsonLd } from "@/components/JsonLd";
 import { faqPage } from "@/lib/structured-data";
@@ -61,12 +62,14 @@ export function HowItWorks() {
           </li>
         ))}
       </ol>
+      <p className="landing-steps-more">The people behind every step: <Link href="/team">meet the team</Link>, or read <Link href="/about">how Buzzly works</Link>.</p>
       <a className="cta" href="#start-project">Start with Step 01 ↗</a>
     </Reveal>
   );
 }
 
 export const faqs = [
+  { question: "What kinds of businesses does Buzzly work with?", answer: "Ambitious businesses that want to grow through content. We know food and restaurants, healthcare and wellness, and real estate best, because we build and run our own companies in each of those spaces." },
   { question: "How quickly will I hear back?", answer: "We reply personally to every inquiry that comes through the form." },
   { question: "Do I need a studio or my own team?", answer: "No. We are based in Hyderabad and usually shoot on location at your business: the kitchen, clinic, site or office your customers already know. Shoots in other cities are planned as part of your scope." },
   { question: "Who approves the content?", answer: "You do. You approve every script before shoot day and every edit before it is published, with one point of contact for feedback." },
