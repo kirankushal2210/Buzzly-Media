@@ -47,7 +47,11 @@
 
 /* ---------- Interior footer additions ---------- */
 .footer-portal{opacity:.75}
-.footer-social{display:flex;flex-wrap:wrap;gap:16px}
+.footer-main nav.footer-social{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;align-items:center;gap:4px;margin:4px 0 0 -10px}
+.footer-social>a,.footer-social>span{display:inline-grid;place-items:center;width:44px;height:44px;color:var(--red);transition:color .2s,transform .2s}
+.footer-social>a:hover,.footer-social>a:focus-visible{color:var(--cream);transform:translateY(-2px)}
+.footer-social>span{cursor:default}
+.footer-social svg{width:24px;height:24px;display:block}
 
 /* ---------- Services: engagement tiers ---------- */
 .tiers,.techstack,.readiness,.leadfaq,.builders,.insights-hub,.insight-article{max-width:1500px;margin:auto;padding:clamp(80px,9vw,140px) clamp(20px,8vw,130px);box-sizing:border-box;border-top:1px solid var(--line)}

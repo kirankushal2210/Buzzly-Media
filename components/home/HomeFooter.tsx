@@ -1,7 +1,8 @@
 import Link from "@/components/Link";
 import { ClientPortalLink } from "@/components/ClientPortalLink";
 import { companies } from "@/lib/content";
-import { socialProfiles } from "@/lib/site";
+import { socialChannels } from "@/lib/site";
+import { SocialIcon } from "@/components/SocialIcon";
 
 const fanLines = Array.from({ length: 21 }, (_, i) => -400 + i * 100);
 const arcLines = [12, 47, 91, 134, 171];
@@ -43,11 +44,11 @@ export function HomeFooter({ variant = "home" }: { variant?: "home" | "interior"
           {home ? <a href="#start-project">Contact</a> : <Link href="/contact">Contact</Link>}
           <ClientPortalLink className="footer-portal">Client Portal</ClientPortalLink>
         </nav>
-        {socialProfiles.length > 0 && (
-          <nav aria-label="Buzzly channels" className="footer-social">
-            {socialProfiles.map(profile => <a key={profile.label} href={profile.href} target="_blank" rel="noopener noreferrer">{profile.label} ↗</a>)}
-          </nav>
-        )}
+        <nav aria-label="Buzzly on social media" className="footer-social">
+          {socialChannels.map(channel => channel.href
+            ? <a key={channel.label} href={channel.href} target="_blank" rel="noopener noreferrer" aria-label={`Buzzly on ${channel.label}`} title={channel.label}><SocialIcon name={channel.label} /></a>
+            : <span key={channel.label} role="img" aria-label={`${channel.label}, coming soon`} title={`${channel.label} · coming soon`}><SocialIcon name={channel.label} /></span>)}
+        </nav>
       </div>
       <div className="footer-grid-wrap"><FooterGrid /></div>
       <div className="footer-bottom wrap">

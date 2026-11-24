@@ -63,15 +63,22 @@ export const socialLinks: string[] = (process.env.NEXT_PUBLIC_SOCIAL_LINKS || ""
   .map(link => link.trim())
   .filter(link => /^https:\/\//.test(link));
 
-/** Instagram, YouTube and LinkedIn profiles from NEXT_PUBLIC_SOCIAL_LINKS; a channel is hidden until its URL is set. */
-export const socialProfiles: { label: "Instagram" | "YouTube" | "LinkedIn"; href: string }[] = ([
+export type SocialChannel = "LinkedIn" | "Instagram" | "YouTube" | "Facebook";
+
+/**
+ * The footer's social icons, in display order. Each links to its profile from
+ * NEXT_PUBLIC_SOCIAL_LINKS; until that URL is set the icon still shows,
+ * marked "coming soon", and is not a link.
+ */
+export const socialChannels: { label: SocialChannel; href: string | null }[] = ([
+  ["LinkedIn", /(^|\.)linkedin\.com$/],
   ["Instagram", /(^|\.)instagram\.com$/],
   ["YouTube", /(^|\.)(youtube\.com|youtu\.be)$/],
-  ["LinkedIn", /(^|\.)linkedin\.com$/],
-] as const).flatMap(([label, host]) => {
-  const href = socialLinks.find(link => { try { return host.test(new URL(link).hostname); } catch { return false; } });
-  return href ? [{ label, href }] : [];
-});
+  ["Facebook", /(^|\.)(facebook\.com|fb\.com)$/],
+] as const).map(([label, host]) => ({
+  label,
+  href: socialLinks.find(link => { try { return host.test(new URL(link).hostname); } catch { return false; } }) ?? null,
+}));
 
 /**
  * Public booking page for intro calls (Cal.com, Calendly, etc.) from
