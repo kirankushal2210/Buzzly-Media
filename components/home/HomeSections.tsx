@@ -47,9 +47,6 @@ export function ClientProof() {
         <h2 id="clients-title">Client <em>Confessions</em><br />and Wins.</h2>
       </div>
       <ClientCurve items={deck} />
-      <div className="curve-caption">
-        <p>Every brand arrives with a before. Here is what happened next.</p>
-      </div>
       <ul className="sr-only">
         {clientWins.map(win => (
           <li key={win.company}>{win.company}{win.sample ? " (sample)" : ""}: {win.story.before} {win.story.move} {win.story.after}</li>
