@@ -8,8 +8,8 @@ import { money, number } from "@/components/crm/format";
 
 /**
  * Performance marketing by channel: paid search, paid social, tracked
- * influencers, lead generation, marketplace ads and email. Each card shows
- * that channel's real totals; picking one narrows the campaign list to it
+ * influencers, lead generation, marketplace ads and email. Each channel shows
+ * its totals from logged campaigns; picking one narrows the campaign list to it
  * and pre-fills new campaigns with the channel.
  */
 const num = (v: unknown) => (typeof v === "number" ? v : Number(v) || 0);
@@ -57,12 +57,12 @@ export function PerformanceHub() {
       </div>
 
       <div className="pm-channels">
-        {AD_CHANNELS.map((c, i) => {
+        {AD_CHANNELS.map(c => {
           const t = totals((campaigns ?? []).filter(x => x.data.channel === c.name));
           return (
             <button key={c.name} type="button" className="pm-channel" aria-pressed={channel === c.name} onClick={() => pick(channel === c.name ? "" : c.name)}>
-              <span className="pm-channel-head"><i>{i + 1}</i><strong>{c.name}</strong>{t.alerts > 0 && <em>{t.alerts} over target</em>}</span>
-              <span className="pm-channel-sub">{c.short} · {c.types.join(" · ")}</span>
+              <span className="pm-channel-head"><strong>{c.name}</strong>{t.alerts > 0 && <em>{t.alerts} over target</em>}</span>
+              <span className="pm-channel-sub">{c.short}: {c.types.join(", ")}</span>
               <span className="pm-channel-platforms">{c.platforms.join(", ")}</span>
               <span className="pm-channel-stats">
                 <span><b>{number(t.live)}</b> live</span>

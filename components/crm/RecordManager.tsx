@@ -275,12 +275,12 @@ export function RecordManager({ entityKey, board = false, where, title }: {
             const step = stageSteps.indexOf(column);
             return (
               <div key={column} className="crm-board-col">
-                <h3><span className={`crm-tag is-${statusTone(column)}`}>{column}</span> <small>{cards.length}{total ? ` · ${money(total)}` : ""}</small></h3>
+                <h3><span className={`crm-tag is-${statusTone(column)}`}>{column}</span> <small>{cards.length}{total ? `, ${money(total)}` : ""}</small></h3>
                 {cards.map(card => (
                   <article key={card.id} className="crm-card">
                     <button type="button" className="crm-card-open" onClick={() => open(card)}>
                       <strong>{String(card.data[entity.titleField] ?? "")}</strong>
-                      <span>{[card.data.company, card.data.value !== undefined ? money(card.data.value) : "", card.data.expectedClose ? `close ${date(card.data.expectedClose)}` : ""].filter(Boolean).join(" · ")}</span>
+                      <span>{[card.data.company, card.data.value !== undefined ? money(card.data.value) : "", card.data.expectedClose ? `close ${date(card.data.expectedClose)}` : ""].filter(Boolean).join(", ")}</span>
                     </button>
                     {step >= 0 && (
                       <span className="crm-progress" role="img" aria-label={`Stage ${step + 1} of ${stageSteps.length}`}>

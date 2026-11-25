@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AlertTriangle, Copy, ExternalLink, Globe, MapPin, Phone, Send } from "lucide-react";
+import { AlertTriangle, Copy, Globe, MapPin, Phone, Send } from "lucide-react";
 import type { CrmRecord } from "@/lib/crm-config";
 import { callScript, callingWindow, gapsList } from "@/lib/outreach";
 import { dateTime } from "@/components/crm/format";
@@ -84,7 +84,7 @@ export function CallCopilot() {
     if (!current) return;
     setBusy(true);
     const stamp = new Date().toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
-    const line = `${stamp} · ${outcome}${notes.trim() ? `: ${notes.trim()}` : ""}${caller.trim() ? ` (${caller.trim()})` : ""}`;
+    const line = `${stamp}, ${outcome}${notes.trim() ? `: ${notes.trim()}` : ""}${caller.trim() ? ` (${caller.trim()})` : ""}`;
     const data: Record<string, string | number> = {
       ...current.data,
       callStatus: outcome,
@@ -141,7 +141,7 @@ export function CallCopilot() {
     <div className="cc">
       <aside className="cc-queue crm-section" aria-label="Call queue">
         <h2>Up next</h2>
-        <p className="crm-muted">{queue.length} to call · not called, no answer or call back</p>
+        <p className="crm-muted">{queue.length} to call: not called, no answer or call back</p>
         <label className="cc-caller"><span>You are calling as</span>
           <input value={caller} placeholder="Your name" onChange={e => { setCaller(e.target.value); try { localStorage.setItem(CALLER_KEY, e.target.value); } catch { /* storage unavailable */ } }} />
         </label>
@@ -150,7 +150,7 @@ export function CallCopilot() {
             <li key={p.id}>
               <button type="button" aria-current={current?.id === p.id ? "true" : undefined} onClick={() => { setSelected(p.id); setNotes(""); }}>
                 <strong>{String(p.data.business)}</strong>
-                <span>{[p.data.area, p.data.callStatus, p.data.nextCall ? `due ${dateTime(p.data.nextCall)}` : "", p.data.attempts ? `${p.data.attempts} tries` : ""].filter(Boolean).join(" · ")}</span>
+                <span>{[p.data.area, p.data.callStatus, p.data.nextCall ? `due ${dateTime(p.data.nextCall)}` : "", p.data.attempts ? `${p.data.attempts} tries` : ""].filter(Boolean).join(", ")}</span>
               </button>
             </li>
           ))}
@@ -169,22 +169,22 @@ export function CallCopilot() {
             <div className="cc-head">
               <div>
                 <h2>{String(current.data.business)}</h2>
-                <p className="crm-muted">{[current.data.category, current.data.area, current.data.contactName ? `ask for ${current.data.contactName}` : ""].filter(Boolean).join(" · ")}</p>
+                <p className="crm-muted">{[current.data.category, current.data.area, current.data.contactName ? `ask for ${current.data.contactName}` : ""].filter(Boolean).join(", ")}</p>
               </div>
               <div className="cc-links">
                 {current.data.phone && <a className="crm-btn is-primary" href={`tel:${String(current.data.phone).replace(/\s+/g, "")}`}><Phone aria-hidden="true" />{String(current.data.phone)}</a>}
                 {current.data.website && <a className="crm-btn is-icon" href={String(current.data.website)} target="_blank" rel="noopener noreferrer" aria-label="Website"><Globe aria-hidden="true" /></a>}
-                {current.data.instagram && <a className="crm-btn is-icon" href={String(current.data.instagram)} target="_blank" rel="noopener noreferrer" aria-label="Instagram"><ExternalLink aria-hidden="true" /></a>}
+                {current.data.instagram && <a className="crm-btn" href={String(current.data.instagram)} target="_blank" rel="noopener noreferrer">Instagram</a>}
                 {current.data.mapsLink && <a className="crm-btn is-icon" href={String(current.data.mapsLink)} target="_blank" rel="noopener noreferrer" aria-label="Google Maps"><MapPin aria-hidden="true" /></a>}
               </div>
             </div>
 
             <div className="cc-preview">
-              <span>Brand preview · <b>{String(current.data.previewStatus)}</b>{current.data.previewViewedAt ? ` · opened ${dateTime(current.data.previewViewedAt)}` : ""}</span>
+              <span>Brand preview: <b>{String(current.data.previewStatus)}</b>{current.data.previewViewedAt ? `, opened ${dateTime(current.data.previewViewedAt)}` : ""}</span>
               {previewReady ? (
                 <span className="cc-preview-actions">
                   <button type="button" className="crm-btn is-small" onClick={() => navigator.clipboard?.writeText(previewUrl).then(() => setFlash("Preview link copied"))}><Copy aria-hidden="true" />Copy link</button>
-                  <a className="crm-btn is-small" href={`/p/${current.id}`} target="_blank" rel="noopener noreferrer"><ExternalLink aria-hidden="true" />Open</a>
+                  <a className="crm-btn is-small" href={`/p/${current.id}`} target="_blank" rel="noopener noreferrer">Open preview</a>
                   {current.data.previewStatus === "Ready" && <button type="button" className="crm-btn is-small" onClick={markSent}><Send aria-hidden="true" />Mark sent</button>}
                 </span>
               ) : <span className="crm-muted">Fill in “What we noticed” and set Preview to Ready to create their page</span>}

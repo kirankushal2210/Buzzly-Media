@@ -1,11 +1,11 @@
 import { HomeHeader, Hero, Splash } from "@/components/HomeIntro";
 import { PhoneReelStory } from "@/components/home/PhoneReelStory";
 import { EcosystemSection } from "@/components/home/EcosystemSection";
-import { ClientProof, ContentLine } from "@/components/home/HomeSections";
+import { ClientProof } from "@/components/home/HomeSections";
 import { ServiceBillboard } from "@/components/home/ApproachSections";
 import { HomeFooter } from "@/components/home/HomeFooter";
 import { HomeContact } from "@/components/home/HomeContact";
-import { HowItWorks, LandingFaq, ProblemSection } from "@/components/home/LandingSections";
+import { HowItWorks, LandingFaq } from "@/components/home/LandingSections";
 
 export const metadata = {
   alternates: { canonical: "/" },
@@ -15,7 +15,7 @@ export const metadata = {
 
 /**
  * Brand landing page, in conversion order: hero (result without the fear) →
- * visuals and client results → problem → solution and features → how it works
+ * visuals and client results → solution and features → how it works
  * → FAQ → final call to action. Every CTA scrolls to the in-page form (#start-project).
  */
 export default function Home() {
@@ -28,9 +28,7 @@ export default function Home() {
           <Hero />
           <PhoneReelStory />
           <ClientProof />
-          <ProblemSection />
           <ServiceBillboard />
-          <ContentLine />
           <EcosystemSection />
           <HowItWorks />
           <LandingFaq />

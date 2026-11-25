@@ -18,7 +18,7 @@ export default async function AdminLogin() {
     >
       {adminConfigured()
         ? <LoginForm />
-        : <p className="crm-note">Admin sign-in isn’t set up yet. Add an <code>ADMIN_PASSWORD</code> of at least 12 characters in Vercel → Settings → Environment Variables, then redeploy.</p>}
+        : <p className="crm-note">Admin sign-in isn’t set up yet. Add an <code>ADMIN_PASSWORD</code> of at least 12 characters in Vercel, under Settings then Environment Variables, and redeploy.</p>}
     </BuzzlySignIn>
   );
 }

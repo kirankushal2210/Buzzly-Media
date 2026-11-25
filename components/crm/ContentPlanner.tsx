@@ -1,8 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
-import { Check, ChevronLeft, ChevronRight, Plus, Trash2, X } from "lucide-react";
-import { Emoji, TYPE_EMOJI } from "@/components/crm/emoji";
+import { Check, CircleDashed, Clapperboard, Image as ImageIcon, Plus, Trash2, X, type LucideIcon } from "lucide-react";
 import Link from "@/components/Link";
 import { CONTENT_PLATFORMS, CONTENT_STAGES, CONTENT_TYPES, type CrmRecord } from "@/lib/crm-config";
 import {
@@ -34,18 +33,25 @@ function Ring({ p }: { p: TypeProgress }) {
   );
 }
 
+/** One line icon per content type, drawn in that type's colour. */
+const TYPE_ICON: Record<string, LucideIcon> = { Reel: Clapperboard, Story: CircleDashed, Post: ImageIcon };
+function TypeIcon({ type }: { type: string }) {
+  const Icon = TYPE_ICON[type] ?? CircleDashed;
+  return <Icon aria-hidden="true" />;
+}
+
 function PromiseCard({ p, onPlan, busy }: { p: TypeProgress; onPlan?: () => void; busy?: boolean }) {
   return (
     <span className={`cp-promise ${TYPE_TONE[p.type]}`}>
       <span className="cp-ring-wrap">
         <Ring p={p} />
-        <span className="cp-ring-label"><Emoji name={TYPE_EMOJI[p.type]} /></span>
+        <span className="cp-ring-label"><TypeIcon type={p.type} /></span>
       </span>
       <span className="cp-promise-text">
         <strong>{p.posted}<small>/{p.promised || "—"}</small></strong>
         <span>{PLURAL[p.type]} posted</span>
         <small className="cp-sub">
-          {p.promised === 0 ? "No promise set" : `${p.planned} planned${p.behind ? ` · ${p.behind} behind` : ""}`}
+          {p.promised === 0 ? "No promise set" : `${p.planned} planned${p.behind ? `, ${p.behind} behind` : ""}`}
         </small>
         {onPlan && p.unplanned > 0 && (
           <button type="button" className="crm-btn is-small" onClick={onPlan} disabled={busy}>
@@ -115,7 +121,7 @@ export function ContentPlanner() {
       method: id ? "PATCH" : "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(data),
     });
     const body = await res.json().catch(() => ({})) as { record?: CrmRecord; error?: string; fields?: Record<string, string[]> };
-    if (!res.ok || !body.record) throw new Error(body.fields ? Object.entries(body.fields).map(([k, v]) => `${k}: ${v[0]}`).join(" · ") : body.error || "Couldn’t save.");
+    if (!res.ok || !body.record) throw new Error(body.fields ? Object.entries(body.fields).map(([k, v]) => `${k}: ${v[0]}`).join("; ") : body.error || "Couldn’t save.");
     const saved = body.record;
     setPieces(list => (id ? list.map(p => (p.id === id ? saved : p)) : [...list, saved]));
     return saved;
@@ -204,8 +210,8 @@ export function ContentPlanner() {
       <section className="crm-panel cp-today" aria-labelledby="cp-today">
         <div className="cp-head">
           <div>
-            <p className="cp-kicker">{nice(today, { weekday: "long", day: "numeric", month: "long" })}</p>
             <h2 id="cp-today">{client ? `Today for ${str(client.data.name)}` : "Today across clients"}</h2>
+            <p className="crm-muted">{nice(today, { weekday: "long", day: "numeric", month: "long" })}</p>
           </div>
           <button type="button" className="crm-btn is-primary" onClick={() => openNew()}><Plus aria-hidden="true" />Add content</button>
         </div>
@@ -224,10 +230,10 @@ export function ContentPlanner() {
                         aria-label={`Done: ${t.action} for ${str(t.piece.data.title)}. Move to the next stage.`} title="Done, move to the next stage">
                         <Check aria-hidden="true" />
                       </button>
-                      <span className={`cp-type ${TYPE_TONE[type]}`}><Emoji name={TYPE_EMOJI[type] ?? "pin"} />{type}</span>
+                      <span className={`cp-type ${TYPE_TONE[type]}`}><TypeIcon type={type} />{type}</span>
                       <button type="button" className="cp-task-text" onClick={() => openPiece(t.piece)}>
                         <strong>{t.action}</strong>
-                        <small>{str(t.piece.data.title)} · posts {nice(str(t.piece.data.postDate))} · now: {str(t.piece.data.stage)}</small>
+                        <small>{str(t.piece.data.title)}, posts {nice(str(t.piece.data.postDate))}, now at {str(t.piece.data.stage).toLowerCase()}</small>
                       </button>
                       {t.overdue && <span className="cp-late">{late} {late === 1 ? "day" : "days"} late</span>}
                     </li>
@@ -264,7 +270,7 @@ export function ContentPlanner() {
                   return (
                     <button key={p.id} type="button" className={`cp-up-card ${TYPE_TONE[type]}${p.data.stage === "Posted" ? " is-done" : ""}${task?.overdue ? " is-late" : ""}`} onClick={() => openPiece(p)}>
                       {!client && <span className="cp-up-client">{nameOf(str(p.data.clientId))}</span>}
-                      <span className="cp-up-title"><Emoji name={TYPE_EMOJI[type] ?? "pin"} />{str(p.data.title)}</span>
+                      <span className="cp-up-title"><TypeIcon type={type} />{str(p.data.title)}</span>
                       <span className="cp-up-stage">{str(p.data.stage)}</span>
                       {task && <span className="cp-up-next">{task.overdue ? "Late: " : "Next: "}{task.action.toLowerCase()}{task.due > today ? ` by ${nice(task.due)}` : ""}</span>}
                     </button>
@@ -292,7 +298,7 @@ export function ContentPlanner() {
                   </span>
                 </span>
                 <span className="cp-card-rings">{progress.map(p => <PromiseCard key={p.type} p={p} />)}</span>
-                <span className="cp-card-foot">{taskCount(c.id)} due today · open plan <ChevronRight aria-hidden="true" /></span>
+                <span className="cp-card-foot">{taskCount(c.id)} due today</span>
               </button>
             );
           })}
@@ -319,9 +325,9 @@ export function ContentPlanner() {
             <div className="cp-head">
               <h2 id="cp-cal">Content calendar{client ? "" : ": all clients"}</h2>
               <div className="cp-month">
-                <button type="button" className="crm-btn is-icon" aria-label="Previous month" onClick={() => shiftMonth(-1)}><ChevronLeft aria-hidden="true" /></button>
+                <button type="button" className="crm-btn is-small" aria-label="Previous month" onClick={() => shiftMonth(-1)}>Previous</button>
                 <span>{nice(`${month}-01`, { month: "long", year: "numeric" })}</span>
-                <button type="button" className="crm-btn is-icon" aria-label="Next month" onClick={() => shiftMonth(1)}><ChevronRight aria-hidden="true" /></button>
+                <button type="button" className="crm-btn is-small" aria-label="Next month" onClick={() => shiftMonth(1)}>Next</button>
               </div>
             </div>
             <div className="cp-legend">{CONTENT_TYPES.map(t => <span key={t} className={TYPE_TONE[t]}><i />{PLURAL[t]}</span>)}<span className="is-done"><i />Posted</span></div>
@@ -338,7 +344,7 @@ export function ContentPlanner() {
                         <button key={p.id} type="button" onClick={() => openPiece(p)}
                           className={`cp-chip ${TYPE_TONE[type]}${p.data.stage === "Posted" ? " is-done" : ""}${task?.overdue ? " is-late" : ""}`}
                           title={`${client ? "" : `${nameOf(str(p.data.clientId))}: `}${type}: ${str(p.data.title)} (${str(p.data.stage)})`}>
-                          {p.data.stage === "Posted" && <Check aria-hidden="true" />}{client ? "" : `${nameOf(str(p.data.clientId))} · `}{str(p.data.title)}
+                          {p.data.stage === "Posted" && <Check aria-hidden="true" />}{client ? "" : `${nameOf(str(p.data.clientId))}: `}{str(p.data.title)}
                         </button>
                       );
                     })}

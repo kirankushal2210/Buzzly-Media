@@ -454,60 +454,53 @@
 @media(max-width:900px){.bp-ideas{grid-template-columns:1fr}}
 
 /* ==========================================================================
-   Client Confessions and Wins: a corridor of cards (HomeSections ClientProof)
-   Two walls of cards leave a vanishing point in the centre and travel out past
-   the viewer, on a loop. The headline sits above the corridor, the caption below.
+   Client Confessions and Wins: a curved carousel (HomeSections ClientProof +
+   components/home/ClientCurve.tsx). Cards ride the inside of a cylinder from
+   right to left: tall at the edges, flat in the centre, fading out at both
+   sides. Headline above, caption below, in normal flow.
    ========================================================================== */
-.clientproof.corridor-section{position:relative;padding:0;height:clamp(640px,82vh,780px);overflow:hidden;background:var(--bg);isolation:isolate}
-.corridor{--w:240px;--h:330px;--x:430px;--angle:66deg;--far:-4600px;--near:260px;--dur:46s;
-  position:absolute;inset:0;perspective:760px;perspective-origin:50% 54%;transform-style:preserve-3d;pointer-events:none}
-.corridor-slot{position:absolute;left:50%;top:54%;width:var(--w);height:var(--h);margin:calc(var(--h) / -2) 0 0 calc(var(--w) / -2);
-  transform-style:preserve-3d;will-change:transform,opacity;
-  animation:corridor-fly var(--dur) linear infinite;animation-delay:calc(var(--slot) * var(--dur) / (var(--count) * -1))}
-.corridor-slot.is-left{--side:-1;--turn:var(--angle)}
-.corridor-slot.is-right{--side:1;--turn:calc(var(--angle) * -1)}
-@keyframes corridor-fly{
-  0%{transform:translate3d(calc(var(--x) * var(--side)),0,var(--far)) rotateY(var(--turn));opacity:0}
-  12%{opacity:1}
-  100%{transform:translate3d(calc(var(--x) * var(--side)),0,var(--near)) rotateY(var(--turn));opacity:1}
-}
-.corridor-card{display:block;width:100%;height:100%;border-radius:14px;overflow:hidden;box-shadow:0 18px 40px rgb(20 12 8 / 22%)}
-.corridor-still{object-fit:cover;background:#1d1a19}
+.clientproof.curve-section{position:relative;padding:96px 0 80px;overflow:hidden;background:var(--bg)}
+.curve-head,.curve-caption{width:min(640px,calc(100% - 32px));margin:0 auto;text-align:center}
+.curve-head .eyebrow{margin:0 0 10px}
+.curve-head h2{margin:0;font:400 clamp(44px,5.4vw,72px)/.95 'Instrument Serif',serif;letter-spacing:-.03em;color:var(--cream)}
+.curve-caption{display:grid;gap:6px}
+.curve-caption p{margin:0;color:var(--soft);font-size:15px;line-height:1.5}
+.curve-caption .corridor-note{font-size:13px;color:var(--muted,var(--soft))}
 
-/* confession cards: a client's before → after, in Buzzly colours */
-.corridor-confession{display:flex;flex-direction:column;justify-content:space-between;padding:20px 18px;color:#f5efdf;font-family:'DM Sans',sans-serif}
+.curve{--curve-w:400px;--curve-h:256px;position:relative;height:calc(var(--curve-h) * 1.6);margin:12px 0 8px;
+  perspective:600px;perspective-origin:50% 50%;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 13%,#000 87%,transparent 100%);
+          mask-image:linear-gradient(90deg,transparent 0,#000 13%,#000 87%,transparent 100%)}
+.curve-ring{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d}
+.curve-slot{position:absolute;left:calc(var(--curve-w) / -2);top:calc(var(--curve-h) / -2);width:var(--curve-w);height:var(--curve-h);
+  backface-visibility:hidden;will-change:transform}
+.curve-slot .corridor-card{border-radius:16px;box-shadow:none}
+
+/* the same card designs as before, laid out landscape */
+.corridor-card{display:block;width:100%;height:100%;border-radius:14px;overflow:hidden}
+.corridor-still{object-fit:cover;background:#1d1a19}
+.corridor-confession{display:flex;flex-direction:column;justify-content:space-between;padding:22px 24px;color:#f5efdf;font-family:'DM Sans',sans-serif}
 .corridor-confession.tone-0{background:radial-gradient(ellipse at 20% 0%,#ef5a44,transparent 70%),linear-gradient(160deg,#c8261e,#5c120e)}
 .corridor-confession.tone-1{background:radial-gradient(ellipse at 80% 10%,#3a3431,transparent 70%),linear-gradient(160deg,#1d1a19,#0b0a0a)}
 .corridor-confession.tone-2{background:radial-gradient(ellipse at 20% 100%,#e9a23b,transparent 65%),linear-gradient(160deg,#f5efdf,#e6d6b8);color:#171414}
 .corridor-confession.tone-3{background:radial-gradient(ellipse at 70% 0%,#ef342d,transparent 60%),linear-gradient(160deg,#2b1412,#120807)}
 .corridor-field{font:600 11px/1.3 'DM Sans',sans-serif;letter-spacing:.12em;text-transform:uppercase;opacity:.75}
-.corridor-shift{display:grid;gap:8px}
-.corridor-shift s{font:400 17px/1.2 'DM Sans',sans-serif;opacity:.6;text-decoration-color:currentColor}
-.corridor-shift em{font:italic 400 30px/1.02 'Instrument Serif',serif;letter-spacing:-.01em}
+.corridor-shift{display:grid;gap:6px}
+.corridor-shift s{font:400 16px/1.2 'DM Sans',sans-serif;opacity:.6;text-decoration-color:currentColor}
+.corridor-shift em{font:italic 400 34px/1.02 'Instrument Serif',serif;letter-spacing:-.01em}
 .corridor-company{font:600 13px/1.3 'DM Sans',sans-serif}
 .corridor-company i{font-style:normal;opacity:.7}
 
-/* headline above, caption below; both sit over the clear centre of the corridor */
-.corridor-head,.corridor-caption{position:absolute;left:50%;transform:translateX(-50%);z-index:2;width:min(640px,calc(100% - 32px));text-align:center}
-.corridor-head{top:56px}
-.corridor-head .eyebrow{margin:0 0 10px}
-.corridor-head h2{margin:0;font:400 clamp(44px,5.4vw,72px)/.95 'Instrument Serif',serif;letter-spacing:-.03em;color:var(--cream)}
-.corridor-caption{bottom:52px;display:grid;gap:6px}
-.corridor-caption p{margin:0;color:var(--soft);font-size:15px;line-height:1.5}
-.corridor-caption .corridor-note{font-size:13px;color:var(--muted,var(--soft))}
-
 @media (max-width:900px){
-  .clientproof.corridor-section{height:600px}
-  .corridor{--w:140px;--h:190px;--x:190px;--angle:64deg;--far:-3800px;--near:200px;perspective:520px}
-  .corridor-confession{padding:12px 10px;border-radius:10px}
+  .clientproof.curve-section{padding:72px 0 60px}
+  .curve-caption p{font-size:14px}
+  .corridor-confession{padding:12px 14px}
   .corridor-field{font-size:8px}
   .corridor-shift s{font-size:10px}
-  .corridor-shift em{font-size:17px}
+  .corridor-shift em{font-size:18px}
   .corridor-company{font-size:9px}
-  .corridor-head{top:44px}
-  .corridor-caption{bottom:36px}
-  .corridor-caption p{font-size:14px}
 }
-@media (prefers-reduced-motion:reduce){
-  .corridor-slot{animation-play-state:paused}
-}
+
+/* hover / tap: the focused card comes forward with a soft shadow */
+.curve-slot .corridor-card{transition:box-shadow .3s ease}
+.curve-slot.is-focus .corridor-card{box-shadow:0 24px 60px rgb(20 12 8 / 35%),0 0 0 2px var(--red)}

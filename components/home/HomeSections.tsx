@@ -1,6 +1,7 @@
-import Link from "@/components/Link";
 import { Reveal } from "@/components/Reveal";
 import { clientWins, type ClientWin } from "@/lib/clients";
+import { ClientCurve } from "@/components/home/ClientCurve";
+import type { ReactNode } from "react";
 
 /** One client's before → after as a card for the corridor walls. */
 function ConfessionCard({ win, tone }: { win: ClientWin; tone: number }) {
@@ -23,48 +24,31 @@ const STILLS = [
   "/media/reel/post-phone.jpg",
   "/media/reel/edit-desk.jpg",
 ];
-const PER_WALL = 14;
-
 /**
- * Client Confessions and Wins as a corridor: two walls of cards (client
- * before → after stories and real production stills) flowing out of a
- * vanishing point towards the viewer, with the headline above and the
- * caption below. Pure CSS 3D (app/growth.css, .corridor-*); paused for
- * reduced motion. Stories stay in the page text for screen readers and search.
+ * Client Confessions and Wins as a curved carousel: client before → after
+ * story cards and real production stills curve in from the right edge,
+ * flatten out in the centre and fade away round the left, with the headline
+ * above and the caption below (components/home/ClientCurve.tsx).
+ * Stories stay in the page text for screen readers and search.
  */
 export function ClientProof() {
-  const anySample = clientWins.some(win => win.sample);
-  const deck = Array.from({ length: PER_WALL }, (_, i) => i % 2 === 0
-    ? { kind: "story" as const, win: clientWins[(i / 2) % clientWins.length], tone: (i / 2) % 4 }
-    : { kind: "still" as const, src: STILLS[((i - 1) / 2) % STILLS.length] });
-  const wall = (side: "left" | "right") => deck.map((card, i) => {
-    // the right wall runs half a step behind the left, with the deck turned around
-    const item = side === "left" ? card : deck[(PER_WALL - 1 - i + 3) % PER_WALL];
-    const slot = side === "left" ? i : i + 0.5;
-    return (
-      <span key={`${side}-${i}`} className={`corridor-slot is-${side}`} style={{ ["--slot" as string]: slot }}>
-        {item.kind === "story"
-          ? <ConfessionCard win={item.win} tone={item.tone} />
-          // eslint-disable-next-line @next/next/no-img-element -- decorative stills inside a CSS 3D scene
-          : <img className="corridor-card corridor-still" src={item.src} alt="" loading="lazy" decoding="async" />}
-      </span>
-    );
-  });
+  // every story and every still once, alternating while both last
+  const deck: ReactNode[] = [];
+  for (let i = 0; i < Math.max(clientWins.length, STILLS.length); i++) {
+    if (i < clientWins.length) deck.push(<ConfessionCard key={`s${i}`} win={clientWins[i]} tone={i % 4} />);
+    // eslint-disable-next-line @next/next/no-img-element -- decorative stills inside a CSS 3D scene
+    if (i < STILLS.length) deck.push(<img key={`p${i}`} className="corridor-card corridor-still" src={STILLS[i]} alt="" loading="lazy" decoding="async" />);
+  }
 
   return (
-    <Reveal className="clientproof corridor-section" id="clients" aria-labelledby="clients-title">
-      <div className="corridor" aria-hidden="true" style={{ ["--count" as string]: PER_WALL }}>
-        {wall("left")}
-        {wall("right")}
-      </div>
-      <div className="corridor-head">
+    <Reveal className="clientproof curve-section" id="clients" aria-labelledby="clients-title">
+      <div className="curve-head">
         <p className="eyebrow">BUZZLY / PEOPLE WE BUILD WITH</p>
         <h2 id="clients-title">Client <em>Confessions</em><br />and Wins.</h2>
       </div>
-      <div className="corridor-caption">
+      <ClientCurve items={deck} />
+      <div className="curve-caption">
         <p>Every brand arrives with a before. Here is what happened next.</p>
-        <p><Link href="/clients" className="clientproof-more">Read every client story in full ↗</Link></p>
-        {anySample && <p className="corridor-note">Sample brands and stories, shown as placeholders until our first client stories are approved.</p>}
       </div>
       <ul className="sr-only">
         {clientWins.map(win => (

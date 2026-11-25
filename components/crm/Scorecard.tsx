@@ -7,7 +7,7 @@ import { Download } from "lucide-react";
 
 const delta = (value: number | null) =>
   value === null ? <span className="crm-muted">—</span>
-    : <span className={value > 0 ? "crm-up" : value < 0 ? "crm-down" : "crm-muted"}>{value > 0 ? "▲" : value < 0 ? "▼" : "•"} {percent(Math.abs(value))}</span>;
+    : <span className={value > 0 ? "crm-up" : value < 0 ? "crm-down" : "crm-muted"}>{value > 0 ? "+" : value < 0 ? "−" : ""}{percent(Math.abs(value))}</span>;
 
 /** Last 8 weeks side by side, the week-on-week change, and a CSV export. */
 export function Scorecard() {

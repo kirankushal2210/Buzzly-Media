@@ -1,11 +1,11 @@
 /**
- * 3D icon images for the CRM's icon tiles (stat cards, quick actions, activity,
- * search results, content types). Images: Microsoft Fluent Emoji 3D (MIT),
- * stored in public/admin/icons. Navigation and toolbar controls keep line icons.
+ * 3D icon images that tell record types apart in the activity feed, the page
+ * search and notifications. Images: Microsoft Fluent Emoji 3D (MIT), stored in
+ * public/admin/icons. Navigation, toolbar and content types use line icons.
  */
 export type IconName =
   | "money" | "handshake" | "lead" | "phone" | "client" | "target" | "outreach" | "creator" | "chart" | "test"
-  | "search" | "experiment" | "robot" | "calendar" | "reel" | "story" | "post" | "planner" | "home" | "bell" | "pin";
+  | "search" | "experiment" | "robot" | "calendar" | "reel" | "post" | "planner" | "home" | "bell" | "pin";
 
 export function Emoji({ name }: { name: IconName }) {
   // Decorative: the text next to each tile already says what it is.
@@ -25,5 +25,3 @@ export const PAGE_EMOJI: Record<string, IconName> = {
   "/admin/calling": "phone", "/admin/outreach": "outreach", "/admin/performance": "chart", "/admin/research": "experiment", "/admin/seo": "search",
   "/admin/ai-visibility": "robot", "/admin/scorecard": "calendar",
 };
-
-export const TYPE_EMOJI: Record<string, IconName> = { Reel: "reel", Story: "story", Post: "post" };

@@ -1,93 +1,61 @@
 /* ==========================================================================
-   Cinematic sign-in (components/ui/buzzly-sign-in.tsx)
-   A spotlight on a floating key that carries the Buzzly mark; the form sits
-   in the key's shadow. Dark by default, a daylight version in light mode.
+   Sign-in (components/ui/buzzly-sign-in.tsx)
+   The Buzzly key lit from the upper left, with a contact shadow on the floor
+   under it, then the form. The key tilts toward the pointer and a band of
+   light crosses it; nothing else on the page moves.
    ========================================================================== */
 .bsi{
   --lx:0; --ly:0;
-  --bsi-bg:#000; --bsi-floor-1:#35373c; --bsi-floor-2:#1d1e22; --bsi-floor-3:#0b0b0d;
-  --bsi-beam:255,255,255; --bsi-dust:255,255,255; --bsi-ring:rgba(255,255,255,.35);
-  --bsi-shadow-1:rgba(0,0,0,.97); --bsi-shadow-2:rgba(0,0,0,.93); --bsi-shadow-3:rgba(0,0,0,.78);
-  --bsi-ink:#f5efdf; --bsi-soft:#a39a8c; --bsi-field:rgba(0,0,0,.45); --bsi-field-line:#3a3631;
-  --bsi-vig:rgba(0,0,0,.75); --bsi-grain:.07;
-  position:relative; overflow:hidden; min-height:max(100vh,860px); background:var(--bsi-bg); color:var(--bsi-ink);
-  font-family:'DM Sans',sans-serif; isolation:isolate;
+  --bsi-bg:#0e0e0f; --bsi-ink:#f2f2f2; --bsi-soft:#a3a3a3;
+  --bsi-field:#171717; --bsi-field-line:#363636; --bsi-contact:rgb(0 0 0 / 75%);
+  min-height:100vh; display:flex; flex-direction:column;
+  background:var(--bsi-bg); color:var(--bsi-ink); font-family:'DM Sans',sans-serif;
 }
 :root[data-theme="light"] .bsi{
-  --bsi-bg:#efe7d6; --bsi-floor-1:#fffdf7; --bsi-floor-2:#f7f0e2; --bsi-floor-3:#ebe2cf;
-  --bsi-beam:255,250,235; --bsi-dust:120,96,60; --bsi-ring:rgba(23,20,20,.22);
-  --bsi-shadow-1:rgba(239,231,214,.97); --bsi-shadow-2:rgba(239,231,214,.9); --bsi-shadow-3:rgba(239,231,214,.6);
-  --bsi-ink:#171414; --bsi-soft:#5e5750; --bsi-field:rgba(255,252,245,.85); --bsi-field-line:#c9bea9;
-  --bsi-vig:rgba(120,100,70,.28); --bsi-grain:.05;
+  --bsi-bg:#f5f5f5; --bsi-ink:#171717; --bsi-soft:#5c5c5c;
+  --bsi-field:#fff; --bsi-field-line:#cfcfcf; --bsi-contact:rgb(0 0 0 / 28%);
 }
-.bsi-floor{position:absolute;inset:0;background:radial-gradient(ellipse 36% 56% at calc(50% + var(--lx) * 7%) 46%,var(--bsi-floor-1) 0%,var(--bsi-floor-2) 36%,var(--bsi-floor-3) 64%,var(--bsi-bg) 84%);animation:bsi-fade 1.2s ease-out both}
-.bsi-beam{position:absolute;left:50%;top:-200px;width:600px;height:520px;margin-left:-300px;transform-origin:50% 100%;transform:rotate(calc(var(--lx) * 12deg));filter:blur(26px);mix-blend-mode:screen;animation:bsi-fade 1.6s .1s ease-out both;pointer-events:none}
-:root[data-theme="light"] .bsi-beam{mix-blend-mode:normal;opacity:.7}
-.bsi-beam i{position:absolute;inset:0;background:linear-gradient(rgba(var(--bsi-beam),.2),rgba(var(--bsi-beam),.07) 70%,rgba(var(--bsi-beam),0));clip-path:polygon(42% 0,58% 0,100% 100%,0 100%)}
-.bsi-rings{position:absolute;left:50%;top:338px;width:0;height:0;pointer-events:none}
-.bsi-rings i{position:absolute;left:-140px;top:-24px;width:280px;height:48px;border-radius:50%;border:.7px solid var(--bsi-ring);opacity:0;animation:bsi-ring 6s cubic-bezier(.15,.6,.3,1) infinite}
-.bsi-rings i:nth-child(2){animation-delay:2s}
-.bsi-rings i:nth-child(3){animation-delay:4s}
-.bsi-dust{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.bsi-shadow{position:absolute;left:50%;top:300px;width:460px;height:760px;margin-left:-230px;transform-origin:50% 0;transform:skewX(calc(var(--lx) * -7deg));filter:blur(14px);animation:bsi-fade .8s .25s ease-out both;pointer-events:none}
-.bsi-shadow i{position:absolute;inset:0;background:linear-gradient(var(--bsi-shadow-1),var(--bsi-shadow-2) 55%,var(--bsi-shadow-3));clip-path:polygon(19% 0,81% 0,100% 100%,0 100%)}
 
 /* top bar */
-.bsi-top{position:relative;z-index:3;display:flex;justify-content:space-between;align-items:center;padding:24px}
+.bsi-top{display:flex;justify-content:space-between;align-items:center;padding:24px}
 .bsi .bsi-wordmark{font:700 24px/1 'DM Sans',sans-serif;letter-spacing:-.05em;color:var(--red);text-decoration:none}
 .bsi-wordmark small{margin-left:8px;font:500 12px/1 'DM Sans',sans-serif;letter-spacing:0;color:var(--bsi-soft)}
 
 /* the key, carrying the Buzzly mark */
-.bsi-drop{position:absolute;left:50%;top:88px;width:240px;height:240px;margin-left:-120px;z-index:1;animation:bsi-land .9s cubic-bezier(.2,.8,.2,1) both}
-.bsi-key{position:relative;width:100%;height:100%;border-radius:56px;display:grid;place-items:center;
-  transform:perspective(900px) rotateY(calc(var(--lx) * 12deg)) rotateX(calc(var(--ly) * -9deg));
-  background:linear-gradient(180deg,#2b2a2c 0%,#141315 42%,#070607 100%);
-  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55),inset 0 0 0 1px rgba(255,255,255,.06),inset 0 -12px 26px rgba(0,0,0,.75),0 34px 60px -22px rgba(0,0,0,.9)}
-.bsi-key svg{width:128px;height:128px;overflow:visible}
-.bsi-hex{fill:rgba(255,255,255,.04);stroke:rgba(255,255,255,.18);stroke-width:1.2}
-.bsi-trace{fill:none;stroke:#ef342d;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:90 910;animation:bsi-trace 5.5s linear infinite;filter:drop-shadow(0 0 4px rgba(239,52,45,.9))}
+.bsi-stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 16px 72px;text-align:center}
+.bsi-drop{width:168px;margin-bottom:28px}
+.bsi-key{position:relative;width:168px;height:168px;border-radius:40px;display:grid;place-items:center;overflow:hidden;
+  transform:perspective(900px) rotateY(calc(var(--lx) * 10deg)) rotateX(calc(var(--ly) * -8deg));
+  background:linear-gradient(145deg,#38373a 0%,#171618 46%,#070607 100%);
+  box-shadow:inset 1.5px 1.5px 0 rgb(255 255 255 / 42%),inset 0 0 0 1px rgb(255 255 255 / 6%),inset -8px -12px 24px rgb(0 0 0 / 70%)}
+.bsi-key svg{width:92px;height:92px}
+.bsi-hex{fill:rgb(255 255 255 / 4%);stroke:rgb(255 255 255 / 20%);stroke-width:1.2}
 .bsi-play{fill:#ef342d}
-.bsi-live{position:absolute;top:26px;right:28px;width:8px;height:8px;border-radius:50%;background:#ef342d;box-shadow:0 0 10px 1px rgba(239,52,45,.8)}
-.bsi-live::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:1px solid rgba(239,52,45,.7);animation:bsi-ping 2s ease-out infinite}
-.bsi-sheen{position:absolute;inset:0;border-radius:inherit;pointer-events:none;mix-blend-mode:screen;background:linear-gradient(115deg,transparent 36%,rgba(255,255,255,.16) 48%,rgba(255,255,255,.04) 56%,transparent 64%);background-size:260% 100%;background-position:calc(50% - var(--lx) * 60%) 0}
+.bsi-sheen{position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 36%,rgb(255 255 255 / 15%) 48%,rgb(255 255 255 / 4%) 56%,transparent 64%);background-size:260% 100%;background-position:calc(50% - var(--lx) * 60%) 0}
+/* light comes from the upper left, so the shadow sits low and a little right */
+.bsi-contact{display:block;width:150px;height:14px;margin:14px auto 0;border-radius:50%;
+  background:radial-gradient(ellipse at center,var(--bsi-contact) 0%,transparent 68%);
+  transform:translateX(calc(8px - var(--lx) * 6px))}
 
-/* copy and form, inside the shadow */
-.bsi-stage{position:absolute;left:50%;top:388px;width:320px;margin-left:-160px;text-align:center;z-index:2}
-.bsi-stage h1{margin:0 -80px 12px;font:400 54px/1 'Instrument Serif',serif;letter-spacing:-.02em;white-space:nowrap;color:var(--bsi-ink)}
-.bsi-c{display:inline-block;animation:bsi-char .65s cubic-bezier(.2,.8,.2,1) both}
-.bsi-sub{margin:0 0 24px;color:var(--bsi-soft);font-size:14px;line-height:1.5}
-.bsi-rise{animation:bsi-rise .8s cubic-bezier(.2,.8,.2,1) both}
+/* copy and form */
+.bsi-stage h1{margin:0 0 10px;font:700 40px/1.1 'DM Sans',sans-serif;letter-spacing:-.03em;color:var(--bsi-ink)}
+.bsi-sub{margin:0 0 28px;color:var(--bsi-soft);font-size:15px;line-height:1.5}
+.bsi-form{width:min(320px,100%)}
 .bsi .crm-form{gap:12px;text-align:left}
 .bsi .crm-form label{gap:8px;color:var(--bsi-soft);font-size:13px}
-.bsi .crm-form input{height:48px;background:var(--bsi-field);border-color:var(--bsi-field-line);color:var(--bsi-ink);font-size:16px;transition:border-color .25s}
+.bsi .crm-form input{height:48px;border-radius:10px;background:var(--bsi-field);border-color:var(--bsi-field-line);color:var(--bsi-ink);font-size:16px}
 .bsi .crm-form input:hover,.bsi .crm-form input:focus{border-color:var(--bsi-soft)}
-.bsi .crm-form .crm-btn.is-primary{position:relative;overflow:hidden;height:48px;justify-content:center;font-size:15px}
-.bsi .crm-form .crm-btn.is-primary::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;transform:skewX(-20deg);background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);animation:bsi-shine 4.5s 2.4s ease-in-out infinite}
+.bsi .crm-form .crm-btn.is-primary{height:48px;border-radius:10px;justify-content:center;font-size:15px}
 .bsi .crm-note{color:var(--bsi-soft);text-align:left}
 .bsi-terms{margin:20px 0 0;font-size:12px;line-height:1.5;color:var(--bsi-soft)}
 .bsi .bsi-terms a{color:var(--bsi-ink)}
 
-/* film */
-.bsi-vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 75% 80% at 50% 45%,transparent 55%,var(--bsi-vig) 100%)}
-.bsi-grain{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:var(--bsi-grain);mix-blend-mode:overlay}
-
-@keyframes bsi-fade{from{opacity:0}}
-@keyframes bsi-land{from{opacity:0;transform:translateY(-44px) scale(.94);filter:blur(12px)}}
-@keyframes bsi-char{from{opacity:0;transform:translateY(16px);filter:blur(10px)}}
-@keyframes bsi-rise{from{opacity:0;transform:translateY(16px)}}
-@keyframes bsi-trace{to{stroke-dashoffset:-1000}}
-@keyframes bsi-ping{0%{transform:scale(.6);opacity:1}100%{transform:scale(2.6);opacity:0}}
-@keyframes bsi-ring{0%{transform:scale(1);opacity:0}8%{opacity:.9}100%{transform:scale(4.8);opacity:0}}
-@keyframes bsi-shine{0%,55%{left:-60%}100%{left:130%}}
-@media (prefers-reduced-motion:reduce){.bsi *,.bsi *::before,.bsi *::after{animation:none!important;transition:none!important}}
+@media (prefers-reduced-motion:reduce){.bsi *{transition:none!important}}
 @media (max-width:600px){
-  .bsi{min-height:max(100vh,760px)}
   .bsi-top{padding:16px}
-  .bsi-drop{top:84px;width:180px;height:180px;margin-left:-90px}
-  .bsi-key{border-radius:44px}
-  .bsi-key svg{width:96px;height:96px}
-  .bsi-rings{top:270px}
-  .bsi-shadow{top:240px;width:380px;margin-left:-190px}
-  .bsi-stage{top:310px;width:min(320px,calc(100% - 32px));margin-left:0;transform:translateX(-50%)}
-  .bsi-stage h1{margin:0 0 12px;font-size:44px;white-space:normal}
+  .bsi-drop{width:128px;margin-bottom:24px}
+  .bsi-key{width:128px;height:128px;border-radius:32px}
+  .bsi-key svg{width:70px;height:70px}
+  .bsi-contact{width:114px}
+  .bsi-stage h1{font-size:32px}
 }

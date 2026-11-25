@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ArrowDownRight, ArrowUpRight, ChevronRight, Search } from "lucide-react";
-import { ENTITY_EMOJI, Emoji, type IconName } from "@/components/crm/emoji";
+import { Search } from "lucide-react";
+import { ENTITY_EMOJI, Emoji } from "@/components/crm/emoji";
 import Link from "@/components/Link";
 import type { CrmSummary, WeeklyScorecard } from "@/lib/crm-metrics";
 import { dateTime, money, number, percent } from "@/components/crm/format";
@@ -13,7 +13,7 @@ function Stat({ label, value, hint, href }: { label: string; value: string; hint
 }
 
 /** Bars stay neutral; only the row that matters (`highlight`) carries the accent. */
-/** Leads vs qualified leads, week by week, as two smooth lines (real CRM data only). */
+/** Leads vs qualified leads, week by week, as two smooth lines drawn from CRM records. */
 function Trend({ rows }: { rows: WeeklyScorecard["rows"] }) {
   const w = 600, h = 180;
   const max = Math.max(4, ...rows.map(r => r.leads)) * 1.15;
@@ -104,7 +104,7 @@ function RecentActivity({ rows }: { rows: Recent }) {
                 <li key={r.id}>
                   <Link href={ENTITY_HREF[r.entity] ?? "/admin"}>
                     <span className="as-tile"><Emoji name={ENTITY_EMOJI[r.entity] ?? "pin"} /></span>
-                    <span className="as-feed-text"><strong>{r.title}</strong><small>{r.section}{r.status ? ` · ${r.status}` : ""}</small></span>
+                    <span className="as-feed-text"><strong>{r.title}</strong><small>{r.section}{r.status ? `, ${r.status}` : ""}</small></span>
                     <time dateTime={r.updatedAt}>{ago(r.updatedAt)}</time>
                   </Link>
                 </li>
@@ -124,11 +124,11 @@ function QuickStats({ summary }: { summary: CrmSummary }) {
     { label: "Call show rate", value: summary.calls.showRate },
     { label: "Outreach reply rate", value: summary.gtm.replyRate },
   ];
-  const actions: { label: string; emoji: IconName; href: string }[] = [
-    { label: "Add lead", emoji: "lead", href: "/admin/leads?add=leads" },
-    { label: "Log a call", emoji: "phone", href: "/admin/sales?add=calls" },
-    { label: "Add prospect", emoji: "target", href: "/admin/calling?add=prospects" },
-    { label: "Plan client content", emoji: "planner", href: "/admin/content" },
+  const actions = [
+    { label: "Add lead", href: "/admin/leads?add=leads" },
+    { label: "Log a call", href: "/admin/sales?add=calls" },
+    { label: "Add prospect", href: "/admin/calling?add=prospects" },
+    { label: "Plan client content", href: "/admin/content" },
   ];
   return (
     <div className="as-side-stack">
@@ -146,16 +146,14 @@ function QuickStats({ summary }: { summary: CrmSummary }) {
       <section className="crm-panel as-card" aria-labelledby="dash-actions">
         <h3 id="dash-actions">Quick actions</h3>
         <div className="as-actions">
-          {actions.map(({ label, emoji, href }) => (
-            <Link key={label} href={href} className="as-action"><span className="as-tile is-red"><Emoji name={emoji} /></span>{label}<ChevronRight aria-hidden="true" /></Link>
-          ))}
+          {actions.map(({ label, href }) => <Link key={label} href={href} className="as-action">{label}</Link>)}
         </div>
       </section>
     </div>
   );
 }
 
-/** A small line chart with a soft fill and a dot on the latest week. Real weekly values only. */
+/** A small line chart with a soft fill and a dot on the latest week, drawn from the CRM's weekly values. */
 function Sparkline({ values, tone }: { values: number[]; tone: "ink" | "red" }) {
   const w = 300, h = 64, pad = 6;
   const max = Math.max(...values), min = Math.min(...values);
@@ -204,8 +202,7 @@ function StatCards({ summary }: { summary: CrmSummary }) {
               <strong>{value}</strong>
               {!flat && (
                 <span className={`as-delta${down ? " is-down" : ""}`}>
-                  {down ? <ArrowDownRight aria-hidden="true" /> : <ArrowUpRight aria-hidden="true" />}
-                  <span className="sr-only">{down ? "down" : "up"} </span>{Math.abs(trend.change! * 100).toFixed(1)}%
+                  <span aria-hidden="true">{down ? "−" : "+"}</span><span className="sr-only">{down ? "down" : "up"} </span>{Math.abs(trend.change! * 100).toFixed(1)}%
                 </span>
               )}
             </span>
@@ -271,7 +268,7 @@ export function Dashboard() {
         <section className="crm-panel as-card gd-trend-panel" aria-labelledby="dash-trend">
           <div className="gd-trend-head">
             <h3 id="dash-trend">Leads, last 8 weeks</h3>
-            <div className="gd-legend"><span><i />Leads</span><span><i className="is-qual" />Qualified</span><Link href="/admin/scorecard">Weekly scorecard →</Link></div>
+            <div className="gd-legend"><span><i />Leads</span><span><i className="is-qual" />Qualified</span><Link href="/admin/scorecard">Weekly scorecard</Link></div>
           </div>
           <Trend rows={weeks} />
         </section>
@@ -287,7 +284,7 @@ export function Dashboard() {
         <section className="crm-panel is-narrow" aria-labelledby="dash-pipeline">
           <h3 id="dash-pipeline">Sales pipeline</h3>
           <Bars rows={sales.byStage.map(s => ({ label: s.label, count: s.value }))} format={money} highlight="Won" />
-          <p className="crm-muted">Won so far {money(sales.wonValue)} · deal win rate {percent(sales.dealWinRate)}</p>
+          <p className="crm-muted">Won so far: {money(sales.wonValue)}. Deal win rate: {percent(sales.dealWinRate)}.</p>
         </section>
 
         <section className="crm-panel is-wide" aria-labelledby="dash-calls">
@@ -295,7 +292,7 @@ export function Dashboard() {
           {calls.upcoming.length
             ? <ul className="crm-list">{calls.upcoming.map(c => <li key={c.id}><b>{dateTime(c.when)}</b><span>{c.title}</span><small>{c.type}</small></li>)}</ul>
             : <p className="crm-muted">No calls scheduled</p>}
-          <p className="crm-muted">Completed this month {calls.completedThisMonth} · show rate {percent(calls.showRate)}</p>
+          <p className="crm-muted">Completed this month: {calls.completedThisMonth}. Show rate: {percent(calls.showRate)}.</p>
         </section>
 
         <section className="crm-panel is-narrow" aria-labelledby="dash-clients">

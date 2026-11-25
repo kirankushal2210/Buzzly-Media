@@ -5,16 +5,16 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "@/components/Link";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
-  Bell, Building2, CalendarCheck, CalendarRange, ChartColumn, ChevronRight, ChevronsLeft, ExternalLink, FlaskConical, Handshake,
-  LayoutDashboard, LogOut, Menu, PhoneCall, ScanSearch, Search, Send, Users, X, type LucideIcon,
+  Bell, Building2, CalendarCheck, CalendarRange, ChartColumn, FlaskConical, Globe, Handshake,
+  LayoutDashboard, LogOut, Menu, PanelLeftClose, PhoneCall, ScanSearch, Search, Send, Users, X, type LucideIcon,
 } from "lucide-react";
 import type { CrmSummary } from "@/lib/crm-metrics";
 import { Emoji, PAGE_EMOJI } from "@/components/crm/emoji";
 
 /**
- * The CRM workspace: a clean sidebar with every page grouped by job, a toolbar
- * (search, notifications, theme, sign out) and plain cards in Buzzly's colours.
- * Badges and notifications come from real CRM counts only. Styles: app/admin/shell.css (.as-*).
+ * The CRM workspace: a sidebar with every page grouped by job, a toolbar
+ * (search, notifications, theme, sign out) and unboxed content in neutral greys.
+ * Badges and notifications are counted from CRM records. Styles: app/admin/shell.css (.as-*).
  */
 export type ViewLink = { href: string; label: string; icon: LucideIcon; description: string };
 type Group = { label: string; views: ViewLink[] };
@@ -107,7 +107,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  // Real counts only: what needs a person, shown as badges and in the bell.
+  // Counted from CRM records: what needs a person, shown as badges and in the bell.
   const badges: Record<string, number> = summary ? {
     "/admin/leads": summary.leads.followUpsDue,
     "/admin/sales": summary.calls.upcoming.length,
@@ -156,9 +156,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
           ))}
         </nav>
         <div className="as-side-foot">
-          <Link href="/" target="_blank" title={collapsed ? "View site" : undefined}><ExternalLink aria-hidden="true" /><span className="as-nav-text">View site</span></Link>
+          <Link href="/" target="_blank" title={collapsed ? "View site" : undefined}><Globe aria-hidden="true" /><span className="as-nav-text">View site</span></Link>
           <button type="button" className="as-hide" onClick={toggleCollapsed} aria-expanded={!collapsed} title={collapsed ? "Show sidebar" : undefined}>
-            <ChevronsLeft aria-hidden="true" /><span className="as-nav-text">Hide</span>
+            <PanelLeftClose aria-hidden="true" /><span className="as-nav-text">Hide</span>
           </button>
         </div>
       </aside>
@@ -188,7 +188,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <div className="as-list">
             {results.map(({ href, label, description }) => (
               <button key={href} type="button" onClick={() => { setModal(null); router.push(href); }}>
-                <span className="as-tile"><Emoji name={PAGE_EMOJI[href] ?? "pin"} /></span><span><strong>{label}</strong><small>{description}</small></span><ChevronRight aria-hidden="true" />
+                <span className="as-tile"><Emoji name={PAGE_EMOJI[href] ?? "pin"} /></span><span><strong>{label}</strong><small>{description}</small></span>
               </button>
             ))}
             {results.length === 0 && <p className="as-empty" role="status">No matching page</p>}
@@ -200,7 +200,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <div className="as-list">
             {(attention ?? []).map(item => (
               <button key={item.text} type="button" onClick={() => { setModal(null); router.push(item.href); }}>
-                <span className="as-tile"><Emoji name={PAGE_EMOJI[item.href] ?? "bell"} /></span><span><strong>{item.n} {item.text}</strong><small>Open {VIEWS.find(v => v.href === item.href)?.label}</small></span><ChevronRight aria-hidden="true" />
+                <span className="as-tile"><Emoji name={PAGE_EMOJI[item.href] ?? "bell"} /></span><span><strong>{item.n} {item.text}</strong><small>Open {VIEWS.find(v => v.href === item.href)?.label}</small></span>
               </button>
             ))}
             {attention && attention.length === 0 && <p className="as-empty">You’re all caught up</p>}
